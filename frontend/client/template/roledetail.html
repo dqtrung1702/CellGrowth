@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container"  style="max-width: 40em;">
+    <div >              
+      <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('role_blueprint.Role') }}'"> Back to Roles screen</i>
+    </div>
+    <form method="POST">        
+        <div class="">
+          <h4>Role Info</h4>
+          <div class="input-group">
+              <label for="RoleName"><i class="fa fa-tag col-third">Role Name</i></label>
+              {% if role.get('RoleName') %} 
+                <input id="RoleName" type="text" disabled value="{{role.get('RoleName')}}"  placeholder="Role Name" name="RoleName"/>
+              {% else %}
+                <input id="RoleName" type="text"  placeholder="Role Name" name="RoleName"/>
+              {%endif%}
+          </div>
+          
+          <div class="input-group">
+            <label for="Description"><i class="fa fa-align-center">Description</i></label>
+            <input id ="Description" type="text" value="{{role.get('Description','')}}"  placeholder="Description" name="Description" />
+          </div>
+          
+          <div class="input-group">
+            
+            <div class="input-group col-half">
+              <i class="fa fa-history"></i>
+              <label for="LastUpdateDateTime">Last Update</label>
+              <input id = "LastUpdateDateTime" type="text" disabled value="{{role.get('LastUpdateDateTime','')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
+            </div>
+            <div class="input-group col-half">
+              <label for="LastUpdateUserName">by</label>
+              <input id = "LastUpdateUserName" type="text" disabled value="{{role.get('LastUpdateUserName','')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="xpermission"><i class="fa fa-check-circle">Permissions</i></label>            
+            <select id="xpermission" name="Permission">
+              
+            </select>            
+          </div>
+        </div>
+        <div class="input-group">            
+          <div class="col-half">
+            <button type="submit"><i class="fa fa-save"> Save</i></button>
+          </div>
+          <div class="col-half">              
+            <button type="button" onclick="window.location.href='{{ url_for('role_blueprint.role_detail', id = role.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
+          </div>
+        </div>
+        
+    </form>
+  </div>
+  <script>
+    $(document).ready(function(){
+      
+      const rolepermissions = {{ permissions | safe }};
+      var $xpermission = $('#xpermission');
+      $xpermission.select2({
+        placeholder: '--- SELECT ---',
+        allowClear: true,
+        tags: true,
+        multiple: true,
+        closeOnSelect: true,
+        // minimumInputLength: 2,
+        data: rolepermissions,
+        ajax: {          
+          url: "{{url_for('uaa_blueprint.getRolePermissionList')}}",
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: function (params) {
+            return JSON.stringify({
+              Code: params.Code || '',
+              page: params.page || 1
+            })
+          },
+          processResults: function (data,params) {
+            // var page = params.page;
+            var result = $.map(data, function (item){
+                return {
+                  text: item.text,
+                  id: item.id
+                };
+              });
+            return {
+              results: result,
+              pagination: {
+                more:data.length > 0
+              }
+            };
+          }
+        }
+      })
+      const permissionids = [];
+      for(const permission of {{ permissions | safe }}){               
+        permissionids.push(permission.id)
+      };
+      $xpermission.val(permissionids).trigger("change");   
+    });
+   
+    
+  </script>
+  
+{% endblock %}

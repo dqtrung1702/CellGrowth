@@ -1,0 +1,77 @@
+{% block base %}
+    
+    <head>
+        <!-- CSS -->   
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/select2.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet" />
+        
+        <!-- jQuery -->
+        <script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>        
+        <script src="{{ url_for('static', filename='js/pagination.js') }}"></script>
+
+        <!-- Image -->
+        <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/ico" />
+        {% block head %}        
+        {% endblock head %}
+        
+    </head>
+    <body>
+            <div class="col-fifth">
+                <nav class="accordion" >
+                    <header class="box">            
+                        <label for="acc-close" class="box-title"></label>
+                    </header>
+                    {% if not auth %}
+                    <input type="radio" name="accordion" id="login" />
+                    <section class="box">
+                        <label class="box-title" for="login"><a href="{{ url_for('auth_blueprint.login') }}">Login</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="Register" />
+                    <section class="box">
+                        <label class="box-title" for="Register"><a href="{{ url_for('auth_blueprint.register') }}">Register</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    {% else %}
+                    <input type="radio" name="accordion" id="Home" />
+                    <section class="box">
+                        <label class="box-title" for="Home"><a href="{{ url_for('home_blueprint.home') }}">Home</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="Users" />
+                    <section class="box">
+                        <label class="box-title" for="Users"><a href="{{ url_for('user_blueprint.User') }}">Users</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="Roles" />
+                    <section class="box">
+                        <label class="box-title" for="Roles"><a href="{{ url_for('role_blueprint.Role') }}">Roles</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="Permissions" />
+                    <section class="box">
+                        <label class="box-title" for="Permissions"><a href="{{ url_for('permission_blueprint.Permission') }}">Permissions</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="Logout" />
+                    <section class="box">
+                        <label class="box-title" for="Logout"><a href="{{ url_for('auth_blueprint.logout') }}">Logout</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                        <div class="box-content">Bye!</div>
+                    </section>
+                    {% endif %}
+                    <input type="radio" name="accordion" id="acc-close" />
+                </nav>
+            </div>
+            
+            <div class="col-xfifth">
+                {% block content %}
+                {% endblock %}
+            </div>
+        
+    </body>
+{% endblock %}

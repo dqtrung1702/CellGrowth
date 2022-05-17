@@ -1,0 +1,34 @@
+
+from flask import Flask
+from config import Config
+from models.database import db
+from flask_migrate import Migrate
+from modules.Authentication import authentication
+from modules.Set import route_set
+from modules.User import route_user
+from modules.Role import route_role
+from modules.Permission import route_permission
+from modules.ImportData import route_import
+from flask_cors import CORS
+
+app = Flask(__name__) # khởi tạo app
+CORS(app)
+app.config.from_object(Config) # đưa các thông tin từ config vào app
+db.init_app(app) # đưa các giá trị tham số từ app vào db
+migrate = Migrate(app, db) # thực hiện migrate bảng bằng flask_migrate, chạy lần lượt các lệnh trong list [export FLASK_APP=main.py, flask db init, flask db migrate, flask db upgrade, flask db downgrade]
+
+app.register_blueprint(authentication)
+app.register_blueprint(route_set)
+app.register_blueprint(route_role)
+app.register_blueprint(route_permission)
+app.register_blueprint(route_user)
+app.register_blueprint(route_import)
+
+
+
+@app.route('/')
+def index():
+    return 'The User and Authentication (UAA) services provides role-based access control (RBAC) for both internal services and user-facing applications. Although the UAA can use an internal identity store (e.g. MySQL or PostgreSQL), typically an external identity provider (IdP) is used.'
+
+if __name__ == '__main__':
+    app.run('0.0.0.0', '8081', debug=True)

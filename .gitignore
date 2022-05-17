@@ -1,0 +1,10 @@
+*.pyo
+*.sh
+*.pyc
+*.mo
+__pycache__
+.env
+test*
+venv
+log.txt
+runtime.log

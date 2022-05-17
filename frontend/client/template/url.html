@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container"  style="max-width: 100%;">
+    <div class="">
+        <div class="">
+            <h1>Url Access Rights</h1>
+        </div>
+    </div>
+    <div id="PermissionRole"></div>
+    <div class=" table-wrapper">
+        <div class="table-scroll">
+            <table id="UrlTable" class="table">
+                <thead>
+                    {% for key in urlpermission[0].keys() %}
+                        {%if key not in ['id','PermissionId']%}
+                            <th class="table__heading" scope="col">{{key}}</th>
+                        {% endif %}
+                    {% endfor %}
+                    <th class="table__heading" scope="col">Action</th>
+                </thead>
+                <tbody>
+                    {% for line in urlpermission %}
+                        <tr>  
+                            {% for col,value in line.items() %}
+                                {%if col not in ['id','PermissionId']%}
+                                    {%if col in ['Description','Type','Method','url']%}
+                                        <td contenteditable="true" class="table__content" data-heading={{col}} scope="col">
+                                            {{value}}
+                                        </td>
+                                    {%else%}
+                                        <td class="table__content" data-heading={{col}} scope="col">
+                                            {{value}}
+                                        </td>
+                                    {% endif %}
+                                                                                                               
+                                {% endif %}
+                            {% endfor %}
+                            <td style="width: 10em;">
+                                    <a onclick="save({{line}})">
+                                        <i class="fa fa-save" style="color: #F4D03F;"></i>
+                                    </a>
+                                    <a href="{{ url_for('uaa_blueprint.URLPermission') }}">
+                                        <i class="fa fa-undo" style="color: rgb(216, 195, 255);"></i>
+                                    </a>
+                                    <a href="{{ url_for('uaa_blueprint.URLPermission', id = line.get('id')) }}">
+                                        <i class="fa fa-remove" style="color: rgb(153, 153, 153);"></i>
+                                    </a>
+                                
+                            </td>
+                        </tr>                            
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+   
+   $(document).ready
+   (function()
+        {
+            const urlpermission = {{ urlpermission | safe }};
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "{{url_for('uaa_blueprint.getRolePermissionList')}}",
+                    data: JSON.stringify({'page':1, 'defaultstrolepermission':{}}), 
+                    contentType: "application/json; charset=utf-8",
+                    success: function(response, textStatus, jqXHR) 
+                    {
+                        if (textStatus == "success")
+                        {
+                            const PermissionList = JSON.parse(response);
+                            var $PermissionRole = $('#PermissionRole');
+                            console.log(PermissionList)
+                            $PermissionRole.select2({
+                            placeholder: '--- SELECT ---',
+                            allowClear: true,
+                            tags: true,
+                            multiple: true,
+                            closeOnSelect: true,
+                            data: PermissionList              
+                            });
+                            $PermissionRole.on('select2:select', function (e) {
+                            // Do something
+                            });
+                        }
+                    }
+                }
+            );
+            
+        }
+    );
+    function save(urlpermission) 
+    {
+      console.log(urlpermission);
+    }
+</script>
+{% endblock %}

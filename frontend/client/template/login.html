@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<div class="container col-half">
+    <div class="">
+        <img src="/static/images/login.jfif" height="350px">
+    </div>   
+    
+    <div>
+        <h2>Slogan!</h2>
+        <p>Introduction.</p>
+        <form method="post">
+            <div class="input-group">
+                <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
+            </div>
+            <div class="input-group">
+                <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
+            </div>
+            <div class="input-group">                
+                <input type="submit" value="Login">
+            </div>            
+        </form>
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{ error }}
+        {% endif %}  
+    </div>
+  </div>
+
+{% endblock %}

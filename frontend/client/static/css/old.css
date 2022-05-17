@@ -1,0 +1,248 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+body {
+  padding: 1em;
+  font-family: sans-serif;
+  font-size: 15px;
+  color: rgb(153, 153, 153);
+  background-color: #e3e3e3;
+}
+h1, h4 {
+  margin: 50px auto 50px auto;
+  text-align: center;
+}
+/* table */
+tr:hover {background-color: #fffdf2;}
+tr:nth-child(even){background-color: #f8f8f8;}
+td, th { padding: 8px; padding: .5rem;
+}
+th {
+  text-align: left;
+  font-weight: 300;
+  font-size: 20px;
+  font-size: 1.25rem;
+}
+td { font-family: sans-serif; }
+.table {
+  width: 100%;
+  padding: 1rem;
+}
+
+.table__heading { border-bottom: 2px solid #F4D03F; }
+.table-scroll {
+  height:50%;
+  overflow:auto;  
+  margin-top:20px;
+}
+
+/* Form */
+input, button,
+input[type="radio"] + label,
+input[type="checkbox"] + label:before,
+select option,
+select {
+  width: 100%;
+  padding: 1em;
+  line-height: 1.4;
+  background-color: #f9f9f9;
+  border: 1px solid #f9f9f9;
+  border-radius: 3px;
+  -webkit-transition: 0.35s ease-in-out;
+  -moz-transition: 0.35s ease-in-out;
+  -o-transition: 0.35s ease-in-out;
+  transition: 0.35s ease-in-out;
+  transition: all 0.35s ease-in-out;
+}
+input:focus {
+  outline: 0;
+  border-color: rgb(21, 0, 139);
+}
+input:focus + .input-icon i {
+  color: rgb(21, 0, 139);
+}
+input:focus + .input-icon:after {
+  border-right-color: rgb(21, 0, 139);
+}
+input[type="radio"] {
+  display: none;
+}
+input[type="radio"] + label,
+select {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  float: left;
+  border-radius: 0;
+}
+input[type="radio"] + label:first-of-type {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+input[type="radio"] + label:last-of-type {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+input[type="radio"] + label i {
+  padding-right: 0.4em;
+}
+input[type="radio"]:checked + label,
+input:checked + label:before,
+select:focus,
+select:active {
+  background-color: #F4D03F;
+  color: #fff;
+  border-color: #F4D03F;
+}
+input[type="checkbox"] {
+  display: none;
+}
+input[type="checkbox"] + label {
+  position: relative;
+  display: block;
+  padding-left: 1.6em;
+}
+input[type="checkbox"] + label:before {
+  position: absolute;
+  top: 0.2em;
+  left: 0;
+  display: block;
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  content: "";  
+}
+input[type="checkbox"] + label:after {
+  position: absolute;
+  top: 0.25em;
+  left: 0.1em;
+  font-size: 1em;
+  color: rgb(0, 0, 0);
+  opacity: 0;
+  font-family: FontAwesome;
+  content: "🗸";
+}
+
+input:checked + label:after {
+  opacity: 1;
+}
+
+input[type=submit],
+input[type=button]{
+	border-radius: 3px;
+  color: rgb(153, 153, 153);
+  border-radius: 0.3em;
+  background: #F4D03F;
+}
+input[type=submit]:hover,
+input[type=button]:hover{
+background: #FAD7A0;
+
+}
+select {
+  height: 3.4em;
+  line-height: 2;
+}
+select:first-of-type {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+select:last-of-type {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+select:focus,
+select:active {
+  outline: 0;  
+}
+button[type=submit],
+button[type=button] {
+  border-radius: 3px;
+  color: rgb(153, 153, 153);
+  border-radius: 0.3em;
+  background: #F4D03F;
+}
+button[type=submit]:hover,
+button[type=button]:hover{
+  color: rgb(223, 223, 223);
+  background: #FAD7A0;
+}
+select option {
+  background-color: rgb(21, 0, 139);
+  color: #fff;
+}
+.input-group {
+  margin-bottom: 1em;
+  zoom: 1;
+}
+.input-group:before,
+.input-group:after {
+  content: "";
+  display: table;
+}
+.input-group:after {
+  clear: both;
+}
+.container {
+  padding: 1em 3em 2em 3em;
+  margin: 0em auto;
+  background-color: #fff;
+  border-radius: 4.2px;
+  box-shadow: 0px 3px 10px -2px rgba(0, 0, 0, 0.2);
+}
+.row {
+  zoom: 1;
+}
+.row:before,
+.row:after {
+  content: "";
+  display: table;
+}
+.row:after {
+  clear: both;
+}
+.col-half {
+  padding-right: 10px;
+  float: left;
+  width: 50%;
+}
+.col-half:last-of-type {
+  padding-right: 0;
+}
+.col-third {
+  padding-right: 10px;
+  float: left;
+  width: 33.33333333%;
+}
+.col-third:last-of-type {
+  padding-right: 0;
+}
+.col-fifth {
+  padding-right: 10px;
+  float: left;
+  width: 20%;
+}
+.col-fifth:last-of-type {
+  padding-right: 0;
+}
+.col-xfifth {
+  padding-right: 10px;
+  float: left;
+  width: 80%;
+}
+.col-xfifth:last-of-type {
+  padding-right: 0;
+}
+
+.col-fifth:last-of-type {
+  padding-right: 0;
+}
+@media only screen and (max-width: 540px) {
+  .col-half {
+    width: 100%;
+    padding-right: 0;
+  }
+}
+

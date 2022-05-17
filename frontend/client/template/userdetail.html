@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container"  style="max-width: 40em;">
+    <div >              
+      <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('user_blueprint.User') }}'"> Back to Users screen</i>
+    </div>
+    <form method="POST">        
+        <div class="">
+          <h4>User Info</h4>
+          <div>
+            <div class="input-group">
+              <label for="UserName"><i class="fa fa-user col-third"> User Name</i></label>                
+              <input id="UserName" type="text" disabled value="{{user.get('UserName')}}"  placeholder="User Name" name="UserName"/>              
+            </div>
+            <div class="input-group">
+              {% if user.get('UserLocked')== True %}
+                <input id="UserLocked" checked type="checkbox" name="UserLocked" />
+              {% else %}
+                <input id="UserLocked" type="checkbox" name="UserLocked" />
+              {% endif %}
+              <label for="UserLocked"> UserLocked</label>
+            </div>
+          </div>
+          <div class="input-group">
+            <input id="PasswordChanging"  onclick="chg_pass()" type="checkbox" class=""/>
+            <label for="PasswordChanging" class=""><i class="fa fa-key"> Need to change password?</i></label>
+            <input style="display: none;" disabled type="password" id="inputPassword" placeholder="New Password" name="Password"/>                          
+        </div>
+          <div class="input-group">
+            <label for="NameDisplay"><i class="fa fa-tag"> Name Display</i></label>
+            <input id ="NameDisplay" type="text" value="{{user.get('NameDisplay')}}"  placeholder="Name Display" name="NameDisplay" />
+          </div>
+          <div class="input-group">
+            <label for="DataPermission"><i class="fa fa-table"> Data-Permission</i></label>            
+            <select id="DataPermission" name="DataPermission"></select>            
+          </div>
+          <div class="input-group">
+            <i class="fa fa-history"></i>
+            <label for="LastSignOnDateTime"> Last SignOn</label>
+            <input id = "LastSignOnDateTime" type="text" disabled value="{{user.get('LastSignOnDateTime')}}"  placeholder="Last SignOn DateTime" name="LastSignOnDateTime" />
+            
+            <div class="input-group col-half">
+              <label for="LastUpdateDateTime">Last Update</label>
+              <input id = "LastUpdateDateTime" type="text" disabled value="{{user.get('LastUpdateDateTime')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
+            </div>
+            <div class="input-group col-half">
+              <label for="LastUpdateUserName">by</label>
+              <input id = "LastUpdateUserName" type="text" disabled value="{{user.get('LastUpdateUserName')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="xrole"><i class="fa fa-lock"> Roles</i></label>            
+            <select id="xrole" name="xrole"></select>            
+          </div>
+        </div>
+        <div class="input-group">            
+          <div class="col-half ">
+            <button type="submit"><i class="fa fa-save"> Save</i></button>
+          </div>
+          <div class="col-half">
+            <button type="button" onclick="window.location.href='{{ url_for('user_blueprint.user_detail', id = user.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
+          </div>
+        </div>
+    </form>
+  </div>
+  <script>
+    $(document).ready(function(){
+      // RoleList
+      const userroles = {{ roles | safe }};
+      var $xrole = $('#xrole');
+      $xrole.select2({
+        placeholder: '--- SELECT ---',
+        allowClear: true,
+        tags: true,
+        multiple: true,
+        closeOnSelect: true,
+        // minimumInputLength: 2,
+        data: userroles,
+        ajax: {          
+          url: "{{url_for('role_blueprint.getRoleList')}}",
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: function (params) {
+            return JSON.stringify({
+              Code: params.Code || '',
+              page: params.page || 1
+            })
+          },
+          processResults: function (data,params) {
+            // var page = params.page;
+            var result = $.map(data, function (item){
+                return {
+                  text: item.text,
+                  id: item.id
+                };
+              });
+            return {
+              results: result,
+              pagination: {
+                more:data.length > 0
+              }
+            };
+          }
+        }
+      })
+      const roleids = [];
+      for(const role of {{ roles | safe }}){               
+        roleids.push(role.id)
+      };
+      $xrole.val(roleids).trigger("change");      
+      // DataPermissionList
+      const datapermission = {{ datapermission | tojson }};
+      var datapermissionlist = [datapermission];
+      var $DataPermission = $('#DataPermission');
+      $DataPermission.select2({
+        placeholder: '--- SELECT ---',
+        allowClear: true,
+        tags: true,
+        multiple: true,
+        closeOnSelect: true,
+        // minimumInputLength: 2,
+        data: datapermissionlist,
+        ajax: {          
+          url: "{{url_for('permission_blueprint.getDataPermissionList')}}",
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: function (params) {
+            return JSON.stringify({
+              Code: params.Code,
+              page: params.page || 1
+            })
+          },
+          processResults: function (data,params) {
+            // var page = params.page;
+            var result = $.map(data, function (item){
+                return {
+                  text: item.text,
+                  id: item.id
+                };
+              });
+            return {
+              results: result,
+              pagination: {
+                more:data.length > 0
+              }
+            };
+          }
+        }
+      });
+      var datapermissionid = datapermission.id;
+      $DataPermission.val(datapermissionid).trigger("change");
+    });
+    
+    function chg_pass() 
+    {
+      // Get the checkbox
+      var checkBox = document.getElementById("PasswordChanging");
+      // Get the output text
+      var inputPassword = document.getElementById("inputPassword");
+
+      // If the checkbox is checked, display the output text
+      if (checkBox.checked == true){
+        inputPassword.style.display = "block";
+        inputPassword.disabled  = false
+      } else {
+        inputPassword.style.display = "none";
+        inputPassword.disabled  = true
+      }
+    }
+    
+  </script>
+  
+{% endblock %}
