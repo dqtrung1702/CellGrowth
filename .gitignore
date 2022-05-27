@@ -4,7 +4,7 @@
 *.mo
 __pycache__
 .env
-test*
+# test*
 venv
 log.txt
 runtime.log
