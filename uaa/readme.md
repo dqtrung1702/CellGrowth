@@ -11,7 +11,12 @@ sudo apt install git # version control system
 git --version
 git init
 git clone https://github.com/dqtrung1702/UAA.git
+
+sudo service postgresql restart
+cd UAA
+virtualenv venv
+source venv/bin/activate
+cd uaa
+pip3 install -r requirements.txt
+python3 main.py
 ```
-
-cd UAA/uaa/test
-
