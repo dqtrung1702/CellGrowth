@@ -7,7 +7,6 @@ import time
 print(time.tzname)
 print(datetime.now())
 print(datetime.utcnow())
-print(datetime.strptime('20/08/2021 23:59:59','%d/%m/%Y %H:%M:%S'))
 
 
 
@@ -19,3 +18,7 @@ dt_local = dt_utc.astimezone(local_zone)
 print(dt_local)
 dt_utc2 = dt_local.astimezone(pytz.utc)
 print(dt_utc2)
+
+
+print(datetime.strftime(dt_utc2,'%d/%m/%Y %H:%M:%S'))
+print(datetime.strptime('20/08/2021 23:59:59','%d/%m/%Y %H:%M:%S'))
