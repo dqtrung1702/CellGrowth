@@ -121,11 +121,13 @@ sudo apt install npm
 npm -v or npm –version
 ```
 ## Install Angular
-* sudo npm uninstall -g angular-cli
-* sudo npm uninstall -g @angular/cli
-* sudo npm cache clear --force
-* sudo npm install -g @angular/cli@latest
-* Gen frontend - Angular-client
+```
+sudo npm uninstall -g angular-cli
+sudo npm uninstall -g @angular/cli
+sudo npm cache clear --force
+sudo npm install -g @angular/cli@latest
+```
+* Tạo frontend - Angular-client
 
 # Show PID/Program name - kill program running
 * sudo apt install net-tools
