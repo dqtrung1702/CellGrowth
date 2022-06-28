@@ -142,7 +142,8 @@ input[type="checkbox"] + label:before {
   width: 1em;
   height: 1em;
   padding: 0;
-  content: "";  
+  content: "";
+  border: 1px solid rgb(153, 153, 153); 
 }
 input[type="checkbox"] + label:after {
   position: absolute;
