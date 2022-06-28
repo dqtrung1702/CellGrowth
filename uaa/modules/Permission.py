@@ -91,7 +91,8 @@ def getPermissionList():
 def getPermissionInfo():
     if True:
         data= json.loads(request.data)
-        PermissionIds = data.getlist("ids")
+        # PermissionIds = data.getlist("ids")
+        PermissionIds = data.get("ids")
         PermissionIds.append('0')
         sql = '''select
                     pd."id",

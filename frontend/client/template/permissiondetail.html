@@ -70,7 +70,7 @@
       const PermissionId = {{permission.get('id')}};
       $.ajax({
           type: "POST",
-          url: "{{url_for('uaa_blueprint.getURLbyPermission')}}",
+          url: "{{url_for('permission_blueprint.getURLbyPermission')}}",
           data: JSON.stringify({'PermissionId':PermissionId}),
           contentType: "application/json; charset=utf-8",
           success: function (response, textStatus, jqXHR) {
