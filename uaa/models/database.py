@@ -23,6 +23,8 @@ class BaseModel(db.Model):
     Không có  foreign-key nên khi query cần join nhiều bảng thì viết câu query và chạy qua class sqlexec
     """
     __abstract__ = True
+    def __init__(self, sql):
+        self.sql = sql
 
     def json(self):
         """Define a base way to jsonify models, dealing with datetime objects"""
@@ -33,7 +35,18 @@ class BaseModel(db.Model):
                 value = self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
                 r.update({column:value})        
         return r
-    
+        
+    def xquery(self):
+        record = db.engine.execute(self.sql).mappings().all()
+        result = []
+        for row in record:
+            line = {}
+            for key,val in row.items():
+                value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+                line.update({key:value}) 
+            result.append(line)
+        return result
+
     def add(self):
         db.session.add(self)
         db.session.commit()

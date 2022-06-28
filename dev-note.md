@@ -125,10 +125,16 @@ npm -v or npm –version
 sudo npm uninstall -g angular-cli
 sudo npm uninstall -g @angular/cli
 sudo npm cache clear --force
-sudo npm install -g @angular/cli@latest
+sudo npm install -g @angular/cli@8          #Angular 8
+sudo npm install -g @angular/cli@9          #Angular 9
+sudo npm install -g @angular/cli@10         #Angular 10
+sudo npm install -g @angular/cli@latest     #Angular latest
+ng --version
 ```
-* Tạo frontend - Angular-client
-
+# Create a workspace and initial application: frontend - Angular-client
+```
+ng new A-frontend
+```
 # Show PID/Program name - kill program running
 * sudo apt install net-tools
 * sudo netstat -tulpn
