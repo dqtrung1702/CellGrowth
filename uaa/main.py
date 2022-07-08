@@ -10,6 +10,8 @@ from modules.Role import route_role
 from modules.Permission import route_permission
 from modules.ImportData import route_import
 from flask_cors import CORS
+# Mặc dù SOP(same origin policy) có hiệu quả trong việc ngăn chặn việc truy cập trái phép từ các domain khác nhau nhưng đồng thời nó cũng ngăn cản những tương tác hợp lệ giữa các server hoặc client đáng tin cậy. Ví dụ như api.example.com và image.example.com, hai domain này chắc chắn là không cùng origin rồi.
+# CORS (Cross Origin Resource Sharing) là một tính năng mới được tích hợp trong HTML5, thêm vào các HTTP headers chỉ dẫn cho trình duyệt web về sử dụng và quản lý nội dung cross-domain, cho phép lấy dữ liệu từ một trang khác thông qua XMLHttpRequest
 
 app = Flask(__name__) # khởi tạo app
 CORS(app)
