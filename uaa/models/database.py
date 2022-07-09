@@ -84,7 +84,7 @@ class UserDefine(BaseModel, db.Model):
 
     id = db.Column(db.Integer, primary_key = True, nullable=False)
     SetId = db.Column(db.Integer)
-    Code = db.Column(db.String(50), nullable=False, unique=True)
+    UserName = db.Column(db.String(50), nullable=False, unique=True)
     PersonId = db.Column(db.Integer)
     DataPermission = db.Column(db.Integer)
     Password = db.Column(db.LargeBinary(500), nullable=False)
@@ -115,6 +115,7 @@ class UserDefine(BaseModel, db.Model):
             value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
+
 class RoleDefine(BaseModel, db.Model):
     """Model for the RoleDefine table"""
     # Tạo bảng RoleDefine 
