@@ -21,10 +21,22 @@ class BaseModel(db.Model):
     """
     Các object không sử dụng foreign-key vì hệ thống viết theo kiến trúc microservice rất nhiều bảng chứa ID của bảng nằm trên service khác.
     Không có  foreign-key nên khi query cần join nhiều bảng thì viết câu query và chạy qua class sqlexec
+    Mỗi lần deploy mà đồng bộ dữ liệu cũ xong cần cover lại đống seq sinh id của các bảng.
     """
     __abstract__ = True
-    def __init__(self, sql):
-        self.sql = sql
+    # def __init__(self, sql):
+    #     self.sql = sql
+    
+    # def xquery(self):
+    #     record = db.engine.execute(self.sql).mappings().all()
+    #     result = []
+    #     for row in record:
+    #         line = {}
+    #         for key,val in row.items():
+    #             value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+    #             line.update({key:value}) 
+    #         result.append(line)
+    #     return result
 
     def json(self):
         """Define a base way to jsonify models, dealing with datetime objects"""
@@ -35,18 +47,6 @@ class BaseModel(db.Model):
                 value = self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
                 r.update({column:value})        
         return r
-        
-    def xquery(self):
-        record = db.engine.execute(self.sql).mappings().all()
-        result = []
-        for row in record:
-            line = {}
-            for key,val in row.items():
-                value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
-                line.update({key:value}) 
-            result.append(line)
-        return result
-
     def add(self):
         db.session.add(self)
         db.session.commit()
@@ -83,10 +83,8 @@ class UserDefine(BaseModel, db.Model):
     __table_args__ = {"schema": "uaa"}
 
     id = db.Column(db.Integer, primary_key = True, nullable=False)
-    SetId = db.Column(db.Integer)
-    UserName = db.Column(db.String(50), nullable=False, unique=True)
+    UserName = db.Column(db.String(50), nullable=False, unique=True,default='False')
     PersonId = db.Column(db.Integer)
-    DataPermission = db.Column(db.Integer)
     Password = db.Column(db.LargeBinary(500), nullable=False)
     UserLocked = db.Column(db.Boolean,default=False)
     NameDisplay = db.Column(db.String(100))
@@ -207,26 +205,46 @@ class RolePermission(BaseModel, db.Model):
             value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
-class SetDefine(BaseModel, db.Model):
-
-
-    """Model for the SetDefine table"""
+class SetTbl(BaseModel, db.Model):
+    """Model for the SetTbl table"""
     """
-    BU hình dung như COA
-    SetId một cách để chia sẻ dữ liệu master data, giúp giảm dữ liệu bằng cách để các BU dùng chung dữ liệu master data
-    
-    BU hướng tới việc tổ chức công ty: BU theo đơn vị, vùng miền, cơ cấu tổ chức - trụ sở, chi nhánh, phòng ban
-    SetID tổ chức dữ liệu trong hệ thống - chi sẻ dữ liệu master data giữa các BU
-
-    thiết lập BU cho trụ sở, set SetId = 1, tương tự với chi nhánh A, user có setid = 1, xử lý được cv ở trụ sở và chi nhánh A
-    SetId = 2 cho chi nhanh B xử lý cv ở chi nhanh B
+    Những dữ liệu masterdata cần giới hạn truy xuất của user sẽ tạo các bộ dữ liệu(set) các Set này có thể dùng chung hoặc riêng bằng cách gán vào các DataPermission
     """
-    # Tạo bảng SetDefine 
-    __tablename__ = 'SetDefine'
+    # Tạo bảng SetTbl 
+    __tablename__ = 'SetTbl'
     __table_args__ = {"schema": "uaa"}
 
     id = db.Column(db.Integer, primary_key = True, nullable=False)
+    EFFFDate = db.Column(db.Date,default=date.today())
+    EFFTDate = db.Column(db.Date)
+    BUId = db.Column(db.Integer)
+    Type = db.Column(db.String(10))
     Code = db.Column(db.String(50), nullable=False, unique=True)
+    Description = db.Column(db.String(150))
+    LastUpdateUserName = db.Column(db.String(50))
+    LastUpdateDateTime = db.Column(db.DateTime)    
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        r = ''
+        for item in self.__dict__:
+            column = item
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            r += f'\n{column} = {value}'
+        return r
+class BU(BaseModel, db.Model):
+    """Model for the BU table"""
+    """
+    BU chỉ ra cách tổ chức cấu trúc của công ty, doanh nghiệp một cách logic, dữ liệu được phân chia theo cấu trúc BU.
+    """
+    # Tạo bảng BU 
+    __tablename__ = 'BU'
+    __table_args__ = {"schema": "uaa"}
+
+    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    xCode = db.Column(db.String(50), nullable=False, unique=True)
     Description = db.Column(db.String(150))
     LastUpdateUserName = db.Column(db.String(50))
     LastUpdateDateTime = db.Column(db.DateTime)    
@@ -248,10 +266,10 @@ class URLPermission(BaseModel, db.Model):
     __table_args__ = {"schema": "uaa"}
 
     id = db.Column(db.Integer, primary_key = True, nullable=False)
+    PermissionId = db.Column(db.Integer, nullable=False)
     url = db.Column(db.String(150), nullable=False)
     EFFFDate = db.Column(db.Date,default=date.today())
     EFFTDate = db.Column(db.Date)
-    PermissionId = db.Column(db.Integer, nullable=False)
     Method = db.Column(db.String(10))
     Description = db.Column(db.String(100))
     Type = db.Column(db.String(10))
@@ -268,7 +286,52 @@ class URLPermission(BaseModel, db.Model):
             value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
+class DataPermission(BaseModel, db.Model):
+    """Model for the DataPermission table"""
+    # Tạo bảng DataPermission 
+    __tablename__ = 'DataPermission'
+    __table_args__ = {"schema": "uaa"}
 
+    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    UserId = db.Column(db.Integer, nullable=False)
+    PermissionId = db.Column(db.Integer, nullable=False)
+    Description = db.Column(db.String(100))
+    LastUpdateUserName = db.Column(db.String(50))
+    LastUpdateDateTime = db.Column(db.DateTime)    
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        r = ''
+        for item in self.__dict__:
+            column = item
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            r += f'\n{column} = {value}'
+        return r
+class DataSet(BaseModel, db.Model):
+    """Model for the DataPermission table"""
+    # Tạo bảng DataSet 
+    __tablename__ = 'DataSet'
+    __table_args__ = {"schema": "uaa"}
+
+    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    DataPermissionId = db.Column(db.Integer, nullable=False)
+    SetId = db.Column(db.Integer, nullable=False)
+    Description = db.Column(db.String(100))
+    LastUpdateUserName = db.Column(db.String(50))
+    LastUpdateDateTime = db.Column(db.DateTime)    
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        r = ''
+        for item in self.__dict__:
+            column = item
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            r += f'\n{column} = {value}'
+        return r
 """Note:
     Query sample:
         peter = User.query.filter_by(username='peter').first()

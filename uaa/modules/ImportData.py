@@ -3,7 +3,7 @@ from models.database import UserRole
 from models.database import RolePermission
 from models.database import PermissionDefine
 from models.database import URLPermission
-from models.database import SetDefine
+from models.database import SetTbl
 from models.database import RoleDefine
 from models.database import sqlexec
 from flask import Blueprint, request
@@ -131,13 +131,13 @@ def importUser():
                             dtprmsn = PermissionDefine.query.filter_by(Code = DataPermission).first()
                     update_pay_load.update({'DataPermission':dtprmsn.id})
                 if SetCode:
-                    set = SetDefine.query.filter_by(Code = SetCode).first()
+                    set = SetTbl.query.filter_by(Code = SetCode).first()
                     if not set:
                         Description = user.get('SetCode')
                         set_pay_load = {"Code":SetCode,"Description":Description}
                         set_res = requests.post(url+'addSet', data=json.dumps(set_pay_load), cookies = request.cookies)
                         if set_res.status_code == 200 and set_res.json().get('status','') == 'OK':
-                            set = SetDefine.query.filter_by(Code = SetCode).first()
+                            set = SetTbl.query.filter_by(Code = SetCode).first()
                     update_pay_load.update({'SetId':set.id})
                 update_res = requests.post(url+'updateUser', data=json.dumps(update_pay_load), cookies = request.cookies)
                 if update_res.status_code == 200 and update_res.json().get('status','') == 'OK':

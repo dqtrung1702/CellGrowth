@@ -5,6 +5,7 @@ from models.database import db
 from flask_migrate import Migrate
 from modules.Authentication import authentication
 from modules.Set import route_set
+from modules.BU import route_bu
 from modules.User import route_user
 from modules.Role import route_role
 from modules.Permission import route_permission
@@ -21,6 +22,7 @@ migrate = Migrate(app, db) # thực hiện migrate bảng bằng flask_migrate, 
 
 app.register_blueprint(authentication)
 app.register_blueprint(route_set)
+app.register_blueprint(route_bu)
 app.register_blueprint(route_role)
 app.register_blueprint(route_permission)
 app.register_blueprint(route_user)
