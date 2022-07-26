@@ -164,6 +164,7 @@ def searchURLPermission():
         else:
             EFFTDate_F = datetime.strptime('01/01/0001','%d/%m/%Y')
             EFFTDate_T = datetime.now()
+        PermissionId = data.get("PermissionId",0)
         sql = '''select
                     up."id",
                     up."EFFFDate",
@@ -183,16 +184,17 @@ def searchURLPermission():
                   and (up."EFFFDate" <= '{2}' or '{2}' = '')
                   and (up."EFFTDate" >= '{3}' or '{3}' = '')
                   and (up."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (up."url" ~ '({5})' or '{5}' = '')
-                  and (up."Method" ~ '({6})' or '{6}' = '')
-                  and (up."Type"  ~ '({7})' or '{7}' = '')
-                  and (up."Description"  ~ '({8})' or '{8}' = '')
-                  and (up."LastUpdateUserName"  ~ '({9})' or '{9}' = '')
-                  and (up."LastUpdateDateTime" >= '{10}' or '{10}' = '')
-                  and (up."LastUpdateDateTime" <= '{11}' or '{11}' = '')
+                  and (up.PermissionId = {5} or {5} = 0)
+                  and (up."url" ~ '({6})' or '{6}' = '')
+                  and (up."Method" ~ '({7})' or '{7}' = '')
+                  and (up."Type"  ~ '({8})' or '{8}' = '')
+                  and (up."Description"  ~ '({9})' or '{9}' = '')
+                  and (up."LastUpdateUserName"  ~ '({10})' or '{10}' = '')
+                  and (up."LastUpdateDateTime" >= '{11}' or '{11}' = '')
+                  and (up."LastUpdateDateTime" <= '{12}' or '{12}' = '')
                 ORDER BY up.id
-                OFFSET {12} ROWS 
-                FETCH FIRST {13} ROW ONLY;'''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
+                OFFSET {13} ROWS 
+                FETCH FIRST {14} ROW ONLY;'''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
         sql2 = '''select sum(1) 
                 from
                     uaa."PermissionDefine" pd
@@ -202,14 +204,15 @@ def searchURLPermission():
                   and (up."EFFFDate" <= '{2}' or '{2}' = '')
                   and (up."EFFTDate" >= '{3}' or '{3}' = '')
                   and (up."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (up."url" ~ '({5})' or '{5}' = '')
-                  and (up."Method" ~ '({6})' or '{6}' = '')
-                  and (up."Type"  ~ '({7})' or '{7}' = '')
-                  and (up."Description"  ~ '({8})' or '{8}' = '')
-                  and (up."LastUpdateUserName"  ~ '({9})' or '{9}' = '')
-                  and (up."LastUpdateDateTime" >= '{10}' or '{10}' = '')
-                  and (up."LastUpdateDateTime" <= '{11}' or '{11}' = '')
-                  '''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
+                  and (up.PermissionId = {5} or {5} = 0)
+                  and (up."url" ~ '({6})' or '{6}' = '')
+                  and (up."Method" ~ '({7})' or '{7}' = '')
+                  and (up."Type"  ~ '({8})' or '{8}' = '')
+                  and (up."Description"  ~ '({9})' or '{9}' = '')
+                  and (up."LastUpdateUserName"  ~ '({10})' or '{10}' = '')
+                  and (up."LastUpdateDateTime" >= '{11}' or '{11}' = '')
+                  and (up."LastUpdateDateTime" <= '{12}' or '{12}' = '')
+                  '''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
         data = sqlexec(sql)
         total_row = sqlexec(sql2)
         res = json.dumps({"data":data.json(),"total_row":total_row.json(),"status":"OK"},default=json_util.default).encode('utf-8')
