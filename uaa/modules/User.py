@@ -10,7 +10,7 @@ from bson import json_util
 import json
 from werkzeug.wrappers import Response
 from datetime import datetime
-from modules.common import check_userurl,hashed_password
+from modules.common import check_auth,hashed_password
 
 route_user = Blueprint('route_user', __name__)
 
@@ -19,9 +19,9 @@ def before_request_func():
     # các request tới route_user đều phải qua đây trước
     jwt_token = request.cookies.get('app_token', None)
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-    auth_user = UserDefine.query.filter_by(id = auth_info['UserId']).first()
-    if auth_user and check_userurl(auth_info['UserId'],request.url,request.method,'Function'):
-        auth_info.update({'Username':auth_user.UserName})
+    auth,UserName = check_auth(auth_info['UserId'],request.url,request.method,'Function')
+    if auth:
+        auth_info.update({'Username':UserName})
         setattr(request, "auth_info", auth_info)
     else:
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')
@@ -40,30 +40,10 @@ def getUserInfobyUserId():
                     ud."UserLocked",
                     ud."LastSignOnDateTime",
                     ud."LastUpdateUserName",
-                    ud."LastUpdateDateTime",
-                    ud."DataPermission" "DataPermissionId",
-                    pd."Code" "DataPermission",
-                    STRING_AGG(rd."Code",',' order by rd."id")
+                    ud."LastUpdateDateTime"
                 from
                     uaa."UserDefine" ud
-                left join uaa."PermissionDefine" pd on
-                    pd."id" = ud."DataPermission"
-                    and pd."PermissionType" = 'DATA'
-                left join uaa."UserRole" ur on
-                    ur."UserId" = ud."id"
-                join uaa."RoleDefine" rd on
-                    rd."id" = ur."RoleId"
-                where ud.id = {}
-                Group by ud."id",
-                    ud."UserName",
-                    ud."NameDisplay",
-                    ud."PersonId",
-                    ud."UserLocked",
-                    ud."LastSignOnDateTime",
-                    ud."LastUpdateUserName",
-                    ud."LastUpdateDateTime",
-                    ud."DataPermission",
-                    pd."Code";'''.format(UserId)        
+                where ud.id = {} ;'''.format(UserId)        
         data = sqlexec(sql)
         res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
@@ -235,5 +215,38 @@ def changeUserRoles():
         for userrole in UserRole.query.filter_by(UserId=UserId).all():
             userroles.append(userrole.json())
         res = json.dumps({"data":userroles,"status":"OK"},default=json_util.default).encode('utf-8')
+        status = 200
+    return Response(res, mimetype='application/json', status=status)
+
+from urllib.parse import urlsplit
+@route_user.route('/check_auth_ext',methods =['POST'])
+def check_auth_ext():
+    if True:
+        auth_info = request.auth_info
+        data = json.loads(request.data)
+        url = urlsplit(data.get("url").strip().lower())
+        method = data.get("method")
+        type = data.get("type")
+        UserId =  auth_info.get("UserId")
+        sql = '''select
+                    True "Auth",
+                    ud."UserName"
+                from uaa."UserDefine" ud 
+                join uaa."UserRole" ur on
+                    ur."UserId" = ud."id"
+                join uaa."RolePermission" rp on
+                    rp."RoleId" = ur."RoleId"
+                join uaa."URLPermission" up on
+                    up."PermissionId" = rp."PermissionId" 
+                and up."url" = '{}'
+                and up."Method" = '{}'
+                and up."Type" = '{}'              
+                where ur."id" = {}
+                limit 1;'''.format(url.path,method,type,UserId)
+        data = sqlexec(sql).json()
+        if data:
+            res = json.dumps({"data":data[0],"status":"OK"},default=json_util.default).encode('utf-8')
+        else:
+            res = json.dumps({"data":{"Auth":False,"UserName":None},"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)

@@ -29,8 +29,7 @@ def login():
                     payload = {}
                     # basic info
                     payload.update({'exp': datetime.utcnow() + timedelta(seconds=Config.JWT_EXP_DELTA_SECONDS)})# truyền vào hàm jwt.encode là gmt, lúc jwt.deceode lại trả ra timezone server(gmt + 7) 
-                    
-                    payload.update({'DataPermission':user.DataPermission})
+                    payload.update({'UserId':user.id})
                     # gen token 4 auth
                     jwt_token = jwt.encode(payload, Config.JWT_SECRET, Config.JWT_ALGORITHM)
                     # Response

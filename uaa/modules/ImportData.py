@@ -14,7 +14,7 @@ import json
 from werkzeug.wrappers import Response
 import requests
 from datetime import datetime
-from modules.common import check_userurl,hashed_password
+from modules.common import check_auth,hashed_password
 
 route_import = Blueprint('route_import', __name__)
 
@@ -23,8 +23,9 @@ def before_request_func():
     # các request tới route_import đều phải qua đây trước
     jwt_token = request.cookies.get('app_token', None)
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-    auth_user = UserDefine.query.filter_by(Code = auth_info['Code']).first()
-    if auth_user and check_userurl(auth_info['id'],request.url,'privAPI',request.method):
+    auth,UserName = check_auth(auth_info['UserId'],request.url,request.method,'Function')
+    if auth:
+        auth_info.update({'Username':UserName})
         setattr(request, "auth_info", auth_info)
     else:
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')

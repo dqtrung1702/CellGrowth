@@ -9,13 +9,16 @@ def hashed_password(Password):
 def check_password(hashPassword:bytes, Password:str):
     return checkpw(Password.encode('utf-8'),hashPassword) 
 
-def check_userurl(UserId,url,method,type):
+def check_auth(UserId,url,method,type):
     url = urlsplit(url.strip().lower())
-    print(url.path,method,type,UserId)
     if True:
+        if url.path == '/check_auth_ext':
+            return True,None
         sql = '''select
-                    1
-                from uaa."UserRole" ur
+                    ud."UserName"
+                from uaa."UserDefine" ud 
+                join uaa."UserRole" ur on
+                    ur."UserId" = ud."id"
                 join uaa."RolePermission" rp on
                     rp."RoleId" = ur."RoleId"
                 join uaa."URLPermission" up on
@@ -23,10 +26,9 @@ def check_userurl(UserId,url,method,type):
                 and up."url" = '{}'
                 and up."Method" = '{}'
                 and up."Type" = '{}'              
-                where ur."UserId" = {}
+                where ur."id" = {}
                 limit 1;'''.format(url.path,method,type,UserId)
         data = sqlexec(sql).json()
-        print('data',data)
         if data:
-            return True
-    return False
+            return True,data.get('UserName')        
+    return False,None

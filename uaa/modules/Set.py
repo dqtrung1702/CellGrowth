@@ -10,7 +10,7 @@ from bson import json_util
 import json
 from werkzeug.wrappers import Response
 from datetime import datetime
-from modules.common import check_userurl
+from modules.common import check_auth
 
 route_set = Blueprint('route_set', __name__)
 
@@ -19,9 +19,9 @@ def before_request_func():
     # các request tới route_user đều phải qua đây trước
     jwt_token = request.cookies.get('app_token', None)
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-    auth_user = UserDefine.query.filter_by(id = auth_info['UserId']).first()
-    if auth_user and check_userurl(auth_info['UserId'],request.url,request.method,'Function'):
-        auth_info.update({'Username':auth_user.UserName})
+    auth,UserName = check_auth(auth_info['UserId'],request.url,request.method,'Function')
+    if auth:
+        auth_info.update({'Username':UserName})
         setattr(request, "auth_info", auth_info)
     else:
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')
