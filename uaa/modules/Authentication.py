@@ -10,7 +10,6 @@ from modules.common import hashed_password,check_password,getPagesbyUserId,getFu
 
 authentication = Blueprint('authentication', __name__)
 
-
 #Login
 @authentication.route('/login', methods = ['POST'])
 def login():
@@ -39,7 +38,7 @@ def login():
                     session["UserId"] = UserId
                     session["UserName"] = UserName
                     session["Pages"] = Pages
-                    session["Functions"] = Functions
+                    session["UAA"] = Functions
                 else:
                     res = json.dumps({"message":"Password is incorrect","status":"FAIL"},default=json_util.default).encode('utf-8')
                     status = 200
@@ -93,7 +92,7 @@ def check_auth_ext():
         type = data.get("type")
         UserId =  auth_info.get("UserId")
         Functions = getFunctionbyUserId(UserId,type)
-        UserName = auth_info.get('UserName')
+        UserName = session["UserName"]
         data = {"Functions":Functions,"UserName":UserName}
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200

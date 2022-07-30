@@ -4,21 +4,27 @@ from config import Config
 import requests, json
 
 def check_auth(url,method,cookies):
-    url = urlsplit(url.strip().lower())
-    if "Functions" in session:
-        urls = session.get('Functions')
-        if urls:
-            for u in urls:
-                if u=={"url":url.path.lower(),"method":method.lower()}:
-                    return True,session.get('UserName')
-    else:
-        url = Config.UAA_URL + "check_auth_ext"
-        payload={"url":url,"method":method,"type":'DEPT'}
-        res = requests.post(url, data=json.dumps(payload), cookies=cookies)
-        UserName= res.json().get("data").get('UserName')
-        Functions = res.json().get("data").get('Functions')
-        session["Functions"] = Functions
-        session["UserName"] = UserName
-        if "Functions" in session:
-            check_auth(url,method,cookies)
+    print(session)
+    if True:
+        if "DEPT" in session:
+            urls = session.get('DEPT')
+            if urls:
+                for u in urls:
+                    if u=={"url":urlsplit(url.strip()).path.lower(),"method":method.lower()}:
+                        return True,session.get('UserName')
+        else:
+            UAA_URL = Config.UAA_URL + "check_auth_ext"
+            payload={"type":'DEPT'}
+            res = requests.post(UAA_URL, data=json.dumps(payload), cookies=cookies)
+            print(res)
+            UserName= res.json().get("data").get('UserName')
+            Functions = res.json().get("data").get('Functions')
+            session["DEPT"] = Functions
+            session["UserName"] = UserName
+            if "DEPT" in session:
+                urls = session.get('DEPT')
+                if urls:
+                    for u in urls:
+                        if u=={"url":urlsplit(url.strip()).path.lower(),"method":method.lower()}:
+                            return True,session.get('UserName')
     return False,None

@@ -9,13 +9,13 @@ def hashed_password(Password):
 def check_password(hashPassword:bytes, Password:str):
     return checkpw(Password.encode('utf-8'),hashPassword) 
 
-def check_auth(url,method):    
+def check_auth(url,method): 
+    print(session)   
     if True:
         url = urlsplit(url.strip().lower())
-        urls = session.get('Functions')
+        urls = session.get('UAA')
         if urls:
             for u in urls:
-                print(u)
                 if u=={"url":url.path.lower(),"method":method.lower()}:
                     return True,session.get('UserName')
     return False,None
@@ -46,5 +46,5 @@ def getFunctionbyUserId(UserId,Type):
                     up."PermissionId" = rp."PermissionId"
                     and up."Type" = '{1}'
                 where ur."UserId" = {0};'''.format(UserId,Type)
-        Functions = [{"url":function.get('url').lower(), "method":function.get('Method').lower()} for function in sqlexec(sql).json()]
+        Functions = [{"method":function.get('Method').lower(),"url":function.get('url').lower()} for function in sqlexec(sql).json()]
     return Functions

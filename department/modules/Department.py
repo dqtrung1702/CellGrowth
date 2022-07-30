@@ -11,6 +11,7 @@ route_dept = Blueprint('route_dept', __name__)
 def before_request_func():
     cookies = request.cookies
     auth,UserName = check_auth(request.url,request.method,cookies)
+    print(auth,UserName)
     if auth:
         auth_info={'Username':UserName}
         setattr(request, "auth_info", auth_info)
