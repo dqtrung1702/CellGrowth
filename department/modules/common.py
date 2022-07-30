@@ -4,7 +4,6 @@ from config import Config
 import requests, json
 
 def check_auth(url,method,cookies):
-    print(session)
     if True:
         if "DEPT" in session:
             urls = session.get('DEPT')
