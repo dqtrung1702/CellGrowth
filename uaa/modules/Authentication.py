@@ -29,8 +29,7 @@ def login():
                     UserId = user.id
                     payload.update({'exp': exp,'UserId':UserId})
                     # gen token 4 auth
-                    jwt_token = jwt.encode(payload, Config.JWT_SECRET, Config.JWT_ALGORITHM)
-                    
+                    jwt_token = jwt.encode(payload, Config.JWT_SECRET, Config.JWT_ALGORITHM)                    
                     # Response
                     Pages = getPagesbyUserId(user.id)                
                     res = json.dumps({"token": jwt_token.decode('utf-8'),"Pages":Pages,"status":'OK'},default=json_util.default).encode('utf-8')
@@ -39,7 +38,6 @@ def login():
                     Functions = getFunctionbyUserId(UserId,'UAA')
                     session["UserId"] = UserId
                     session["UserName"] = UserName
-                    session["exp"] = exp
                     session["Pages"] = Pages
                     session["Functions"] = Functions
                 else:

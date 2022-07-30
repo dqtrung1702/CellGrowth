@@ -19,7 +19,7 @@ def before_request_func():
     # các request tới route_user đều phải qua đây trước
     jwt_token = request.cookies.get('app_token', None)
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-    auth,UserName = check_auth(auth_info['UserId'],request.url,request.method,'Function')
+    auth,UserName = check_auth(request.url,request.method)
     if auth:
         auth_info.update({'Username':UserName})
         setattr(request, "auth_info", auth_info)
