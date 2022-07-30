@@ -1,15 +1,12 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 from config import Config
 from werkzeug.wrappers import Response
 from bson import json_util
 import jwt
 import json
-from models.database import sqlexec
 from models.database import UserDefine
-from models.database import UserRole
-from models.database import RolePermission
-from modules.common import hashed_password,check_password
+from modules.common import hashed_password,check_password,getPagesbyUserId,getFunctionbyUserId
 
 authentication = Blueprint('authentication', __name__)
 
@@ -28,13 +25,23 @@ def login():
                     user.update({"LastSignOnDateTime":datetime.now()})
                     payload = {}
                     # basic info
-                    payload.update({'exp': datetime.utcnow() + timedelta(seconds=Config.JWT_EXP_DELTA_SECONDS)})# truyền vào hàm jwt.encode là gmt, lúc jwt.deceode lại trả ra timezone server(gmt + 7) 
-                    payload.update({'UserId':user.id})
+                    exp=datetime.utcnow() + timedelta(seconds=Config.JWT_EXP_DELTA_SECONDS)# truyền vào hàm jwt.encode là gmt, lúc jwt.deceode lại trả ra timezone server(gmt + 7) 
+                    UserId = user.id
+                    payload.update({'exp': exp,'UserId':UserId})
                     # gen token 4 auth
                     jwt_token = jwt.encode(payload, Config.JWT_SECRET, Config.JWT_ALGORITHM)
+                    
                     # Response
-                    res = json.dumps({"token": jwt_token.decode('utf-8'),"Pages":getPagesbyUserId(user.id),"status":'OK'},default=json_util.default).encode('utf-8')
+                    Pages = getPagesbyUserId(user.id)                
+                    res = json.dumps({"token": jwt_token.decode('utf-8'),"Pages":Pages,"status":'OK'},default=json_util.default).encode('utf-8')
                     status = 200
+                    #init session
+                    Functions = getFunctionbyUserId(UserId,'UAA')
+                    session["UserId"] = UserId
+                    session["UserName"] = UserName
+                    session["exp"] = exp
+                    session["Pages"] = Pages
+                    session["Functions"] = Functions
                 else:
                     res = json.dumps({"message":"Password is incorrect","status":"FAIL"},default=json_util.default).encode('utf-8')
                     status = 200
@@ -52,14 +59,11 @@ def login():
 #Register
 @authentication.route('/register',methods =['POST'])
 def register():
-    print(request.data)
     data = json.loads(request.data)
     UserName = data['UserName'].strip().lower()
-    print(UserName)
     payload = {}
     user = UserDefine.query.filter_by(UserName = UserName).first()
     if not user:
-        print(UserName)
         UserId = UserDefine(
             UserName = UserName,
             DataPermission = None,
@@ -82,17 +86,17 @@ def register():
         status = 200
     return Response(res, mimetype='application/json', status=status)
 
-def getPagesbyUserId(UserId):
+@authentication.route('/check_auth_ext',methods =['POST'])
+def check_auth_ext():
     if True:
-        sql = '''select
-                    url
-                from
-                    uaa."UserRole" ur
-                join uaa."RolePermission" rp on
-                    rp."RoleId" = ur."RoleId"
-                join uaa."URLPermission" up on
-                    up."PermissionId" = rp."PermissionId"
-                    and up."Type" = 'Page'
-                where ur."UserId" = {};'''.format(UserId)
-        Pages = list(set([page.get('url') for page in sqlexec(sql).json()]))
-    return Pages
+        jwt_token = request.cookies.get('app_token', None)
+        auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
+        data = json.loads(request.data)
+        type = data.get("type")
+        UserId =  auth_info.get("UserId")
+        Functions = getFunctionbyUserId(UserId,type)
+        UserName = auth_info.get('UserName')
+        data = {"Functions":Functions,"UserName":UserName}
+        res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
+        status = 200
+    return Response(res, mimetype='application/json', status=status)

@@ -2,6 +2,8 @@ class Config(object):
         UAA_IP = '0.0.0.0'
         UAA_PORT = 8081
         UAA_DEBUG_MODE = True
+        SECRET_KEY = 'ERP-as-Services'
+        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
         JWT_SECRET = 'ERP-as-Services'
         JWT_ALGORITHM = 'HS256'
         JWT_EXP_DELTA_SECONDS = 6000000

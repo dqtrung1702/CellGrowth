@@ -1,7 +1,7 @@
-from models.database import sqlexec
-import json
 from bcrypt import hashpw, checkpw, gensalt
 from urllib.parse import urlsplit
+from flask import session
+from models.database import sqlexec
 
 def hashed_password(Password):
     return hashpw(Password.encode('utf-8'), gensalt())
@@ -9,26 +9,42 @@ def hashed_password(Password):
 def check_password(hashPassword:bytes, Password:str):
     return checkpw(Password.encode('utf-8'),hashPassword) 
 
-def check_auth(UserId,url,method,type):
-    url = urlsplit(url.strip().lower())
+def check_auth(url,method):    
     if True:
-        if url.path == '/check_auth_ext':
-            return True,None
+        url = urlsplit(url.strip().lower())
+        urls = session.get('Functions')
+        if urls:
+            for u in urls:
+                print(u)
+                if u=={"url":url.path.lower(),"method":method.lower()}:
+                    return True,session.get('UserName')
+    return False,None
+
+def getPagesbyUserId(UserId):
+    if True:
         sql = '''select
-                    ud."UserName"
-                from uaa."UserDefine" ud 
-                join uaa."UserRole" ur on
-                    ur."UserId" = ud."id"
+                    url
+                from
+                    uaa."UserRole" ur
                 join uaa."RolePermission" rp on
                     rp."RoleId" = ur."RoleId"
                 join uaa."URLPermission" up on
-                    up."PermissionId" = rp."PermissionId" 
-                and up."url" = '{}'
-                and up."Method" = '{}'
-                and up."Type" = '{}'              
-                where ur."id" = {}
-                limit 1;'''.format(url.path,method,type,UserId)
-        data = sqlexec(sql).json()
-        if data:
-            return True,data.get('UserName')        
-    return False,None
+                    up."PermissionId" = rp."PermissionId"
+                    and up."Type" = 'Page'
+                where ur."UserId" = {};'''.format(UserId)
+        Pages = [page.get('url') for page in sqlexec(sql).json()]
+    return Pages
+def getFunctionbyUserId(UserId,Type):
+    if True:
+        sql = '''select
+                    url, up."Method"
+                from
+                    uaa."UserRole" ur
+                join uaa."RolePermission" rp on
+                    rp."RoleId" = ur."RoleId"
+                join uaa."URLPermission" up on
+                    up."PermissionId" = rp."PermissionId"
+                    and up."Type" = '{1}'
+                where ur."UserId" = {0};'''.format(UserId,Type)
+        Functions = [{"url":function.get('url').lower(), "method":function.get('Method').lower()} for function in sqlexec(sql).json()]
+    return Functions

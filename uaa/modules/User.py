@@ -1,9 +1,8 @@
+from requests import session
 from models.database import UserDefine
 from models.database import UserRole
-from models.database import PermissionDefine
-from models.database import RoleDefine
 from models.database import sqlexec
-from flask import Blueprint, request
+from flask import Blueprint, request,session
 import jwt
 from config import Config
 from bson import json_util
@@ -19,7 +18,7 @@ def before_request_func():
     # các request tới route_user đều phải qua đây trước
     jwt_token = request.cookies.get('app_token', None)
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-    auth,UserName = check_auth(auth_info['UserId'],request.url,request.method,'Function')
+    auth,UserName = check_auth(request.url,request.method)
     if auth:
         auth_info.update({'Username':UserName})
         setattr(request, "auth_info", auth_info)
@@ -53,8 +52,6 @@ def addUser():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info
-        print(data)
-        print(auth_info)
         UserName = data.get('UserName')
         Password = hashed_password(data.get('Password'))
         if UserName and Password:
@@ -218,35 +215,3 @@ def changeUserRoles():
         status = 200
     return Response(res, mimetype='application/json', status=status)
 
-from urllib.parse import urlsplit
-@route_user.route('/check_auth_ext',methods =['POST'])
-def check_auth_ext():
-    if True:
-        auth_info = request.auth_info
-        data = json.loads(request.data)
-        url = urlsplit(data.get("url").strip().lower())
-        method = data.get("method")
-        type = data.get("type")
-        UserId =  auth_info.get("UserId")
-        sql = '''select
-                    True "Auth",
-                    ud."UserName"
-                from uaa."UserDefine" ud 
-                join uaa."UserRole" ur on
-                    ur."UserId" = ud."id"
-                join uaa."RolePermission" rp on
-                    rp."RoleId" = ur."RoleId"
-                join uaa."URLPermission" up on
-                    up."PermissionId" = rp."PermissionId" 
-                and up."url" = '{}'
-                and up."Method" = '{}'
-                and up."Type" = '{}'              
-                where ur."id" = {}
-                limit 1;'''.format(url.path,method,type,UserId)
-        data = sqlexec(sql).json()
-        if data:
-            res = json.dumps({"data":data[0],"status":"OK"},default=json_util.default).encode('utf-8')
-        else:
-            res = json.dumps({"data":{"Auth":False,"UserName":None},"status":"OK"},default=json_util.default).encode('utf-8')
-        status = 200
-    return Response(res, mimetype='application/json', status=status)
