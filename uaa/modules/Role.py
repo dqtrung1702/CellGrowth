@@ -17,7 +17,7 @@ def before_request_func():
     auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
     auth,UserName = check_auth(request.url,request.method)
     if auth:
-        auth_info.update({'Username':UserName})
+        auth_info.update({'UserName':UserName})
         setattr(request, "auth_info", auth_info)
     else:
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')

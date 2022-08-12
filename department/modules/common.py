@@ -15,7 +15,6 @@ def check_auth(url,method,cookies):
             UAA_URL = Config.UAA_URL + "check_auth_ext"
             payload={"type":'DEPT'}
             res = requests.post(UAA_URL, data=json.dumps(payload), cookies=cookies)
-            print(res)
             UserName= res.json().get("data").get('UserName')
             Functions = res.json().get("data").get('Functions')
             session["DEPT"] = Functions
