@@ -76,13 +76,12 @@ def searchRole():
         Code = data.get("Code",'')
         Description = data.get("Description",'')
         LastUpdateUserName = data.get("LastUpdateUserName",'')
-        LastUpdateDateTime = data.get("LastUpdateDateTime",'')
-        if LastUpdateDateTime:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime,'%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime+' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastUpdateDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.now()
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+        if LastUpdateDateTime_F:
+            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+        if LastUpdateDateTime_T:
+            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
 
 
         sql = '''select
@@ -125,14 +124,16 @@ def updateRolebyRoleId():
         data = json.loads(request.data)
         auth_info = request.auth_info
         RoleId = data.get('id',0)
-        role = RoleDefine.query.get(RoleId)
+        role = RoleDefine.query.get(RoleId)        
         if role:
+            itm = {}
             for key, value in data.items():
                     if hasattr(RoleDefine, key):
-                        data.update({key:value})
-            data.update({'Code':role.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
-            role.update(data)
-            res = json.dumps({"data":role.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+                        itm.update({key:value})
+            itm.update({'Code':role.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
+            role.update(itm)
+            data = role.json()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
             res = json.dumps({'message': 'No data found',"status":"FAIL"}, default=json_util.default)

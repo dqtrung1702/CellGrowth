@@ -38,14 +38,12 @@ def searchPermission():
         PermissionType = data.get("PermissionType","")
         Description = data.get("Description",'')
         LastUpdateUserName = data.get("LastUpdateUserName",'')
-        LastUpdateDateTime = data.get("LastUpdateDateTime",'')
-        if LastUpdateDateTime:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime,'%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastUpdateDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.now()
-
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+        if LastUpdateDateTime_F:
+            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+        if LastUpdateDateTime_T:
+            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
         sql = '''select
                     pd."id",
                     pd."Code",
@@ -118,12 +116,14 @@ def updatePermissionbyPermissionId():
         PermissionId = data.get('id',0)
         permission = PermissionDefine.query.get(PermissionId)
         if permission:
+            itm = {}
             for key, value in data.items():
                     if hasattr(PermissionDefine, key):
-                        data.update({key:value})
-            data.update({'Code':permission.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
-            permission.update(data)
-            res = json.dumps({"data":role.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+                        itm.update({key:value})
+            itm.update({'Code':permission.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
+            permission.update(itm)
+            data = permission.json()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
             res = json.dumps({'message': 'No data found',"status":"FAIL"}, default=json_util.default)
@@ -145,25 +145,16 @@ def searchURLPermission():
         Type = data.get("Type","")
         Description = data.get("Description",'')
         LastUpdateUserName = data.get("LastUpdateUserName",'')
-        LastUpdateDateTime = data.get("LastUpdateDateTime",'')
-        if LastUpdateDateTime:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime,'%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastUpdateDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.now()
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+        if LastUpdateDateTime_F:
+            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+        if LastUpdateDateTime_T:
+            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
         if EFFFDate:
-            EFFFDate_F = datetime.strptime(EFFFDate,'%d/%m/%Y')
-            EFFFDate_T = datetime.strptime(EFFFDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            EFFFDate_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            EFFFDate_T = datetime.now()
+            EFFFDate = datetime.strptime(EFFFDate,'%d/%m/%Y')
         if EFFTDate:
-            EFFTDate_F = datetime.strptime(EFFTDate,'%d/%m/%Y')
-            EFFTDate_T = datetime.strptime(EFFTDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            EFFTDate_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            EFFTDate_T = datetime.now()
+            EFFTDate = datetime.strptime(EFFTDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
         PermissionId = data.get("PermissionId",0)
         sql = '''select
                     up."id",
@@ -181,38 +172,34 @@ def searchURLPermission():
                 where 1=1
                   and (up.id = {0} or {0} = 0)
                   and (up."EFFFDate" >= '{1}' or '{1}' = '')
-                  and (up."EFFFDate" <= '{2}' or '{2}' = '')
-                  and (up."EFFTDate" >= '{3}' or '{3}' = '')
-                  and (up."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (up.PermissionId = {5} or {5} = 0)
-                  and (up."url" ~ '({6})' or '{6}' = '')
-                  and (up."Method" ~ '({7})' or '{7}' = '')
-                  and (up."Type"  ~ '({8})' or '{8}' = '')
-                  and (up."Description"  ~ '({9})' or '{9}' = '')
-                  and (up."LastUpdateUserName"  ~ '({10})' or '{10}' = '')
-                  and (up."LastUpdateDateTime" >= '{11}' or '{11}' = '')
-                  and (up."LastUpdateDateTime" <= '{12}' or '{12}' = '')
+                  and (up."EFFTDate" <= '{2}' or '{2}' = '')
+                  and (up.PermissionId = {3} or {3} = 0)
+                  and (up."url" ~ '({4})' or '{4}' = '')
+                  and (up."Method" ~ '({5})' or '{5}' = '')
+                  and (up."Type"  ~ '({6})' or '{6}' = '')
+                  and (up."Description"  ~ '({7})' or '{7}' = '')
+                  and (up."LastUpdateUserName"  ~ '({8})' or '{8}' = '')
+                  and (up."LastUpdateDateTime" >= '{9}' or '{9}' = '')
+                  and (up."LastUpdateDateTime" <= '{10}' or '{10}' = '')
                 ORDER BY up.id
-                OFFSET {13} ROWS 
-                FETCH FIRST {14} ROW ONLY;'''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
+                OFFSET {11} ROWS 
+                FETCH FIRST {12} ROW ONLY;'''.format(id,EFFFDate,EFFTDate,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
         sql2 = '''select sum(1) 
                 from
                     uaa."PermissionDefine" pd
                 where 1=1
                   and (up.id = {0} or {0} = 0)
                   and (up."EFFFDate" >= '{1}' or '{1}' = '')
-                  and (up."EFFFDate" <= '{2}' or '{2}' = '')
-                  and (up."EFFTDate" >= '{3}' or '{3}' = '')
-                  and (up."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (up.PermissionId = {5} or {5} = 0)
-                  and (up."url" ~ '({6})' or '{6}' = '')
-                  and (up."Method" ~ '({7})' or '{7}' = '')
-                  and (up."Type"  ~ '({8})' or '{8}' = '')
-                  and (up."Description"  ~ '({9})' or '{9}' = '')
-                  and (up."LastUpdateUserName"  ~ '({10})' or '{10}' = '')
-                  and (up."LastUpdateDateTime" >= '{11}' or '{11}' = '')
-                  and (up."LastUpdateDateTime" <= '{12}' or '{12}' = '')
-                  '''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
+                  and (up."EFFTDate" <= '{2}' or '{2}' = '')
+                  and (up.PermissionId = {3} or {3} = 0)
+                  and (up."url" ~ '({4})' or '{4}' = '')
+                  and (up."Method" ~ '({5})' or '{5}' = '')
+                  and (up."Type"  ~ '({6})' or '{6}' = '')
+                  and (up."Description"  ~ '({7})' or '{7}' = '')
+                  and (up."LastUpdateUserName"  ~ '({8})' or '{8}' = '')
+                  and (up."LastUpdateDateTime" >= '{9}' or '{9}' = '')
+                  and (up."LastUpdateDateTime" <= '{10}' or '{10}' = '')
+                  '''.format(id,EFFFDate,EFFTDate,PermissionId,url,Method,Type,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
         data = sqlexec(sql)
         total_row = sqlexec(sql2)
         res = json.dumps({"data":data.json(),"total_row":total_row.json(),"status":"OK"},default=json_util.default).encode('utf-8')
@@ -282,13 +269,15 @@ def updateURLbyURLId():
         auth_info = request.auth_info
         UrlPermissionId = data.get('id',0)
         urlpermission = URLPermission.query.get(UrlPermissionId)
-        if role:
+        if urlpermission:
+            itm = {}
             for key, value in data.items():
                     if hasattr(URLPermission, key):
-                        data.update({key:value})
-            data.update({'PermissionId':URLPermission.PermissionId,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update PermissionId: URLPermission.PermissionId để chặn không cho update PermissionId
-            urlpermission.update(data)
-            res = json.dumps({"data":urlpermission.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+                        itm.update({key:value})
+            itm.update({'PermissionId':URLPermission.PermissionId,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update PermissionId: URLPermission.PermissionId để chặn không cho update PermissionId
+            urlpermission.update(itm)
+            data = urlpermission.json()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
             res = json.dumps({'message': 'No data found',"status":"FAIL"}, default=json_util.default)

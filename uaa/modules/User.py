@@ -90,21 +90,18 @@ def searchUser():
             UserLocked = 'ud."UserLocked"'
         LastUpdateUserName = data.get("LastUpdateUserName",'')
 
-        LastSignOnDateTime = data.get("LastSignOnDateTime",'')
-        if LastSignOnDateTime:
-            LastSignOnDateTime_F = datetime.strptime(LastSignOnDateTime,'%d/%m/%Y')
-            LastSignOnDateTime_T = datetime.strptime(LastSignOnDateTime+' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastSignOnDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastSignOnDateTime_T = datetime.now()
-        LastUpdateDateTime = data.get("LastUpdateDateTime",'')
-        if LastUpdateDateTime:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime,'%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime+' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastUpdateDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.now()
-
+        LastSignOnDateTime_F = data.get("LastSignOnDateTime_F",'')
+        LastSignOnDateTime_T = data.get("LastSignOnDateTime_T",'')
+        if LastSignOnDateTime_F:
+            LastSignOnDateTime_F = datetime.strptime(LastSignOnDateTime_F,'%d/%m/%Y')
+        if LastSignOnDateTime_T:            
+            LastSignOnDateTime_T = datetime.strptime(LastSignOnDateTime_T+' 23:59:59','%d/%m/%Y %H:%M:%S')
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+        if LastUpdateDateTime_F:
+            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+        if LastUpdateDateTime_T:
+            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
         page_size = data.get("page_size")
         page = data.get("page")
         offset = int(page)*int(page_size)-int(page_size)
@@ -159,16 +156,18 @@ def updateUserbyUserId():
         UserId = data.get('UserId',0)
         user = UserDefine.query.get(UserId)
         if user:
+            itm = {}
             for key, value in data.items():
                     if hasattr(UserDefine, key):
-                        data.update({key:value})
-            data.update({'UserName':user.UserName,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update UserName: user.UserName để chặn không cho update UserName
+                        itm.update({key:value})
+            itm.update({'UserName':user.UserName,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update UserName: user.UserName để chặn không cho update UserName
             if data.get('Password'):
-                data.update({'Password':hashed_password(data['Password'])})
+                itm.update({'Password':hashed_password(data['Password'])})
             if data.get('UserLocked'):
-                data.update({'UserLocked':Config.BOOLEAN.get(data.get('UserLocked'))})
-            user.update(data)
-            res = json.dumps({"data":user.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+                itm.update({'UserLocked':Config.BOOLEAN.get(data.get('UserLocked'))})
+            user.update(itm)
+            data = user.json()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
             res = json.dumps({'message': 'No data found',"status":"FAIL"}, default=json_util.default)

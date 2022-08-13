@@ -15,7 +15,7 @@ dt_utc = datetime.utcnow()
 dt_utc = dt_utc.replace(tzinfo=pytz.UTC)  
 local_zone = tz.tzlocal()
 dt_local = dt_utc.astimezone(local_zone)
-print(dt_local)
+print('dt_local',dt_local)
 dt_utc2 = dt_local.astimezone(pytz.utc)
 print(dt_utc2)
 

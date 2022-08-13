@@ -9,8 +9,7 @@ def hashed_password(Password):
 def check_password(hashPassword:bytes, Password:str):
     return checkpw(Password.encode('utf-8'),hashPassword) 
 
-def check_auth(url,method): 
-    print(session)   
+def check_auth(url,method):
     if True:
         url = urlsplit(url.strip().lower())
         urls = session.get('UAA')

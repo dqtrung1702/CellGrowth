@@ -87,26 +87,18 @@ def searchSet():
         Code = data.get("Code",'')
         Description = data.get("Description",'')
         LastUpdateUserName = data.get("LastUpdateUserName",'')
-        LastUpdateDateTime = data.get("LastUpdateDateTime",'')
-        if LastUpdateDateTime:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime,'%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime+' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            LastUpdateDateTime_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            LastUpdateDateTime_T = datetime.now()
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+        if LastUpdateDateTime_F:
+            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+        if LastUpdateDateTime_T:
+            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
         if EFFFDate:
-            EFFFDate_F = datetime.strptime(EFFFDate,'%d/%m/%Y')
-            EFFFDate_T = datetime.strptime(EFFFDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            EFFFDate_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            EFFFDate_T = datetime.now()
+            EFFFDate = datetime.strptime(EFFFDate,'%d/%m/%Y')
         if EFFTDate:
-            EFFTDate_F = datetime.strptime(EFFTDate,'%d/%m/%Y')
-            EFFTDate_T = datetime.strptime(EFFTDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        else:
-            EFFTDate_F = datetime.strptime('01/01/0001','%d/%m/%Y')
-            EFFTDate_T = datetime.now()
+            EFFTDate = datetime.strptime(EFFTDate +' 23:59:59','%d/%m/%Y %H:%M:%S')
         BUId = data.get("BUId",0)
+        Type = data.get("Type",'')
         sql = '''select
                     st."id",
                     st."EFFFDate",
@@ -121,34 +113,31 @@ def searchSet():
                     uaa."SetTbl" st
                 where (st.id = {0} or {0} = 0)                  
                   and (st."EFFFDate" >= '{1}' or '{1}' = '')
-                  and (st."EFFFDate" <= '{2}' or '{2}' = '')
-                  and (st."EFFTDate" >= '{3}' or '{3}' = '')
-                  and (st."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (st."BUId"  = {5} or {5} = 0)
-                  and (st."Type"  ~ '({6})' or '{6}' = '')
-                  and (st."Code"  ~ '({7})' or '{7}' = '')
-                  and (st."Description"  ~ '({8})' or '{8}' = '')
-                  and (st."LastUpdateUserName"  ~ '({9})' or '{9}' = '')
-                  and (rd."LastUpdateDateTime" >= '{10}' or '{10}' = '')
-                  and (rd."LastUpdateDateTime" <= '{11}' or '{11}' = '')
+                  and (st."EFFTDate" <= '{2}' or '{2}' = '')
+                  and (st."BUId"  = {3} or {3} = 0)
+                  and (st."Type"  ~ '({4})' or '{4}' = '')
+                  and (st."Code"  ~ '({5})' or '{5}' = '')
+                  and (st."Description"  ~ '({6})' or '{6}' = '')
+                  and (st."LastUpdateUserName"  ~ '({7})' or '{7}' = '')
+                  and (rd."LastUpdateDateTime" >= '{8}' or '{8}' = '')
+                  and (rd."LastUpdateDateTime" <= '{9}' or '{9}' = '')
                 ORDER BY rd.id
-                OFFSET {12} ROWS 
-                FETCH FIRST {13} ROW ONLY;'''.format(id,EFFFDate_F,EFFFDate_T,EFFTDate_F,EFFTDate_T,BUId,Type,Code,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
+                OFFSET {10} ROWS 
+                FETCH FIRST {11} ROW ONLY;'''.format(id,EFFFDate,EFFTDate,BUId,Type,Code,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
         sql2 = '''select sum(1) 
                 from
                     uaa."SetTbl" st
                 where (st.id = {0} or {0} = 0)                  
                   and (st."EFFFDate" >= '{1}' or '{1}' = '')
-                  and (st."EFFFDate" <= '{2}' or '{2}' = '')
-                  and (st."EFFTDate" >= '{3}' or '{3}' = '')
-                  and (st."EFFTDate" <= '{4}' or '{4}' = '')
-                  and (st."BUId"  = {5} or {5} = 0)
-                  and (st."Type"  ~ '({6})' or '{6}' = '')
-                  and (st."Code"  ~ '({7})' or '{7}' = '')
-                  and (st."Description"  ~ '({8})' or '{8}' = '')
-                  and (st."LastUpdateUserName"  ~ '({9})' or '{9}' = '')
-                  and (rd."LastUpdateDateTime" >= '{10}' or '{10}' = '')
-                  and (rd."LastUpdateDateTime" <= '{11}' or '{11}' = '');'''.format(id,Code,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
+                  and (st."EFFTDate" <= '{2}' or '{2}' = '')
+                  and (st."BUId"  = {3} or {3} = 0)
+                  and (st."Type"  ~ '({4})' or '{4}' = '')
+                  and (st."Code"  ~ '({5})' or '{5}' = '')
+                  and (st."Description"  ~ '({6})' or '{6}' = '')
+                  and (st."LastUpdateUserName"  ~ '({7})' or '{7}' = '')
+                  and (rd."LastUpdateDateTime" >= '{8}' or '{8}' = '')
+                  and (rd."LastUpdateDateTime" <= '{9}' or '{9}' = '');
+                  '''.format(id,EFFFDate,EFFTDate,BUId,Type,Code,Description,LastUpdateUserName,LastUpdateDateTime_F,LastUpdateDateTime_T)
         data = sqlexec(sql)
         total_row = sqlexec(sql2)
         res = json.dumps({"data":data.json(),"total_row":total_row.json(),"status":"OK"},default=json_util.default).encode('utf-8')
@@ -162,12 +151,14 @@ def updateSetbySetId():
         SetId = data.get('id',0)
         setrcd = SetTbl.query.get(SetId)
         if setrcd:
+            itm = {}
             for key, value in data.items():
                     if hasattr(SetTbl, key):
-                        data.update({key:value})
-            data.update({'Code':setrcd.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
-            setrcd.update(data)
-            res = json.dumps({"data":setrcd.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+                        itm.update({key:value})
+            itm.update({'Code':setrcd.Code,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}) #update Code: role.Code để chặn không cho update Code
+            setrcd.update(itm)
+            data = setrcd.json()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
             res = json.dumps({'message': 'No data found',"status":"FAIL"}, default=json_util.default)
@@ -183,14 +174,14 @@ def changeUserDataSet():
         Description = data.get('Description','')        
         datasets= DataSet.query.filter_by(SetId=SetId).all()
         for dataset in datasets:
-            datasets.remove()
+            dataset.remove()
         if DataPermissionIds:
             for DataPermissionId in DataPermissionIds:
                 data = {'SetId':SetId, 'DataPermissionId':DataPermissionId, 'Description':Description}
                 data.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})
                 DataSet(**data).add()
         datasets = []
-        for dataset in DataSet.query.filter_by(UserId=UserId).all():
+        for dataset in DataSet.query.filter_by(SetId=SetId).all():
             datasets.append(dataset.json())
         res = json.dumps({"data":datasets,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
