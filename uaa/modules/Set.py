@@ -1,7 +1,4 @@
-from models.database import UserDefine
-from models.database import DataPermission
-from models.database import DataSet
-from models.database import SetTbl
+from models.database import UserDefine,DataPermission,DataSet,SetTbl,DEPTSet
 from models.database import sqlexec
 from flask import Blueprint, request
 import jwt
@@ -166,6 +163,28 @@ def updateSetbySetId():
     return Response(res, mimetype='application/json', status=status)
 @route_set.route('/changeUserDataSet',methods =['POST'])
 def changeUserDataSet():
+    if True:
+        data = json.loads(request.data)
+        auth_info = request.auth_info
+        DataPermissionIds = data.get('DataPermissionList')
+        SetId = data.get('SetId')
+        Description = data.get('Description','')        
+        datasets= DataSet.query.filter_by(SetId=SetId).all()
+        for dataset in datasets:
+            dataset.remove()
+        if DataPermissionIds:
+            for DataPermissionId in DataPermissionIds:
+                data = {'SetId':SetId, 'DataPermissionId':DataPermissionId, 'Description':Description}
+                data.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})
+                DataSet(**data).add()
+        datasets = []
+        for dataset in DataSet.query.filter_by(SetId=SetId).all():
+            datasets.append(dataset.json())
+        res = json.dumps({"data":datasets,"status":"OK"},default=json_util.default).encode('utf-8')
+        status = 200
+    return Response(res, mimetype='application/json', status=status)
+@route_set.route('/changeDEPTDataSet',methods =['POST'])
+def changeDEPTDataSet():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info

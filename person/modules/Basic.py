@@ -1,4 +1,4 @@
-from models.database import dept
+from models.database import person
 from models.database import transf,transf2
 from flask import Blueprint, request
 from bson import json_util
@@ -9,9 +9,9 @@ from modules.common import check_auth
 from datetime import datetime
 import pytz
 
-route_dept = Blueprint('route_dept', __name__)
+route_basic = Blueprint('route_basic', __name__)
 
-@route_dept.before_request
+@route_basic.before_request
 def before_request_func():
     cookies = request.cookies
     auth,UserName = check_auth(request.url,request.method,cookies)
@@ -22,103 +22,95 @@ def before_request_func():
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')
         status = 403
         return Response(res, mimetype='application/json', status=status)
-@route_dept.route('/test',methods =['POST'])
-def test():
-    if True:
-        res = json.dumps({"data":"test","status":"OK"},default=json_util.default).encode('utf-8')
-        status = 200
-    return Response(res, mimetype='application/json', status=status)
-@route_dept.route('/getDEPTInfobyDEPTCode',methods =['POST'])
-def getDEPTInfobyDEPTId():
+@route_basic.route('/getPersonInfobyPersonId',methods =['POST'])
+def getPersonInfobyPersonId():
     if True:
         data= json.loads(request.data)
-        DEPTCode = data.get("Code")
-        deptinfo = dept.db.department.find_one({'Code':DEPTCode})
-        data = transf2(deptinfo).json_str()
+        PersonId = data.get("id")
+        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+        data = transf2(personinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
-@route_dept.route('/addDEPT',methods =['POST'])
-def addDEPT():
+@route_basic.route('/addPerson',methods =['POST'])
+def addPerson():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info
         Code = data.get("Code")
-        EFFDT = datetime.strptime(data.get("EFFDT"), "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
-        Status = data.get("Status")
-        ActionCD = data.get("ActionCD")
-        Name = data.get("Name")
-        ParentId = data.get("ParentId")
-        ManagerId = data.get("ManagerId")
-        Description = data.get("Description")
+        BirthDate = datetime.strptime(data.get("BirthDate"), "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
+        BirthPlace = data.get("BirthPlace")
+        BirthCity = data.get("BirthCity")
+        Nationallity = data.get("Nationallity")
+        FamilyType = data.get("ParentId")
+        Ethenic = data.get("Ethenic")
+        FullName = data.get("FullName")
         LastUpdateDateTime = datetime.now().astimezone(pytz.utc)
         LastUpdateUserName = auth_info.get('UserName','???').strip().lower()
-        DEPTId = dept.db.department.insert_one({
+        PersonId = person.db.person.insert_one({
             'Code':Code,
-            'EFFDT':EFFDT,
-            'Status':Status,
-            'ActionCD':ActionCD,
-            'Name':Name,
-            'ParentId':ParentId,
-            'ManagerId': ManagerId,
-            'Description':Description,
+            'BirthDate':BirthDate,
+            'BirthPlace':BirthPlace,
+            'BirthCity':BirthCity,
+            'Nationallity':Nationallity,
+            'FamilyType':FamilyType,
+            'Ethenic': Ethenic,
+            'FullName':FullName,
             'LastUpdateDateTime':LastUpdateDateTime,
             'LastUpdateUserName':LastUpdateUserName
         })
-        deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
-        data = transf2(deptinfo).json_str()
+        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+        data = transf2(personinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, status=status)
-@route_dept.route('/searchDEPT',methods =['POST'])
-def searchDEPT():
+@route_basic.route('/searchPerson',methods =['POST'])
+def searchPerson():
     if True:
         data= json.loads(request.data)
-        auth_info = request.auth_info
         query = {}
-        DEPTId = data.get("id","")
-        if DEPTId:
-            query.update({"_id":DEPTId})
+        PersonId = data.get("id","")
+        if PersonId:
+            query.update({"_id":PersonId})
         Code = data.get("Code")
         if Code:
             query.update({"Code":Code})
-        EFFDT_F = data.get("EFFDT_F","")
-        EFFDT_T = data.get("EFFDT_T","")
-        EFFDT={}
-        if EFFDT_F:
-            EFFDT_F = datetime.strptime(EFFDT_F,'%d/%m/%Y').astimezone(pytz.utc)
-            EFFDT.update({ '$gte': EFFDT_F })
-        if EFFDT_T:
-            EFFDT_T = datetime.strptime(EFFDT_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
-            EFFDT.update({ '$lte': EFFDT_T })
-        if EFFDT:
-            query.update({"EFFDT":EFFDT})
-
-        Status = data.get("Status")
-        if Status:
-            query.update({"Status":Status})
-        ActionCD = data.get("ActionCD")
-        if ActionCD:
-            query.update({"ActionCD":ActionCD})
-        Name = data.get("Name")
-        if Name:
+        BirthDate_F = data.get("BirthDate_F","")
+        BirthDate_T = data.get("BirthDate_T","")
+        BirthDate={}
+        if BirthDate_F:
+            BirthDate_F = datetime.strptime(BirthDate_F,'%d/%m/%Y').astimezone(pytz.utc)
+            BirthDate.update({ '$gte': BirthDate_F })
+        if BirthDate_T:
+            BirthDate_T = datetime.strptime(BirthDate_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
+            BirthDate.update({ '$lte': BirthDate_T })
+        if BirthDate:
+            query.update({"BirthDate":BirthDate})
+        BirthPlace = data.get("BirthPlace")
+        if BirthPlace:
             query.update({
-                "Name":{
-                    "$regex": Name,
+                "BirthPlace":{
+                    "$regex": BirthPlace,
                     "$options" :'i' # case-insensitive
                     }
                 })
-        ParentId = data.get("ParentId")
-        if ParentId:
-            query.update({"ParentId":ParentId})
-        ManagerId = data.get("ManagerId")
-        if ManagerId:
-            query.update({"ManagerId":ManagerId})
-        Description = data.get("Description")
-        if Description:
+        BirthCity = data.get("BirthCity.Code")
+        if BirthCity:
+            query.update({"BirthCity.Code":BirthCity})
+        Nationallity = data.get("Nationallity.Code")
+        if Nationallity:
+            query.update({"Nationallity.Code":Nationallity})
+        FamilyType = data.get("FamilyType")
+        if FamilyType:
+            query.update({"FamilyType":FamilyType})
+        Ethenic = data.get("Ethenic.Code")
+        if Ethenic:
+            query.update({"Ethenic.Code":Ethenic})
+        FullName = data.get("FullName")
+        if FullName:
             query.update({
-                "Description":{
-                    "$regex": Description,
+                "FullName":{
+                    "$regex": FullName,
                     "$options" :'i' # case-insensitive
                     }
                 })
@@ -137,28 +129,28 @@ def searchDEPT():
         page_size = data.get("page_size")
         page = data.get("page")
         offset = int(page)*int(page_size)-int(page_size)
-        deptlist = dept.db.department.find(query).sort("_id").skip(offset).limit(page_size).allow_disk_use(True)
-        data = transf(deptlist).json_str()
-        total_row = dept.db.department.count_documents(query)
+        personlist = person.db.person.find(query).sort("_id").skip(offset).limit(page_size).allow_disk_use(True)
+        data = transf(personlist).json_str()
+        total_row = person.db.person.count_documents(query)
         res = json.dumps({"data":data,'total_row':total_row,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
-@route_dept.route('/updateDEPTbyDEPTId',methods =['POST'])
-def updateDEPTbyDEPTCode():
+@route_basic.route('/updatePersonbyPersonId',methods =['POST'])
+def updatePersonbyPersonId():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info
-        DEPTCode = data.get('Code')
+        PersonId = data.get('id')
         data.pop('id')
         data.pop('Code')
-        EFFDT = data.get("EFFDT","")
-        if EFFDT:
-            data.pop("EFFDT")
-            data.update({"EFFDT":datetime.strptime(EFFDT, "%d/%m/%Y").astimezone(pytz.utc)})
+        BirthDate = data.get("BirthDate","")
+        if BirthDate:
+            data.pop("BirthDate")
+            data.update({"BirthDate":datetime.strptime(BirthDate, "%d/%m/%Y").astimezone(pytz.utc)})
         data.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})
-        dept.db.department.update_one({'Code':DEPTCode}, {'$set':data})
-        deptinfo = dept.db.department.find_one({'Code':DEPTCode})
-        data = transf2(deptinfo).json_str()
+        person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
+        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+        data = transf2(personinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200        
     return Response(res, mimetype='application/json', status=status)

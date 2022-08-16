@@ -332,6 +332,29 @@ class DataSet(BaseModel, db.Model):
             value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
+class DEPTSet(BaseModel, db.Model):
+    """Model for the DataPermission table"""
+    # Tạo bảng DataSet 
+    __tablename__ = 'DepartmentSet'
+    __table_args__ = {"schema": "uaa"}
+
+    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    DEPTId = db.Column(db.String(100), nullable=False)
+    SetId = db.Column(db.Integer, nullable=False)
+    Description = db.Column(db.String(100))
+    LastUpdateUserName = db.Column(db.String(50))
+    LastUpdateDateTime = db.Column(db.DateTime)    
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        r = ''
+        for item in self.__dict__:
+            column = item
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            r += f'\n{column} = {value}'
+        return r
 """Note:
     Query sample:
         peter = User.query.filter_by(username='peter').first()

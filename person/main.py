@@ -2,19 +2,17 @@
 # encoding: utf-8
 from flask import Flask
 from config import Config
-from models.database import dept
+from models.database import person
 from flask_cors import CORS
-from modules.Department import route_dept
-from modules.Action import route_action
+from person.modules.Basic import route_person
 
 app = Flask(__name__) # khởi tạo app
 CORS(app)
 app.config.from_object(Config) # đưa các thông tin từ config vào app
 
-dept.init_app(app)
+person.init_app(app)
 
-app.register_blueprint(route_dept)
-app.register_blueprint(route_action)
+app.register_blueprint(route_person)
 
 @app.route('/')
 def index():
