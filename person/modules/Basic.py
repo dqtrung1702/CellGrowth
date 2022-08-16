@@ -36,13 +36,19 @@ def getPersonInfobyPersonId():
 def addPerson():
     if True:
         data = json.loads(request.data)
-        auth_info = request.auth_info
         Code = data.get("Code")
+        if Code:
+            PersonId = person.db.person.find_one({'Code':Code},{'_id':1})
+            if PersonId:
+                res = json.dumps({'message': 'Data existed',"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
+        auth_info = request.auth_info
         BirthDate = datetime.strptime(data.get("BirthDate"), "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
         BirthPlace = data.get("BirthPlace")
         BirthCity = data.get("BirthCity")
         Nationallity = data.get("Nationallity")
-        FamilyType = data.get("ParentId")
+        FamilyType = data.get("FamilyType")
         Ethenic = data.get("Ethenic")
         FullName = data.get("FullName")
         LastUpdateDateTime = datetime.now().astimezone(pytz.utc)
@@ -58,8 +64,8 @@ def addPerson():
             'FullName':FullName,
             'LastUpdateDateTime':LastUpdateDateTime,
             'LastUpdateUserName':LastUpdateUserName
-        })
-        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+        }).inserted_id
+        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})        
         data = transf2(personinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
@@ -152,5 +158,5 @@ def updatePersonbyPersonId():
         personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
         data = transf2(personinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
-        status = 200        
+        status = 200
     return Response(res, mimetype='application/json', status=status)

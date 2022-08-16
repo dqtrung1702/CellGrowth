@@ -22,7 +22,7 @@ def get_user():
         for row in record:
             line = {}
             for key,val in row.items():
-                value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val
+                value = val.strftime('%d/%m/%Y,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val
                 line.update({key:value}) 
             result.append(line)
         if result:

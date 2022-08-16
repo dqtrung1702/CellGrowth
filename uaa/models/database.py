@@ -11,7 +11,7 @@ class sqlexec:
         for row in record:
             line = {}
             for key,val in row.items():
-                value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+                value = val.strftime('%d/%m/%Y,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
                 line.update({key:value}) 
             result.append(line)
         return result
@@ -33,7 +33,7 @@ class BaseModel(db.Model):
     #     for row in record:
     #         line = {}
     #         for key,val in row.items():
-    #             value = val.strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+    #             value = val.strftime('%d/%m/%Y,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
     #             line.update({key:value}) 
     #         result.append(line)
     #     return result
@@ -44,7 +44,7 @@ class BaseModel(db.Model):
         for item in self.__dict__:
             if item != '_sa_instance_state':
                 column = item
-                value = self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
+                value = self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
                 r.update({column:value})        
         return r
     def add(self):
@@ -110,7 +110,7 @@ class UserDefine(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 
@@ -133,7 +133,7 @@ class RoleDefine(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class PermissionDefine(BaseModel, db.Model):
@@ -156,7 +156,7 @@ class PermissionDefine(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class UserRole(BaseModel, db.Model):
@@ -179,7 +179,7 @@ class UserRole(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class RolePermission(BaseModel, db.Model):
@@ -202,7 +202,7 @@ class RolePermission(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class SetTbl(BaseModel, db.Model):
@@ -231,7 +231,7 @@ class SetTbl(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class BU(BaseModel, db.Model):
@@ -256,7 +256,7 @@ class BU(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class URLPermission(BaseModel, db.Model):
@@ -283,7 +283,7 @@ class URLPermission(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class DataPermission(BaseModel, db.Model):
@@ -306,7 +306,7 @@ class DataPermission(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class DataSet(BaseModel, db.Model):
@@ -329,7 +329,7 @@ class DataSet(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 class DEPTSet(BaseModel, db.Model):
@@ -352,7 +352,7 @@ class DEPTSet(BaseModel, db.Model):
         r = ''
         for item in self.__dict__:
             column = item
-            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%Y-%m-%d,%H:%M:%S')
+            value = self.__dict__[item] if not isinstance(self.__dict__[item], date) else self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S')
             r += f'\n{column} = {value}'
         return r
 """Note:

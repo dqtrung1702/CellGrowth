@@ -14,9 +14,18 @@ class transf:
         for row in self.list:
             line = {}
             for key,val in row.items():
-                value = val.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+                if isinstance(val, date):
+                    value = val.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%d/%m/%Y,%H:%M:%S')  
+                elif isinstance(val, bytes):
+                    value = str(val,'utf-8')
+                elif isinstance(val, list):
+                    value = transf(val).json_str()
+                elif isinstance(val, dict):
+                    value = transf2(val).json_str()
+                else:
+                    value = val
                 line.update({key:value}) 
-            result.append(line)
+                result.append(line)
         return result
 class transf2:    
     def __init__(self, dict):
@@ -24,7 +33,16 @@ class transf2:
     def json_str(self):
         '''truyền vào dict chứa date trả ra dict tương ứng nhưng date được format thành str'''
         result = {}
-        for key,val in dict.items():
-            value = val.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%Y-%m-%d,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
+        for key,val in self.dict.items():
+            if isinstance(val, date):
+                value = val.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%d/%m/%Y,%H:%M:%S')  
+            elif isinstance(val, bytes):
+                value = str(val,'utf-8')
+            elif isinstance(val, list):
+                value = transf(val)
+            elif isinstance(val, dict):
+                value = transf2(val)
+            else:
+                value = val
             result.update({key:value})
         return result

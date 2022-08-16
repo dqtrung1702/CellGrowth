@@ -1,8 +1,8 @@
 import redis
 class Config(object):
-        DEPT_IP = '0.0.0.0'
-        DEPT_PORT = 8082
-        DEPT_DEBUG_MODE = True
+        PERSON_IP = '0.0.0.0'
+        PERSON_PORT = 8083
+        PERSON_DEBUG_MODE = True
         SECRET_KEY = 'ERP-as-Services'
         SESSION_EXPIRE_AT_BROWSER_CLOSE = True
         SESSION_TYPE = 'redis'
