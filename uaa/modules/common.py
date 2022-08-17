@@ -12,11 +12,10 @@ def check_password(hashPassword:bytes, Password:str):
 def check_auth(url,method):
     if True:
         url = urlsplit(url.strip().lower())
-        urls = session.get('UAA')
+        urls = session.get('UAA','')
         if urls:
-            for u in urls:
-                if u=={"url":url.path.lower(),"method":method.lower()}:
-                    return True,session.get('UserName')
+            if {"url":url.path.lower(),"method":method.lower()} in urls:
+                return True,session.get('UserName')
     return False,None
 
 def getPagesbyUserId(UserId):
