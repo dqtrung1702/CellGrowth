@@ -85,15 +85,20 @@ def register():
 
 @authentication.route('/check_auth_ext',methods =['POST'])
 def check_auth_ext():
-    if True:
+    if session.get("UserId",""):
         jwt_token = request.cookies.get('app_token', None)
         auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
         data = json.loads(request.data)
         type = data.get("type")
         UserId =  auth_info.get("UserId")
         Functions = getFunctionbyUserId(UserId,type)
-        UserName = session["UserName"]
+        UserName = session.get("UserName","")
         data = {"Functions":Functions,"UserName":UserName}
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
+        status = 200
+        print(data)
+    else:
+        data ={"message":"session expired"}
+        res = json.dumps({"data":data,"status":"FAIL"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
