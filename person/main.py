@@ -5,11 +5,11 @@ from config import Config
 from models.database import person
 from flask_cors import CORS
 from modules.Basic import route_basic
-
+from flask_session import Session
 app = Flask(__name__) # khởi tạo app
 CORS(app)
 app.config.from_object(Config) # đưa các thông tin từ config vào app
-
+Session(app)
 person.init_app(app)
 
 app.register_blueprint(route_basic)

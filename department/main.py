@@ -6,11 +6,11 @@ from models.database import dept
 from flask_cors import CORS
 from modules.Department import route_dept
 from modules.Action import route_action
-
+from flask_session import Session
 app = Flask(__name__) # khởi tạo app
 CORS(app)
 app.config.from_object(Config) # đưa các thông tin từ config vào app
-
+Session(app)
 dept.init_app(app)
 
 app.register_blueprint(route_dept)

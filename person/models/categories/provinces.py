@@ -1,5 +1,5 @@
 import pymongo
-MONGO_URI = 'mongodb://10.14.119.40:27017/test'
+MONGO_URI = 'mongodb://10.14.119.41:27017/test'
 person = pymongo.MongoClient(MONGO_URI).test
 
 data = [

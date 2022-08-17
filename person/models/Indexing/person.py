@@ -2,7 +2,7 @@
 from pymongo import MongoClient
 from pymongo import ASCENDING, DESCENDING, HASHED, TEXT, GEOSPHERE
 # Create a connection to the MongoDB server
-con = MongoClient('mongodb://10.14.119.40:27017/test');
+con = MongoClient('mongodb://10.14.119.41:27017/test');
 # Database object
 db = con.test;
 # Collection object
