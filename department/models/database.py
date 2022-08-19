@@ -25,7 +25,7 @@ class transf:
                 else:
                     value = val
                 line.update({key:value}) 
-                result.append(line)
+            result.append(line)
         return result
 class transf2:    
     def __init__(self, dict):
@@ -39,9 +39,9 @@ class transf2:
             elif isinstance(val, bytes):
                 value = str(val,'utf-8')
             elif isinstance(val, list):
-                value = transf(val)
+                value = transf(val).json_str()
             elif isinstance(val, dict):
-                value = transf2(val)
+                value = transf2(val).json_str()
             else:
                 value = val
             result.update({key:value})

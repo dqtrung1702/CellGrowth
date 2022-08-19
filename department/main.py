@@ -10,7 +10,7 @@ from flask_session import Session
 app = Flask(__name__) # khởi tạo app
 CORS(app)
 app.config.from_object(Config) # đưa các thông tin từ config vào app
-Session(app)
+Session(app) # khởi tạo Flask-Session object sau khi app đã có config
 dept.init_app(app)
 
 app.register_blueprint(route_dept)

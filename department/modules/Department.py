@@ -22,12 +22,6 @@ def before_request_func():
         res = json.dumps({"message":"Access is denied","status":'FAIL'},default=json_util.default).encode('utf-8')
         status = 403
         return Response(res, mimetype='application/json', status=status)
-@route_dept.route('/test',methods =['POST'])
-def test():
-    if True:
-        res = json.dumps({"data":"test","status":"OK"},default=json_util.default).encode('utf-8')
-        status = 200
-    return Response(res, mimetype='application/json', status=status)
 @route_dept.route('/getDEPTInfobyDEPTCode',methods =['POST'])
 def getDEPTInfobyDEPTId():
     if True:
@@ -42,8 +36,8 @@ def getDEPTInfobyDEPTId():
 def addDEPT():
     if True:
         data = json.loads(request.data)
-        auth_info = request.auth_info
-        Code = data.get("Code")
+        if "Code" in data:
+            Code = data.get("Code")
         EFFDT = datetime.strptime(data.get("EFFDT"), "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
         Status = data.get("Status")
         ActionCD = data.get("ActionCD")
@@ -51,6 +45,8 @@ def addDEPT():
         ParentId = data.get("ParentId")
         ManagerId = data.get("ManagerId")
         Description = data.get("Description")
+        
+        auth_info = request.auth_info
         LastUpdateDateTime = datetime.now().astimezone(pytz.utc)
         LastUpdateUserName = auth_info.get('UserName','???').strip().lower()
         DEPTId = dept.db.department.insert_one({
@@ -64,7 +60,7 @@ def addDEPT():
             'Description':Description,
             'LastUpdateDateTime':LastUpdateDateTime,
             'LastUpdateUserName':LastUpdateUserName
-        })
+        }).inserted_id
         deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
         data = transf2(deptinfo).json_str()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
