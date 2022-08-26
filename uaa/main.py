@@ -1,4 +1,6 @@
 
+from multiprocessing.dummy import Process
+from threading import Thread
 from flask import Flask
 from config import Config
 from models.database import db
@@ -37,4 +39,4 @@ def index():
     return 'The User Authentication and Authorization(UAA) services provides role-based access control (RBAC) for both internal services and user-facing applications. Although the UAA can use an internal identity store (e.g. MySQL or PostgreSQL), typically an external identity provider (IdP) is used.'
 
 if __name__ == '__main__':
-    app.run(Config.UAA_IP, Config.UAA_PORT, debug=Config.UAA_DEBUG_MODE)
+    app.run(Config.UAA_IP, Config.UAA_PORT)

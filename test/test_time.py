@@ -22,3 +22,10 @@ print(dt_utc2)
 
 print(datetime.strftime(dt_utc2,'%d/%m/%Y %H:%M:%S'))
 print(datetime.strptime('20/08/2021 23:59:59','%d/%m/%Y %H:%M:%S'))
+print(datetime.now()- timedelta(days=1))
+# print(datetime.strptime("222/2/222", "%d/%m/%Y"))
+try:
+    res = datetime.strptime("202/08/2021", "%d/%m/%Y")
+except ValueError as e:
+    res = e
+print(res)

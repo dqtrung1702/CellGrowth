@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_pymongo import PyMongo
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://10.14.119.41:27017/test"
+app.config["MONGO_URI"] = "mongodb://root:pass12345@10.14.119.41:27018/test?authSource=admin"
 dept = PyMongo(app)
 data = [
     {

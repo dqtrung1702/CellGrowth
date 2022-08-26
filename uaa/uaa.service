@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve UAA
+After=network.target
+
+[Service]
+User=webuser
+Group=nginx
+WorkingDirectory=/home/trungd/SoST/CellGrowth/uaa
+Environment="PATH=/home/trungd/SoST/CellGrowth/venv/bin"
+ExecStart=/home/trungd/SoST/CellGrowth/venv/bin/uwsgi --ini uWSGI.ini
+
+[Install]
+WantedBy=multi-user.target

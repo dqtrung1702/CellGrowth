@@ -27,12 +27,18 @@ def updateEmailbyPersonId():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info
-        PersonId = data.get('id')
-        Email = data.get('Email') #[{"PhoneType":"MOBILE","Phone":"0942585299","PRM":True}, ...]
-        data = {'Email':Email,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}
-        person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
-        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
-        data = transf2(personinfo).json_str()
-        res = json.dumps({"data":data,"status":"OK"},default=json_util.default)
-        status = 200        
-    return Response(res, mimetype='application/json', status=status)
+        PersonId = data.get('id','')
+        Email = data.get('Email','') #[{"PhoneType":"MOBILE","Phone":"0942585299","PRM":True}, ...]
+        if Email:
+            data = {'Email':Email,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}
+            person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
+            personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+            data = transf2(personinfo).json_str()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default)
+            status = 200
+            return Response(res, mimetype='application/json', status=status)
+        else:
+            res = json.dumps({'message': '"Email" is required',"status":'FAIL'}, default=json_util.default).encode('utf-8')
+            status = 200
+            return Response(res, status=status)
+

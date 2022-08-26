@@ -43,15 +43,26 @@ def addPerson():
                 res = json.dumps({'message': 'Data existed',"status":'FAIL'}, default=json_util.default).encode('utf-8')
                 status = 200
                 return Response(res, status=status)
-        auth_info = request.auth_info
-        BirthDate = datetime.strptime(data.get("BirthDate"), "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
-        BirthPlace = data.get("BirthPlace")
-        BirthCity = data.get("BirthCity")
-        Nationallity = data.get("Nationallity")
-        FamilyType = data.get("FamilyType")
-        Ethenic = data.get("Ethenic")
-        FullName = data.get("FullName")
+        else:
+            res = json.dumps({'message': '"Code" is required',"status":'FAIL'}, default=json_util.default).encode('utf-8')
+            status = 200
+            return Response(res, status=status)
+        BirthDate = data.get("BirthDate","")
+        if BirthDate:
+            try:
+                BirthDate = datetime.strptime(BirthDate, "%d/%m/%Y").astimezone(pytz.utc)#save vào db giờ utc
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)        
+        BirthPlace = data.get("BirthPlace","")
+        BirthCity = data.get("BirthCity","")
+        Nationallity = data.get("Nationallity","")
+        FamilyType = data.get("FamilyType","")
+        Ethenic = data.get("Ethenic","")
+        FullName = data.get("FullName","")
         LastUpdateDateTime = datetime.now().astimezone(pytz.utc)
+        auth_info = request.auth_info
         LastUpdateUserName = auth_info.get('UserName','???').strip().lower()
         PersonId = person.db.person.insert_one({
             'Code':Code,
@@ -146,17 +157,38 @@ def updatePersonbyPersonId():
     if True:
         data = json.loads(request.data)
         auth_info = request.auth_info
-        PersonId = data.get('id')
-        data.pop('id')
-        data.pop('Code')
+        PersonId = data.get('id','')
+        itm={}
         BirthDate = data.get("BirthDate","")
         if BirthDate:
-            data.pop("BirthDate")
-            data.update({"BirthDate":datetime.strptime(BirthDate, "%d/%m/%Y").astimezone(pytz.utc)})
-        data.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})
-        person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
-        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
-        data = transf2(personinfo).json_str()
-        res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
-        status = 200
+            BirthDate = datetime.strptime(BirthDate, "%d/%m/%Y").astimezone(pytz.utc)
+            itm.update({"BirthDate":BirthDate})
+        BirthPlace = data.get("BirthPlace","")
+        if BirthPlace:
+            itm.update({"BirthPlace":BirthPlace})
+        BirthCity = data.get("BirthCity","")
+        if BirthCity:
+            itm.update({"BirthCity":BirthCity})
+        Nationallity = data.get("Nationallity","")
+        if Nationallity:
+            itm.update({"Nationallity":Nationallity})
+        FamilyType = data.get("FamilyType","")
+        if FamilyType:
+            itm.update({"FamilyType":FamilyType})
+        Ethenic = data.get("Ethenic","")
+        if Ethenic:
+            itm.update({"Ethenic":Ethenic})
+        FullName = data.get("FullName","")
+        if FullName:
+            itm.update({"FullName":FullName})        
+        if itm:
+            itm.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})        
+            person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':itm})
+            personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+            data = transf2(personinfo).json_str()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
+            status = 200
+        else:
+            res = json.dumps({'message': 'Information to change is not available',"status":'FAIL'},default=json_util.default).encode('utf-8')
+            status = 200
     return Response(res, mimetype='application/json', status=status)

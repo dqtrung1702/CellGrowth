@@ -10,5 +10,5 @@ class Config(object):
         JWT_SECRET = 'ERP-as-Services'
         JWT_ALGORITHM = 'HS256'
         JWT_EXP_DELTA_SECONDS = 6000000
-        MONGO_URI = 'mongodb://10.15.145.52:27017/test'
+        MONGO_URI = 'mongodb://root:pass12345@10.14.119.41:27018/test?authSource=admin'
         UAA_URL = 'http://localhost:8081/'
