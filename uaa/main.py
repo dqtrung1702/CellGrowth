@@ -39,4 +39,4 @@ def index():
     return 'The User Authentication and Authorization(UAA) services provides role-based access control (RBAC) for both internal services and user-facing applications. Although the UAA can use an internal identity store (e.g. MySQL or PostgreSQL), typically an external identity provider (IdP) is used.'
 
 if __name__ == '__main__':
-    app.run(Config.UAA_IP, Config.UAA_PORT)
+    app.run(Config.UAA_IP, Config.UAA_PORT,Config.UAA_DEBUG_MODE)

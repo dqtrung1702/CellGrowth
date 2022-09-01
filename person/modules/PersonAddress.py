@@ -26,9 +26,19 @@ def before_request_func():
 def updateAddressbyPersonId():
     if True:
         data = json.loads(request.data)
+        itm={}
         auth_info = request.auth_info
         PersonId = data.get('id')
-        Address = data.get('Address') #[{"PhoneType":"MOBILE","Phone":"0942585299","PRM":True}, ...]
+        Address ={}
+        AddressType = data.get('AddressType','')
+        Address1 =  data.get('Address1','')
+        Address2 =  data.get('Address2','')
+        ProvinceCD = data.get('ProvinceCD','')
+        CityCD = data.get('CityCD','')
+        CountyCD = data.get('CountyCD','')
+        TownCD = data.get('TownCD','')
+        DistrictCD = data.get('DistrictCD','')
+        
         data = {'Address':Address,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}
         person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
         personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
