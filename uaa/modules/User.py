@@ -1,6 +1,7 @@
 from requests import session
 from models.database import UserDefine
 from models.database import UserRole
+from models.database import RoleDefine
 from models.database import sqlexec
 from flask import Blueprint, request,session
 import jwt
@@ -10,6 +11,8 @@ import json
 from werkzeug.wrappers import Response
 from datetime import datetime
 from modules.common import check_auth,hashed_password
+
+from sqlalchemy.sql import or_
 
 route_user = Blueprint('route_user', __name__)
 
@@ -30,21 +33,9 @@ def before_request_func():
 def getUserInfobyUserId():
     if True:
         data= json.loads(request.data)
-        UserId = data.get("UserId")        
-        sql = '''select
-                    ud."id",
-                    ud."UserName",
-                    ud."NameDisplay",
-                    ud."PersonId",
-                    ud."UserLocked",
-                    ud."LastSignOnDateTime",
-                    ud."LastUpdateUserName",
-                    ud."LastUpdateDateTime"
-                from
-                    uaa."UserDefine" ud
-                where ud.id = {} ;'''.format(UserId)        
-        data = sqlexec(sql)
-        res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+        UserId = data.get("UserId")
+        data = UserDefine.query.filter_by(id = UserId).first()
+        res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
 @route_user.route('/addUser',methods =['POST'])
@@ -63,8 +54,8 @@ def addUser():
                         payload.update({key:value})
                 payload.update({'Password':Password, 'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???')})                
                 UserId = UserDefine(**payload).add()
-                user = UserDefine.query.get(UserId)
-                res = json.dumps({"data": user.json(),"status":'OK'},default=json_util.default).encode('utf-8')
+                user = UserDefine.query.get(UserId).json2(['id', 'UserName', 'NameDisplay', 'UserLocked', 'LastSignOnDateTime', 'LastUpdateUserName', 'LastUpdateDateTime'])
+                res = json.dumps({"data": user,"status":'OK'},default=json_util.default).encode('utf-8')
                 status = 200
             else:
                 res = json.dumps({'message': 'Data existed',"status":'FAIL'}, default=json_util.default)
@@ -78,74 +69,96 @@ def searchUser():
     if True:
         data= json.loads(request.data)
         auth_info = request.auth_info
-        id = data.get("id",0)
-        UserName = data.get("UserName",'')
-        NameDisplay = data.get("NameDisplay",'')
+        # sql = '''from uaa."UserDefine" ud
+        #         where 1=1
+        #         '''
 
-        if data.get("UserLocked") =='Locked':
-            UserLocked = True
-        elif data.get("UserLocked") =='UnLocked':
-            UserLocked = False
-        else:
-            UserLocked = 'ud."UserLocked"'
-        LastUpdateUserName = data.get("LastUpdateUserName",'')
+        id = data.get("id","")
+        # if id:
+        #     sql = sql + '''and (ud.id = '{0}')
+        #     '''.format(id)
 
-        LastSignOnDateTime_F = data.get("LastSignOnDateTime_F",'')
-        LastSignOnDateTime_T = data.get("LastSignOnDateTime_T",'')
+        UserName = data.get("UserName","")
+        # if UserName:
+        #     sql = sql + '''and (ud."UserName" ~ '{0}')
+        #     '''.format(UserName)
+
+        NameDisplay = data.get("NameDisplay","")
+        # if NameDisplay:
+        #     sql = sql + '''and (ud."NameDisplay" ~ '{0}')
+        #     '''.format(NameDisplay)
+
+        UserLocked = data.get("UserLocked","")
+        if UserLocked:
+            if UserLocked =='Locked':
+                UserLocked = True
+            else:
+                UserLocked = False
+            # sql = sql + '''and (ud."UserLocked" = {0})
+            # '''.format(NameDisplay)
+
+        LastUpdateUserName = data.get("LastUpdateUserName","")
+        # if LastUpdateUserName:
+        #     sql = sql + '''and (ud."LastUpdateUserName" ~ '{0}')
+        #     '''.format(LastUpdateUserName)
+
+        LastSignOnDateTime_F = data.get("LastSignOnDateTime_F","")
+        LastSignOnDateTime_T = data.get("LastSignOnDateTime_T","")
+
         if LastSignOnDateTime_F:
             LastSignOnDateTime_F = datetime.strptime(LastSignOnDateTime_F,'%d/%m/%Y')
-        if LastSignOnDateTime_T:            
+            # sql = sql + '''and (ud."LastSignOnDateTime" >= {0})
+            # '''.format(LastSignOnDateTime_F)
+
+        if LastSignOnDateTime_T:
             LastSignOnDateTime_T = datetime.strptime(LastSignOnDateTime_T+' 23:59:59','%d/%m/%Y %H:%M:%S')
-        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
-        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
+            # sql = sql + '''and (ud."LastSignOnDateTime" <= {0})
+            # '''.format(LastSignOnDateTime_T)
+
+        LastUpdateDateTime_F = data.get("LastUpdateDateTime_F","")
+        LastUpdateDateTime_T = data.get("LastUpdateDateTime_T","")
+
         if LastUpdateDateTime_F:
             LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y')
+            # sql = sql + '''and (ud."LastUpdateDateTime" >= {0})
+            # '''.format(LastUpdateDateTime_F)
         if LastUpdateDateTime_T:
             LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S')
-        page_size = data.get("page_size")
-        page = data.get("page")
-        offset = int(page)*int(page_size)-int(page_size)
-        sql = '''select
-                    ud."id",
-                    ud."UserName",
-                    ud."NameDisplay",
-                    ud."UserLocked",
-                    ud."LastSignOnDateTime",
-                    ud."LastUpdateUserName",
-                    ud."LastUpdateDateTime"
-                from
-                    uaa."UserDefine" ud
-                where 1=1
-                and (ud.id = {0} or {0} = 0)
-                and (ud."UserName"  ~ '({1})' or '{1}' = '')
-                and (ud."NameDisplay"  ~ '({2})' or '{2}' = '')
-                and (ud."UserLocked" = {3})
-                and (ud."LastUpdateUserName"  ~ '({4})' or '{4}' = '')
-                and (ud."LastSignOnDateTime" >= '{5}' or '{5}' = '')
-                and (ud."LastSignOnDateTime" <= '{6}' or '{6}' = '')
-                and (ud."LastUpdateDateTime" >= '{7}' or '{7}' = '')
-                and (ud."LastUpdateDateTime" <= '{8}' or '{8}' = '')
-                ORDER BY ud.id
-                OFFSET {9} ROWS 
-                FETCH FIRST {10} ROW ONLY;'''.format(id,UserName,NameDisplay,UserLocked,LastUpdateUserName,LastSignOnDateTime_F,LastSignOnDateTime_T,LastUpdateDateTime_F,LastUpdateDateTime_T,offset,page_size)
-        sql2 = '''select
-                    sum(1)
-                from
-                    uaa."UserDefine" ud
-                where 1=1
-                and (ud.id = {0} or {0} = 0)
-                and (ud."UserName"  ~ '({1})' or '{1}' = '')
-                and (ud."NameDisplay"  ~ '({2})' or '{2}' = '')
-                and (ud."UserLocked" = {3})
-                and (ud."LastUpdateUserName"  ~ '({4})' or '{4}' = '')
-                and (ud."LastSignOnDateTime" >= '{5}' or '{5}' = '')
-                and (ud."LastSignOnDateTime" <= '{6}' or '{6}' = '')
-                and (ud."LastUpdateDateTime" >= '{7}' or '{7}' = '')
-                and (ud."LastUpdateDateTime" <= '{8}' or '{8}' = '')
-                ;'''.format(id,UserName,NameDisplay,UserLocked,LastUpdateUserName,LastSignOnDateTime_F,LastSignOnDateTime_T,LastUpdateDateTime_F,LastUpdateDateTime_T)
-        data = sqlexec(sql)
-        total_row = sqlexec(sql2)
-        res = json.dumps({"data":data.json(),'total_row':total_row.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+            # sql = sql + '''and (ud."LastUpdateDateTime" <= {0})
+            # '''.format(LastUpdateDateTime_T)
+        page_size = data.get("page_size",10)
+        page = data.get("page",1)
+        offset = int(page)*int(page_size)-int(page_size) 
+        # sql1 = '''
+        #         select
+        #             ud."id",
+        #             ud."UserName",
+        #             ud."NameDisplay",
+        #             ud."UserLocked",
+        #             ud."LastSignOnDateTime",
+        #             ud."LastUpdateUserName",
+        #             ud."LastUpdateDateTime"
+        #         ''' + sql +'''ORDER BY ud.id
+        #                OFFSET {0} ROWS 
+        #                FETCH FIRST {1} ROW ONLY;'''.format(offset,page_size)
+        # sql2 = '''
+        #         select
+        #             sum(1)
+        #         ''' + sql + ''';'''
+        query = UserDefine.query.filter(
+            or_(UserDefine.id == (id if id else 0), id == ''),
+            or_(UserDefine.UserName.like("%"+UserName+"%"), UserName == ''),
+            or_(UserDefine.NameDisplay.like("%"+NameDisplay+"%"), NameDisplay == ''),
+            or_(UserDefine.NameDisplay.like("%"+NameDisplay+"%"), NameDisplay == '')
+            )
+        data_raw = query.offset(offset).limit(page_size).all()
+        total_row = query.count()
+        # data = sqlexec(sql1).json()
+        # total_row = sqlexec(sql2).json()
+        data = []
+        for d in data_raw:
+            data.append(d.json2(['id', 'UserName', 'NameDisplay', 'UserLocked', 'LastSignOnDateTime', 'LastUpdateUserName', 'LastUpdateDateTime']))        
+        res = json.dumps({"data":data,'total_row':total_row,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
 @route_user.route('/updateUserbyUserId',methods =['POST'])
@@ -166,7 +179,7 @@ def updateUserbyUserId():
             if data.get('UserLocked'):
                 itm.update({'UserLocked':Config.BOOLEAN.get(data.get('UserLocked'))})
             user.update(itm)
-            data = user.json()
+            data = user.json2(['id', 'UserName', 'NameDisplay', 'UserLocked', 'LastSignOnDateTime', 'LastUpdateUserName', 'LastUpdateDateTime'])
             res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:
@@ -178,6 +191,14 @@ def getRolesByUserId():
     if True:
         data = json.loads(request.data)
         UserId = data.get("UserId")
+        # Failed for using ORM
+        query =  UserRole.query.join(RoleDefine, RoleDefine.id==UserRole.RoleId).filter(UserRole.UserId == UserId)
+        data_raw = query.all()
+        data2 = []
+        for d in data_raw:
+            data2.append(d.json2(['UserId', 'RoleId', 'Code']))
+        print(data2)
+
         sql = '''select
                     ur."UserId",
                     ur."RoleId",
@@ -186,7 +207,7 @@ def getRolesByUserId():
                     uaa."UserRole" ur
                 join uaa."RoleDefine" rd on
                     rd.id = ur."RoleId"
-                where ur.UserId = {};'''.format(UserId)        
+                where ur."UserId" = {};'''.format(UserId)        
         data = sqlexec(sql)
         res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200

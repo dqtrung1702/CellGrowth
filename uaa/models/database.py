@@ -24,25 +24,21 @@ class BaseModel(db.Model):
     Mỗi lần deploy mà đồng bộ dữ liệu cũ xong cần cover lại đống seq sinh id của các bảng.
     """
     __abstract__ = True
-    # def __init__(self, sql):
-    #     self.sql = sql
-    
-    # def xquery(self):
-    #     record = db.engine.execute(self.sql).mappings().all()
-    #     result = []
-    #     for row in record:
-    #         line = {}
-    #         for key,val in row.items():
-    #             value = val.strftime('%d/%m/%Y,%H:%M:%S') if isinstance(val, date) else str(val,'utf-8') if isinstance(val, bytes) else val                
-    #             line.update({key:value}) 
-    #         result.append(line)
-    #     return result
 
     def json(self):
         """Define a base way to jsonify models, dealing with datetime objects"""
-        r = {}
+        r = {}        
         for item in self.__dict__:
             if item != '_sa_instance_state':
+                column = item
+                value = self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
+                r.update({column:value})        
+        return r
+    def json2(self,fields):
+        """Define a base way to jsonify models, dealing with datetime objects"""
+        r = {}        
+        for item in self.__dict__:
+            if item in fields:
                 column = item
                 value = self.__dict__[item].strftime('%d/%m/%Y,%H:%M:%S') if isinstance(self.__dict__[item], date) else str(self.__dict__[item],'utf-8') if isinstance(self.__dict__[item], bytes) else self.__dict__[item]
                 r.update({column:value})        
