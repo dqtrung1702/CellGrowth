@@ -34,7 +34,7 @@ def getUserInfobyUserId():
     if True:
         data= json.loads(request.data)
         UserId = data.get("UserId")
-        data = UserDefine.query.filter_by(id = UserId).first()
+        data = UserDefine.query.get(UserId).json()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)

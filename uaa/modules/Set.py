@@ -47,9 +47,11 @@ def getSetInfobySetId():
     #     status = 200
     # return Response(res, mimetype='application/json', status=status)
     if True:
-        data= json.loads(request.data)
+        data = json.loads(request.data)
         SetId = data.get("id")
-        data = SetTbl.query.filter_by(id = SetId).first()
+        data = SetTbl.query.get(SetId).json()
+        data["SetCode"] = data.pop("Code")
+        print(data)
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
