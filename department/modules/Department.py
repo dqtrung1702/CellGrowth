@@ -1,5 +1,5 @@
 from models.database import dept
-from models.database import transf,transf2
+from models.database import transf
 from flask import Blueprint, request
 from bson import json_util
 from bson.objectid import ObjectId
@@ -28,7 +28,7 @@ def getDEPTInfobyDEPTId():
         data= json.loads(request.data)
         DEPTId = data.get("id")
         deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
-        data = transf2(deptinfo).json_str()
+        data = transf(deptinfo).jsonfobject()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
@@ -90,7 +90,7 @@ def addDEPT():
             })
         DEPTId = dept.db.department.insert_one(itm).inserted_id
         deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
-        data = transf2(deptinfo).json_str()
+        data = transf(deptinfo).jsonfobject()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, status=status)
@@ -177,7 +177,7 @@ def searchDEPT():
         page = data.get("page")
         offset = int(page)*int(page_size)-int(page_size)
         deptlist = dept.db.department.find(query).sort("_id").skip(offset).limit(page_size).allow_disk_use(True)
-        data = transf(deptlist).json_str()
+        data = transf(deptlist).jsonfobject()
         total_row = dept.db.department.count_documents(query)
         res = json.dumps({"data":data,'total_row':total_row,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
@@ -198,7 +198,7 @@ def updateDEPTbyDEPTId():
         data.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})
         dept.db.department.update_one({'Code':DEPTId}, {'$set':data})
         deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
-        data = transf2(deptinfo).json_str()
+        data = transf(deptinfo).jsonfobject()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200        
     return Response(res, mimetype='application/json', status=status)
@@ -259,7 +259,7 @@ def changeDEPTInfo():
                                         }
                                     })                                
                                 deptinfo = dept.db.department.find_one({'_id':ObjectId(DEPTId)})
-                                data = transf2(deptinfo).json_str()
+                                data = transf(deptinfo).jsonfobject()
                                 res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
                                 status = 200
                                 return Response(res, status=status)

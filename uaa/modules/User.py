@@ -149,7 +149,12 @@ def searchUser():
             or_(UserDefine.id == (id if id else 0), id == ''),
             or_(UserDefine.UserName.like("%"+UserName+"%"), UserName == ''),
             or_(UserDefine.NameDisplay.like("%"+NameDisplay+"%"), NameDisplay == ''),
-            or_(UserDefine.NameDisplay.like("%"+NameDisplay+"%"), NameDisplay == '')
+            (UserDefine.UserLocked == UserLocked if UserLocked != '' else 1 == 1),
+            or_(UserDefine.LastUpdateUserName.like("%"+LastUpdateUserName+"%"), LastUpdateUserName == ''),
+            or_(UserDefine.LastSignOnDateTime >= LastSignOnDateTime_F, LastSignOnDateTime_F == ''),
+            or_(UserDefine.LastSignOnDateTime <= LastSignOnDateTime_T, LastSignOnDateTime_T == ''),
+            or_(UserDefine.LastUpdateDateTime >= LastUpdateDateTime_F, LastUpdateDateTime_F == ''),
+            or_(UserDefine.LastUpdateDateTime <= LastUpdateDateTime_T, LastUpdateDateTime_T == '')            
             )
         data_raw = query.offset(offset).limit(page_size).all()
         total_row = query.count()
@@ -191,25 +196,13 @@ def getRolesByUserId():
     if True:
         data = json.loads(request.data)
         UserId = data.get("UserId")
-        # Failed for using ORM
-        query =  UserRole.query.join(RoleDefine, RoleDefine.id==UserRole.RoleId).filter(UserRole.UserId == UserId)
+        query =  RoleDefine.query.join(UserRole, UserRole.RoleId==RoleDefine.id).filter(UserRole.UserId == UserId)
         data_raw = query.all()
-        data2 = []
-        for d in data_raw:
-            data2.append(d.json2(['UserId', 'RoleId', 'Code']))
-        print(data2)
-
-        sql = '''select
-                    ur."UserId",
-                    ur."RoleId",
-                    rd."Code" "Role"
-                from
-                    uaa."UserRole" ur
-                join uaa."RoleDefine" rd on
-                    rd.id = ur."RoleId"
-                where ur."UserId" = {};'''.format(UserId)        
-        data = sqlexec(sql)
-        res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+        data = []
+        for dr in data_raw:
+            d = {"UserId":UserId,"RoleId":dr.id,"Role":dr.Code}
+            data.append(d)        
+        res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
 @route_user.route('/changeUserRoles',methods =['POST'])

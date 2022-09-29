@@ -1,5 +1,5 @@
 from models.database import person
-from models.database import transf,transf2
+from models.database import transf
 from flask import Blueprint, request
 from bson import json_util
 from bson.objectid import ObjectId
@@ -26,23 +26,29 @@ def before_request_func():
 def updateAddressbyPersonId():
     if True:
         data = json.loads(request.data)
-        itm={}
         auth_info = request.auth_info
-        PersonId = data.get('id')
-        Address ={}
-        AddressType = data.get('AddressType','')
-        Address1 =  data.get('Address1','')
-        Address2 =  data.get('Address2','')
-        ProvinceCD = data.get('ProvinceCD','')
-        CityCD = data.get('CityCD','')
-        CountyCD = data.get('CountyCD','')
-        TownCD = data.get('TownCD','')
-        DistrictCD = data.get('DistrictCD','')
-        
-        data = {'Address':Address,'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()}
-        person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':data})
-        personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
-        data = transf2(personinfo).json_str()
-        res = json.dumps({"data":data,"status":"OK"},default=json_util.default)
-        status = 200        
+        PersonId = data.get('id','')
+        Address = []
+        itm = {}
+        for addr in data.get('Address',''):
+            AddressType = addr.get('AddressType',{})
+            Address1 =  addr.get('Address1','')
+            Address2 =  addr.get('Address2','')
+            Province = addr.get('Province',{})
+            City = addr.get('City',{})
+            County = addr.get('County',{})
+            Town = addr.get('Town',{})
+            District = addr.get('District',{})
+            Address.append({"AddressType":AddressType,"Address1":Address1,"Address2":Address2,"Province":Province,"City":City,"Town":Town,"District":District})
+        itm.update({"Address":Address})
+        if itm:
+            itm.update({'LastUpdateDateTime':datetime.now().astimezone(pytz.utc),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})        
+            person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':itm})
+            personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
+            data = transf(personinfo).jsonfobject()
+            res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
+            status = 200
+        else:
+            res = json.dumps({'message': 'Information to change is not available',"status":'FAIL'},default=json_util.default).encode('utf-8')
+            status = 200
     return Response(res, mimetype='application/json', status=status)

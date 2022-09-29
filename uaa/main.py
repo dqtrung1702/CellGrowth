@@ -4,7 +4,7 @@ from threading import Thread
 from flask import Flask
 from config import Config
 from models.database import db
-from flask_migrate import Migrate
+# from flask_migrate import Migrate
 from modules.Authentication import authentication
 from modules.Set import route_set
 from modules.BU import route_bu
@@ -22,7 +22,7 @@ CORS(app)
 app.config.from_object(Config) # đưa các thông tin từ config vào app
 Session(app) # Create and initialize the Flask-Session object AFTER `app` has been configured
 db.init_app(app) # đưa các giá trị tham số từ app vào db
-migrate = Migrate(app, db) # thực hiện migrate bảng bằng flask_migrate, chạy lần lượt các lệnh trong list [export FLASK_APP=main.py, flask db init, flask db migrate, flask db upgrade, flask db downgrade]
+# migrate = Migrate(app, db) # thực hiện migrate bảng bằng flask_migrate, chạy lần lượt các lệnh trong list [export FLASK_APP=main.py, flask db init, flask db migrate, flask db upgrade, flask db downgrade]
 
 app.register_blueprint(authentication)
 app.register_blueprint(route_set)

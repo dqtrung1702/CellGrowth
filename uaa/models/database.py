@@ -366,3 +366,23 @@ class DEPTSet(BaseModel, db.Model):
             return render_template('show_user.html', user=user)
         User.query.filter_by(username=username).first_or_404(description='There is no data with {}'.format(username))
 """
+
+
+# Filter	        Syntax
+# ALL	            session.query(Employee)
+# EQUALS	        session.query(Employee).filter(Employee.id == 1)
+# NOT EQUALS	    session.query(Employee).filter(Employee.id != 1)
+# GREATER THAN	    session.query(Employee).filter(Employee.id > 5)
+# LESS THAN	        session.query(Employee).filter(Employee.id < 5)
+# LIKE	            session.query(Employee).filter(Employee.last_name.like(“Pe%k”))
+#                   session.query(Employee).filter(Employee.last_name.contains(“u”))
+#                   session.query(Employee).filter(Employee.last_name.startswith(“D”))
+#                   session.query(Employee).filter(Employee.last_name.endswith(“n”))
+# NOT LIKE	        session.query(Employee).filter(Employee.last_name.not_like(“Pe%k”))
+# IN	            session.query(Employee).filter(Employee.id.in_([1,2,3]))
+# NOT IN	        session.query(Employee).filter(Employee.id.not_in([1,2,3]))
+#                   session.query(Employee).filter(~Employee.id.in_([1,2,3]))
+# AND	            session.query(Employee).filter(filterA, filterB)
+#                   session.query(Employee).filter(and_(filterA, filterB))
+#                   session.query(Employee).filter(filterA).filter(filterB))
+# OR	            session.query(Employee).filter(or_(filterA, filterB))

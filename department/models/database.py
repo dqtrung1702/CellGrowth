@@ -6,12 +6,12 @@ import pytz
 local_zone = tz.tzlocal()
 
 class transf:    
-    def __init__(self, list):
-        self.list = list
-    def json_str(self):
+    def __init__(self, obj):
+        self.obj = obj
+    def jsonflobject(self):
         '''truyền vào list chứa date trả ra list tương ứng nhưng date được format thành str'''
         result = []
-        for row in self.list:
+        for row in self.obj:
             line = {}
             for key,val in row.items():
                 if isinstance(val, date):
@@ -19,30 +19,39 @@ class transf:
                 elif isinstance(val, bytes):
                     value = str(val,'utf-8')
                 elif isinstance(val, list):
-                    value = transf(val).json_str()
+                    value = transf(val).jsonflobject()
                 elif isinstance(val, dict):
-                    value = transf2(val).json_str()
+                    value = transf(val).jsonfdobject()
                 else:
                     value = val
                 line.update({key:value}) 
             result.append(line)
         return result
-class transf2:    
-    def __init__(self, dict):
-        self.dict = dict
-    def json_str(self):
+    def jsonfdobject(self):
         '''truyền vào dict chứa date trả ra dict tương ứng nhưng date được format thành str'''
         result = {}
-        for key,val in self.dict.items():
+        for key,val in self.obj.items():
             if isinstance(val, date):
                 value = val.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%d/%m/%Y,%H:%M:%S')  
             elif isinstance(val, bytes):
                 value = str(val,'utf-8')
             elif isinstance(val, list):
-                value = transf(val).json_str()
+                value = transf(val).jsonflobject()
             elif isinstance(val, dict):
-                value = transf2(val).json_str()
+                value = transf(val).jsonfdobject()
             else:
                 value = val
             result.update({key:value})
+        return result
+    def jsonfobject(self):
+        if isinstance(self.obj, date):
+            result = self.obj.replace(tzinfo=pytz.UTC).astimezone(local_zone).strftime('%d/%m/%Y,%H:%M:%S')  
+        elif isinstance(self.obj, bytes):
+            result = str(self.obj,'utf-8')
+        elif isinstance(self.obj, list):
+            result = transf(self.obj).jsonflobject()
+        elif isinstance(val, dict):
+            result = transf(self.obj).jsonfdobject()
+        else:
+            result = val
         return result

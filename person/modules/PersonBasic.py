@@ -1,5 +1,5 @@
 from models.database import person
-from models.database import transf,transf2
+from models.database import transf
 from flask import Blueprint, request
 from bson import json_util
 from bson.objectid import ObjectId
@@ -28,7 +28,7 @@ def getPersonInfobyPersonId():
         data= json.loads(request.data)
         PersonId = data.get("id")
         personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
-        data = transf2(personinfo).json_str()
+        data = transf(personinfo).jsonfobject()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
@@ -56,10 +56,10 @@ def addPerson():
                 status = 200
                 return Response(res, status=status)        
         BirthPlace = data.get("BirthPlace","")
-        BirthCity = data.get("BirthCity","")
-        Nationallity = data.get("Nationallity","")
+        BirthCity = data.get("BirthCity",{})
+        Nationallity = data.get("Nationallity",{})
         FamilyType = data.get("FamilyType","")
-        Ethenic = data.get("Ethenic","")
+        Ethenic = data.get("Ethenic",{})
         FullName = data.get("FullName","")
         LastUpdateDateTime = datetime.now().astimezone(pytz.utc)
         auth_info = request.auth_info
@@ -77,7 +77,7 @@ def addPerson():
             'LastUpdateUserName':LastUpdateUserName
         }).inserted_id
         personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})        
-        data = transf2(personinfo).json_str()
+        data = transf(personinfo).jsonfobject()
         res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, status=status)
@@ -96,14 +96,24 @@ def searchPerson():
         BirthDate_T = data.get("BirthDate_T","")
         BirthDate={}
         if BirthDate_F:
-            BirthDate_F = datetime.strptime(BirthDate_F,'%d/%m/%Y').astimezone(pytz.utc)
+            try:
+                BirthDate_F = datetime.strptime(BirthDate_F,'%d/%m/%Y').astimezone(pytz.utc)
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
             BirthDate.update({ '$gte': BirthDate_F })
         if BirthDate_T:
-            BirthDate_T = datetime.strptime(BirthDate_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
+            try:
+                BirthDate_T = datetime.strptime(BirthDate_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
             BirthDate.update({ '$lte': BirthDate_T })
         if BirthDate:
             query.update({"BirthDate":BirthDate})
-        BirthPlace = data.get("BirthPlace")
+        BirthPlace = data.get("BirthPlace","")
         if BirthPlace:
             query.update({
                 "BirthPlace":{
@@ -111,19 +121,24 @@ def searchPerson():
                     "$options" :'i' # case-insensitive
                     }
                 })
-        BirthCity = data.get("BirthCity.Code")
+        BirthCity = data.get("BirthCity",{}).get("Code","")
         if BirthCity:
             query.update({"BirthCity.Code":BirthCity})
-        Nationallity = data.get("Nationallity.Code")
+        Nationallity = data.get("Nationallity",{}).get("Code","")
         if Nationallity:
             query.update({"Nationallity.Code":Nationallity})
-        FamilyType = data.get("FamilyType")
+        FamilyType = data.get("FamilyType","")
         if FamilyType:
-            query.update({"FamilyType":FamilyType})
-        Ethenic = data.get("Ethenic.Code")
+            query.update({
+                "FamilyType":{
+                    "$regex": FamilyType,
+                    "$options" :'i' # case-insensitive
+                    }
+                })
+        Ethenic = data.get("Ethenic",{}).get("Code","")
         if Ethenic:
             query.update({"Ethenic.Code":Ethenic})
-        FullName = data.get("FullName")
+        FullName = data.get("FullName","")
         if FullName:
             query.update({
                 "FullName":{
@@ -131,23 +146,38 @@ def searchPerson():
                     "$options" :'i' # case-insensitive
                     }
                 })
-        LastUpdateUserName = data.get("LastUpdateUserName")
+        LastUpdateUserName = data.get("LastUpdateUserName","")
         if LastUpdateUserName:
-            query.update({"LastUpdateUserName":LastUpdateUserName})
+            query.update({
+                "LastUpdateUserName":{
+                    "$regex": LastUpdateUserName,
+                    "$options" :'i' # case-insensitive
+                    }
+                })
         LastUpdateDateTime_F = data.get("LastUpdateDateTime_F",'')
         LastUpdateDateTime_T = data.get("LastUpdateDateTime_T",'')
         LastUpdateDateTime={}
         if LastUpdateDateTime_F:
-            LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y').astimezone(pytz.utc)
+            try:
+                LastUpdateDateTime_F = datetime.strptime(LastUpdateDateTime_F,'%d/%m/%Y').astimezone(pytz.utc)
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
             LastUpdateDateTime.update({ '$gte': LastUpdateDateTime_F })
         if LastUpdateDateTime_T:
-            LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
-            LastUpdateDateTime.update({ '$lte': LastUpdateDateTime_T })
+            try:
+                LastUpdateDateTime_T = datetime.strptime(LastUpdateDateTime_T +' 23:59:59','%d/%m/%Y %H:%M:%S').astimezone(pytz.utc)
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
+            LastUpdateDateTime.update({ '$lte': LastUpdateDateTime_T })            
         page_size = data.get("page_size")
         page = data.get("page")
         offset = int(page)*int(page_size)-int(page_size)
         personlist = person.db.person.find(query).sort("_id").skip(offset).limit(page_size).allow_disk_use(True)
-        data = transf(personlist).json_str()
+        data = transf(personlist).jsonfobject()
         total_row = person.db.person.count_documents(query)
         res = json.dumps({"data":data,'total_row':total_row,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
@@ -161,31 +191,36 @@ def updatePersonbyPersonId():
         itm={}
         BirthDate = data.get("BirthDate","")
         if BirthDate:
-            BirthDate = datetime.strptime(BirthDate, "%d/%m/%Y").astimezone(pytz.utc)
+            try:
+                BirthDate = datetime.strptime(BirthDate,'%d/%m/%Y').astimezone(pytz.utc)
+            except ValueError as e:
+                res = json.dumps({'message': e,"status":'FAIL'}, default=json_util.default).encode('utf-8')
+                status = 200
+                return Response(res, status=status)
             itm.update({"BirthDate":BirthDate})
         BirthPlace = data.get("BirthPlace","")
         if BirthPlace:
             itm.update({"BirthPlace":BirthPlace})
-        BirthCity = data.get("BirthCity","")
+        BirthCity = data.get("BirthCity",{})
         if BirthCity:
             itm.update({"BirthCity":BirthCity})
-        Nationallity = data.get("Nationallity","")
+        Nationallity = data.get("Nationallity",{})
         if Nationallity:
             itm.update({"Nationallity":Nationallity})
         FamilyType = data.get("FamilyType","")
         if FamilyType:
             itm.update({"FamilyType":FamilyType})
-        Ethenic = data.get("Ethenic","")
+        Ethenic = data.get("Ethenic",{})
         if Ethenic:
             itm.update({"Ethenic":Ethenic})
         FullName = data.get("FullName","")
         if FullName:
             itm.update({"FullName":FullName})        
         if itm:
-            itm.update({'LastUpdateDateTime':datetime.now(),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})        
+            itm.update({'LastUpdateDateTime':datetime.now().astimezone(pytz.utc),'LastUpdateUserName':auth_info.get('UserName','???').strip().lower()})        
             person.db.person.update_one({'_id':ObjectId(PersonId)}, {'$set':itm})
             personinfo = person.db.person.find_one({'_id':ObjectId(PersonId)})
-            data = transf2(personinfo).json_str()
+            data = transf(personinfo).jsonfobject()
             res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
             status = 200
         else:

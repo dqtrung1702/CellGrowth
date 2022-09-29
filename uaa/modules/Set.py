@@ -26,26 +26,31 @@ def before_request_func():
         return Response(res, mimetype='application/json', status=status)
 @route_set.route('/getSetInfobySetId',methods =['POST'])
 def getSetInfobySetId():
+    # if True:
+    #     data= json.loads(request.data)
+    #     SetId = data.get("id")
+    #     sql = '''select
+    #                 st."id",
+    #                 st."EFFFDate",
+    #                 st."EFFTDate",
+    #                 st."BUId",
+    #                 st."Type",
+    #                 st."Code" "SetCode",
+    #                 st."Description",
+    #                 st."LastUpdateUserName",
+    #                 st."LastUpdateDateTime"
+    #             from
+    #                 uaa."SetTbl" st
+    #             where st.id = {};'''.format(SetId)
+    #     data = sqlexec(sql)
+    #     res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+    #     status = 200
+    # return Response(res, mimetype='application/json', status=status)
     if True:
         data= json.loads(request.data)
         SetId = data.get("id")
-        
-        sql = '''select
-                    st."id",
-                    st."EFFFDate",
-                    st."EFFTDate",
-                    st."BUId",
-                    st."Type",
-                    st."Code" "SetCode",
-                    st."Description",
-                    st."LastUpdateUserName",
-                    st."LastUpdateDateTime"
-                from
-                    uaa."SetTbl" st
-                where st.id = {};'''.format(SetId)
-        
-        data = sqlexec(sql)
-        res = json.dumps({"data":data.json(),"status":"OK"},default=json_util.default).encode('utf-8')
+        data = SetTbl.query.filter_by(id = SetId).first()
+        res = json.dumps({"data":data,"status":"OK"},default=json_util.default).encode('utf-8')
         status = 200
     return Response(res, mimetype='application/json', status=status)
 @route_set.route('/addSet',methods =['POST'])
