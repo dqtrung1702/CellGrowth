@@ -1,10 +1,10 @@
 from os import environ
 class Config(object):
     SECRET_KEY = 'ERP-as-Services'
-    JWT_SECRET = 'ERP-as-Services'
+    JWT_SECRET = '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW'
     JWT_ALGORITHM = 'HS256'
     DEFAULT_THEME = None
-    UAA_URL = 'http://0.0.0.0:8081'
+    UAA_URL = 'http://localhost:8082'
     PAGE_SIZE = 5
 
 class ProductionConfig(Config):

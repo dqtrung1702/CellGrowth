@@ -13,50 +13,36 @@
     <div class="">
         <div class="">
             <table id="permissionTable" class="table">
+                {% if permissions %}
                 <thead>
-                    {% for key in permissions[0].keys() %}
-                        {%if key != 'id'%}
-                            <th class="table__heading" scope="col">{{key}}</th>
-                        {% endif %}
-                    {% endfor %}
-                    <th class="table__heading" scope="col"></th>
+                    <th class="table__heading">STT</th>
+                    <th class="table__heading">PermissionName</th>
+                    <th class="table__heading">PermissionType</th>
+                    <th class="table__heading">Description</th>
+                    <th class="table__heading">LastUpdateDateTime</th>
+                    <th class="table__heading"></th>
                     <tr>
-                        {% for key in permissions[0].keys() %}
-                        {%if key != 'id'%}
-                        <td class="table__searching" data-heading={{col}} scope="col">
-                            {%if key in ['LastUpdateDateTime']%}
-                            <input id={{key}} type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
-                            {% endif %}
-    
-                            {%if key not in ['STT','LastUpdateDateTime']%}
-                            <input id={{key}} type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" />
-                            {% endif %}
-                        </td>
-                        {% endif %}
-                        {% endfor %}
-                        <th class="table__heading" scope="col"></th>
+                        <td class="table__searching"></td>
+                        <td class="table__searching"><input id="PermissionName" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
+                        <td class="table__searching"><input id="PermissionType" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
+                        <td class="table__searching"><input id="Description" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
+                        <td class="table__searching"><input id="LastUpdateDateTime" type="text" style="width:100%" placeholder="Picker.." onchange="Search()" /></td>
+                        <td class="table__searching"></td>
                     </tr>
                 </thead>
                 <tbody id ="permissionTblBody">
                     {% for line in permissions %}
                         <tr>
-                            {% for col,value in line.items() %}
-                                {%if col != "id"%}
-                                    <td class="table__content" data-heading={{col}} scope="col">
-                                        {%if col == 'PermissionName'%}
-                                            <a href="{{ url_for('permission_blueprint.permission_detail', id = line.get('id')) }}">{{value}}</a>
-                                        {%else%}
-                                            {{value}}
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                            {% endfor %}
-                            <td class="table__content" scope="col">
-                                <a href="#"><i class="fa fa-trash" onclick="Delete({{line.get('id')}})"></i></a>
-                            </td>
+                            <td class="table__content">{{ line.get('STT') }}</td>
+                            <td class="table__content"><a href="{{ url_for('permission_blueprint.permission_detail', id = line.get('id')) }}">{{ line.get('PermissionName') }}</a></td>
+                            <td class="table__content">{{ line.get('PermissionType') }}</td>
+                            <td class="table__content">{{ line.get('Description') }}</td>
+                            <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
+                            <td class="table__content"><a href="#"><i class="fa fa-trash" onclick="Delete({{line.get('id')}})"></i></a></td>
                         </tr>                            
                     {% endfor %}
                 </tbody>
+                {% endif %}
             </table>
             <div style="text-align: left;">
                 <h4>
@@ -84,7 +70,7 @@
             success: function (response, textStatus, jqXHR) {
                 var result = confirm(response); 
                 if(result)  {
-                    $.post("{{url_for('role_blueprint.role_deletion')}}",{'id':id});
+                    $.post("{{url_for('permission_blueprint.permission_deletion')}}",{'id':id});
                     window.location.href = "{{url_for('permission_blueprint.Permission')}}";
                 } else {
                     alert("Cancel");
@@ -96,12 +82,11 @@
         var PermissionName = document.getElementById('PermissionName').value || '';
         var PermissionType = document.getElementById('PermissionType').value || '';
         var Description = document.getElementById('Description').value || '';
-        var LastUpdateUserName = document.getElementById('LastUpdateUserName').value || '';
         var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
         $.ajax({
             type: "POST",
             url: "{{url_for('permission_blueprint.permission_searching')}}",
-            data: JSON.stringify({'page':page, 'Code': PermissionName, "PermissionType":PermissionType,'Description': Description, 'LastUpdateUserName': LastUpdateUserName, 'LastUpdateDateTime': LastUpdateDateTime }),
+            data: JSON.stringify({'page':page, 'Code': PermissionName, "PermissionType":PermissionType,'Description': Description, 'LastUpdateDateTime': LastUpdateDateTime }),
             contentType: "application/json; charset=utf-8",
             success: function (response, textStatus, jqXHR) {
                 if (textStatus == "success") {
@@ -112,24 +97,22 @@
                         for (const p of response['permissions']) {
                             permissionTblBody = permissionTblBody + '<tr>';
 
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="STT" scope="col">' + p['STT'] + '</td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="RoleName" scope="col"><a href=' + '{{ url_for("permission_blueprint.permission_detail")}}' + '?id=' + p['id'] + '>' + p['PermissionName'] + '</a></td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="PermissionType" scope="col">' + p['PermissionType'] + '</td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="Description" scope="col">' + p['Description'] + '</td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col">' + p['LastUpdateUserName'] + '</td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col">' + p['LastUpdateDateTime'] + '</td>';
-                            permissionTblBody = permissionTblBody + '<td class="table__content" scope="col"> <a href=' + '{{ url_for("permission_blueprint.permission_deletion")}}' + '?id=' + p['id'] + '><i class="fa fa-trash"></i></a></td>'
+                            permissionTblBody += '<td class="table__content">' + p['STT'] + '</td>';
+                            permissionTblBody += '<td class="table__content"><a href=' + '{{ url_for("permission_blueprint.permission_detail")}}' + '?id=' + p['id'] + '>' + p['PermissionName'] + '</a></td>';
+                            permissionTblBody += '<td class="table__content">' + p['PermissionType'] + '</td>';
+                            permissionTblBody += '<td class="table__content">' + (p['Description'] || '') + '</td>';
+                            permissionTblBody += '<td class="table__content">' + (p['LastUpdateDateTime'] || '') + '</td>';
+                            permissionTblBody += '<td class="table__content"><a href=' + '{{ url_for("permission_blueprint.permission_deletion")}}' + '?id=' + p['id'] + '><i class="fa fa-trash"></i></a></td>'
                         }
                         
                     } else {
                         permissionTblBody = permissionTblBody + '<tr>';
 
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="STT" scope="col"></td>';
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="RoleName" scope="col"></td>';
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="PermissionType" scope="col"></td>';
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="Description" scope="col"></td>';
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col"></td>';
-                        permissionTblBody = permissionTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col"></td>';
+                        permissionTblBody += '<td class="table__content"></td>';
+                        permissionTblBody += '<td class="table__content"></td>';
+                        permissionTblBody += '<td class="table__content"></td>';
+                        permissionTblBody += '<td class="table__content"></td>';
+                        permissionTblBody += '<td class="table__content"></td>';
                         permissionTblBody = permissionTblBody + '</tr>';
 
                         

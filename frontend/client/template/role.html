@@ -15,51 +15,33 @@
         <div class="">
             
             <table id="roleTable" class="table">
+                {% if roles %}
                 <thead>
-                    {% for key in roles[0].keys() %}
-                        {%if key != 'id'%}
-                            <th class="table__heading" scope="col">{{key}}</th>
-                        {% endif %}
-                    {% endfor %}
-                    <th class="table__heading" scope="col"></th>
+                    <th class="table__heading">STT</th>
+                    <th class="table__heading">RoleName</th>
+                    <th class="table__heading">Description</th>
+                    <th class="table__heading">LastUpdateDateTime</th>
+                    <th class="table__heading"></th>
                     <tr>
-                        {% for key in roles[0].keys() %}
-                        {%if key != 'id'%}
-                        <td class="table__searching" data-heading={{col}} scope="col">
-                            {%if key in ['LastUpdateDateTime']%}
-                            <input id={{key}} type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
-                            {% endif %}
-    
-                            {%if key not in ['STT','LastUpdateDateTime']%}
-                            <input id={{key}} type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" />
-                            {% endif %}
-                        </td>
-                        {% endif %}
-                        {% endfor %}
-                        <th class="table__heading" scope="col"></th>
+                        <td class="table__searching"></td>
+                        <td class="table__searching"><input id="RoleName" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
+                        <td class="table__searching"><input id="Description" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
+                        <td class="table__searching"><input id="LastUpdateDateTime" type="text" style="width:100%" placeholder="Picker.." onchange="Search()" /></td>
+                        <td class="table__searching"></td>
                     </tr>
                 </thead>
                 <tbody id="roleTblBody">
                     {% for line in roles %}
-                        <tr id = {{'roleLine'+line.get('id')|string}}>
-                            {% for col,value in line.items() %}
-                                {%if col != "id"%}
-                                    <td class="table__content" data-heading={{col}} scope="col">
-                                        {%if col == 'RoleName'%}
-                                            <a href="{{ url_for('role_blueprint.role_detail', id = line.get('id')) }}">{{value}} <i class="fa fa-edit"></i></a>
-                                        {%else%}
-                                            {{value}}
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                            {% endfor %}
-                            <td class="table__content" scope="col">
-                                <a href="#"><i class="fa fa-trash" onclick="Delete({{line.get('id')}})"></i></a>
-                            </td>
-                        </tr>
+                    <tr id="{{ 'roleLine' ~ line.get('id') }}">
+                        <td class="table__content">{{ line.get('STT') }}</td>
+                        <td class="table__content"><a href="{{ url_for('role_blueprint.role_detail', id = line.get('id')) }}">{{ line.get('RoleName') }} <i class="fa fa-edit"></i></a></td>
+                        <td class="table__content">{{ line.get('Description') }}</td>
+                        <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
+                        <td class="table__content"><a href="#"><i class="fa fa-trash" onclick="Delete({{line.get('id')}})"></i></a></td>
+                    </tr>
                     {% endfor %}
-                    
                 </tbody>
+                {% endif %}
             </table>
             <div style="text-align: left;">
                 <h4>
@@ -99,12 +81,11 @@
     function Search(page = 1) {
         var RoleName = document.getElementById('RoleName').value || '';
         var Description = document.getElementById('Description').value || '';
-        var LastUpdateUserName = document.getElementById('LastUpdateUserName').value || '';
         var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
         $.ajax({
             type: "POST",
             url: "{{url_for('role_blueprint.role_searching')}}",
-            data: JSON.stringify({'page':page, 'Code': RoleName, 'Description': Description, 'LastUpdateUserName': LastUpdateUserName, 'LastUpdateDateTime': LastUpdateDateTime }),
+            data: JSON.stringify({'page':page, 'Code': RoleName, 'Description': Description, 'LastUpdateDateTime': LastUpdateDateTime }),
             contentType: "application/json; charset=utf-8",
             success: function (response, textStatus, jqXHR) {
                 if (textStatus == "success") {
@@ -115,12 +96,11 @@
                         for (const r of response['roles']) {
                             roleTblBody = roleTblBody + '<tr>';
 
-                            roleTblBody = roleTblBody + '<td class="table__content" data-heading="STT" scope="col">' + r['STT'] + '</td>';
-                            roleTblBody = roleTblBody + '<td class="table__content" data-heading="RoleName" scope="col"><a href=' + '{{ url_for("role_blueprint.role_detail")}}' + '?id=' + r['id'] + '>' + r['RoleName'] + '</a></td>';
-                            roleTblBody = roleTblBody + '<td class="table__content" data-heading="Description" scope="col">' + r['Description'] + '</td>';
-                            roleTblBody = roleTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col">' + r['LastUpdateUserName'] + '</td>';
-                            roleTblBody = roleTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col">' + r['LastUpdateDateTime'] + '</td>';
-                            roleTblBody = roleTblBody + '<td class="table__content" scope="col"> <a href=' + '{{ url_for("role_blueprint.role_deletion")}}' + '?id=' + r['id'] + '><i class="fa fa-trash"></i></a></td>'
+                            roleTblBody += '<td class="table__content">' + r['STT'] + '</td>';
+                            roleTblBody += '<td class="table__content"><a href=' + '{{ url_for("role_blueprint.role_detail")}}' + '?id=' + r['id'] + '>' + r['RoleName'] + '</a></td>';
+                            roleTblBody += '<td class="table__content">' + (r['Description'] || '') + '</td>';
+                            roleTblBody += '<td class="table__content">' + (r['LastUpdateDateTime'] || '') + '</td>';
+                            roleTblBody += '<td class="table__content"><a href=' + '{{ url_for("role_blueprint.role_deletion")}}' + '?id=' + r['id'] + '><i class="fa fa-trash"></i></a></td>';
                         }
                         
                     } else {

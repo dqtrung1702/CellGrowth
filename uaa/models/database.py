@@ -2,35 +2,28 @@
 from config import Config
 from psycopg2.pool import SimpleConnectionPool
 
-class db():
-    # def __init__(self, xuser=Config.POSTGRES_USERNAME,xpassword=Config.POSTGRES_PASSWORD,xhost=Config.POSTGRES_HOST,xdatabase=Config.POSTGRES_DB,xport=Config.POSTGRES_PORT,xconnmin = Config.POSTGRES_MINCONN,xconnmax = Config.POSTGRES_MAXCONN):
+
+class db:
+    """Light wrapper around psycopg2 connection pool."""
+
     def __init__(self):
-        self.dbConfig = Config
         self.conn_pool = SimpleConnectionPool(
-            dbConfig.POSTGRES_MINCONN,
-            dbConfig.POSTGRES_MAXCONN,
-            host=dbConfig.POSTGRES_HOST,
-            database=dbConfig.POSTGRES_DB,
-            user=dbConfig.POSTGRES_USERNAME,
-            password=dbConfig.POSTGRES_PASSWORD,
-            port=dbConfig.POSTGRES_PORT
-            )
-        if (self.conn_pool):
-            print("Connection pool created successfully using ThreadedConnectionPool")
-    
-    def get_cursor(self):
-        conn = self.conn_pool.getconn()
-        try:
-            yield conn.cursor()
-            conn.commit()
-        finally:
-            self.conn_pool.putconn(conn)
+            Config.POSTGRES_MINCONN,
+            Config.POSTGRES_MAXCONN,
+            host=Config.POSTGRES_HOST,
+            database=Config.POSTGRES_DB,
+            user=Config.POSTGRES_USERNAME,
+            password=Config.POSTGRES_PASSWORD,
+            port=Config.POSTGRES_PORT,
+            options=Config.POSTGRES_OPTIONS,
+        )
 
     def start_op(self):
+        """Get a connection + cursor; caller must return the connection via close_op."""
         conn = self.conn_pool.getconn()
         cur = conn.cursor()
-        return (conn, cur)
-    
+        return conn, cur
+
     def close_op(self, conn):
         conn.commit()
         self.conn_pool.putconn(conn)

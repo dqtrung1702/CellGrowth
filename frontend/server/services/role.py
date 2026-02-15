@@ -41,7 +41,7 @@ def Role():
     else:
       page =  request.args.get('page', type=int, default=1)
       data.update({'page':page})
-    res = requests.post(url+'/getRoleList', data=json.dumps(data), cookies=cookies)
+    res = requests.post(url+'/getRoleList', json=data, cookies=cookies, timeout=5)
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         data= res.json().get('data')
@@ -51,9 +51,13 @@ def Role():
           total_row = 0
         roles = []
         for pos,line in enumerate (data):
-          linedata = {}
-          linedata.update({"id":line.get('id'),"STT":pos+1,"RoleName":line.get('Code'), 'Description':line.get('Description'), 'LastUpdateUserName':line.get('LastUpdateUserName'), 'LastUpdateDateTime':line.get('LastUpdateDateTime')})
-          roles.append(linedata)
+          roles.append({
+            "id": line.get('id'),
+            "STT": pos+1,
+            "RoleName": line.get('Code'),
+            "Description": line.get('Description'),
+            "LastUpdateDateTime": line.get('LastUpdateDateTime')
+          })
         if roles:
           total_pages = (round(total_row/page_size) + 1 if round(total_row/page_size) < (total_row/page_size) else round(total_row/page_size))
           pagination = {'page':page,'total_pages': total_pages}
@@ -160,11 +164,11 @@ def role_detail():
       data.update({'Description':Description,'Permission':Permission})
       if RoleId != "New":
         data.update({'RoleId':RoleId})
-        res = requests.post(url+'/updateRole', data=json.dumps(data), cookies=cookies)
+        res = requests.post(url+'/updateRole', json=data, cookies=cookies, timeout=5)
       else:        
         Code = data.get('RoleName',None)
         data.update({'Code':Code})
-        res = requests.post(url+'/addRole', data=json.dumps(data), cookies=cookies)
+        res = requests.post(url+'/addRole', json=data, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data= res.json().get('data')
@@ -177,7 +181,7 @@ def role_detail():
       return redirect(url_for('role_blueprint.role_detail', id = RoleId))
     '''role'''
     if RoleId != 'New':    
-      res = requests.post(url+'/getRoleInfo', data=json.dumps({'id':RoleId}), cookies=cookies)
+      res = requests.post(url+'/getRoleInfo', json={'id':RoleId}, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           role = res.json().get('data')[0]
@@ -186,7 +190,7 @@ def role_detail():
       else:
         return redirect('home')
       '''rolepermission'''
-      res = requests.post(url+'/getPermissionByRole', data=json.dumps({'id':RoleId}), cookies=cookies)
+      res = requests.post(url+'/getPermissionByRole', json={'id':RoleId}, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           permission = res.json().get('data')

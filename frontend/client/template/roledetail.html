@@ -5,6 +5,7 @@
       <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('role_blueprint.Role') }}'"> Back to Roles screen</i>
     </div>
     <form method="POST">        
+        <input type="hidden" name="id" value="{{ role.get('id','New') }}">
         <div class="">
           <h4>Role Info</h4>
           <div class="input-group">

@@ -5,139 +5,200 @@
       <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('permission_blueprint.Permission') }}'"> Back to Permissions screen</i>
     </div>
     <form id="PermissionForm" method="POST">        
-        <div class="col-full">
-          <h4>Permission Info</h4>
-          <div class="input-group col-half">
-              <div class="input-group col-xfifth">
-                <label for="PermissionName"><i class="fa fa-tag col-third">Permission Name</i></label>
-                {% if permission.get('PermissionName') %} 
-                  <input id="PermissionName" type="text" disabled value="{{permission.get('PermissionName')}}"  placeholder="Permission Name" name="PermissionName"/>
-                {% else %}
-                  <input id="PermissionName" type="text"  placeholder="Permission Name" name="PermissionName"/>
-                {%endif%}
-              </div>
-              <div class="input-group col-fifth">
-                <label for="PermissionType"><i class="fa">Type</i></label>
-                <select class="" name="PermissionType" id="PermissionType" placeholder="PermissionType">
-                  <option value="DATA">DATA</option>
-                  <option value="ROLE">ROLE</option>
-                </select>
-              </div>
-              <div class="col-full input-group">
-                <label class="" for="Description"><i class="fa fa-align-center">Description</i></label>
-                <input id ="Description" type="text" value="{{permission.get('Description','')}}"  placeholder="Description" name="Description" />
-              </div>
-              <div class="input-group">
-                <div class="col-half">
-                  <i class="fa fa-history"></i>
-                  <label for="LastUpdateDateTime"><i class="fa">Last Update</i></label>
-                  <input id = "LastUpdateDateTime" type="text" disabled value="{{permission.get('LastUpdateDateTime','')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
-                </div>
-                <div class="col-half">
-                  <label for="LastUpdateUserName"><i class="fa">by</i></label>
-                  <input id = "LastUpdateUserName" type="text" disabled value="{{permission.get('LastUpdateUserName','')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
-                </div>
-              </div>
-          </div>
-          <div class="col-xfifth input-group">
-            <label for="UrlTable"><i class="fa fa-check-circle">Access Right Table</i></label>            
-            <table id="UrlTable" name="UrlTable" class="table">
+      <div class="col-full">
+        <h4>Permission Info</h4>
+        <div class="input-group">
+          <label for="PermissionName"><i class="fa fa-tag col-third">Permission Name</i></label>
+          {% if permission.get('PermissionName') %} 
+            <input id="PermissionName" type="text" disabled value="{{permission.get('PermissionName')}}"  placeholder="Permission Name" name="PermissionName"/>
+          {% else %}
+            <input id="PermissionName" type="text"  placeholder="Permission Name" name="PermissionName"/>
+          {%endif%}
+        </div>
+        <div class="input-group">
+          <label for="PermissionType"><i class="fa">Type</i></label>
+          <select name="PermissionType" id="PermissionType">
+            <option value="ROLE">ROLE</option>
+            <option value="DATA">DATA</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="Description"><i class="fa fa-align-center">Description</i></label>
+          <input id="Description" type="text" value="{{permission.get('Description','')}}" placeholder="Description" name="Description" />
+        </div>
+        <div class="input-group">
+          <i class="fa fa-check-circle"></i>
+          <label>URLs / Data Scopes</label>
+          <div class="table-wrapper" id="url-wrapper">
+            <table id="UrlTable" class="table">
+              <thead>
+                <tr>
+                  <th class="table__heading">STT</th>
+                  <th class="table__heading">Method</th>
+                  <th class="table__heading">URL</th>
+                  <th class="table__heading">Type</th>
+                  <th class="table__heading"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
             </table>
+            <button type="button" class="btn" onclick="addUrlRow()"><i class="fa fa-plus"></i> Add URL</button>
           </div>
-        </div>        
-        <div class="col-half input-group">          
-          <div>
-            <div class="col-half">
-              <button type="submit"><i class="fa fa-save"> Save</i></button>
-            </div>
-            <div class="col-half">              
-              <button type="button" onclick="window.location.href='{{ url_for('permission_blueprint.permission_detail', id = permission.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
-            </div>
+
+          <div class="table-wrapper" id="data-wrapper" style="display:none;">
+            <table id="DataTable" class="table">
+              <thead>
+                <tr>
+                  <th class="table__heading">STT</th>
+                  <th class="table__heading">SetName</th>
+                  <th class="table__heading">SetTbl</th>
+                  <th class="table__heading">SetCol</th>
+                  <th class="table__heading">SetVal</th>
+                  <th class="table__heading"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <button type="button" class="btn" onclick="addDataRow()"><i class="fa fa-plus"></i> Add Data Scope</button>
           </div>
-          
-        </div>        
+        </div>
+        <div class="input-group">
+          <div class="col-half">
+            <label>Last Update</label>
+            <input type="text" disabled value="{{permission.get('LastUpdateDateTime','')}}" />
+          </div>
+          <div class="col-half">
+            <label>by</label>
+            <input type="text" disabled value="{{permission.get('LastUpdateUserName','')}}" />
+          </div>
+        </div>
+      </div>        
+      <div class="col-half input-group">          
+        <div class="col-half">
+          <button type="submit"><i class="fa fa-save"> Save</i></button>
+        </div>
+        <div class="col-half">              
+          <button type="button" onclick="window.location.href='{{ url_for('permission_blueprint.permission_detail', id = permission.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
+        </div>
+      </div>        
+      <input type="hidden" id="UrlListJSON" name="UrlListJSON" />
+      <input type="hidden" id="DataSetsJSON" name="DataSetsJSON" />
     </form>
   </div>
   <script>
     $(document).ready(function(){
-      document.getElementById("PermissionType").value = "{{permission.get('PermissionType','')}}";
-      $("#PermissionForm").submit(function(e) {
-          var UrlTable = JSON.stringify(tableToJson(document.getElementById("UrlTable")))
-          var UrlTable_base64 = btoa(UrlTable)
-          $(this).append('<input type="hidden" name="UrlTable_base64" value="'+UrlTable_base64+'" />');
-          return true;
-      });
-      const PermissionId = {{permission.get('id')}};
-      $.ajax({
-          type: "POST",
-          url: "{{url_for('permission_blueprint.getURLbyPermission')}}",
-          data: JSON.stringify({'PermissionId':PermissionId}),
-          contentType: "application/json; charset=utf-8",
-          success: function (response, textStatus, jqXHR) {
-              if (textStatus == "success") {                  
-                const UrlList = JSON.parse(response);
-                var k, v;
-                var UrlTable = '';
-                var id;
-                if (UrlList) {
-                  UrlTable = UrlTable + '<thead>';
-                  UrlTable = UrlTable + '<th class="table__heading" scope="col">STT</th>';
-                  UrlTable = UrlTable + '<th class="table__heading" scope="col">Url</th>';
-                  UrlTable = UrlTable + '<th class="table__heading" scope="col">Method</th>';
-                  UrlTable = UrlTable + '<th class="table__heading" scope="col">Type</th>';
-                  UrlTable = UrlTable + '<th class="table__heading" scope="col">Description</th>';
-                  UrlTable = UrlTable + '</thead>';
-                  for (const u of UrlList) {
-                    UrlTable = UrlTable + '<tbody>';
-                    UrlTable = UrlTable + '<tr>';                 
-                    UrlTable = UrlTable + '<td class="table__content" data-heading="STT" scope="col">' + u['STT'] + '</td>';
-                    UrlTable = UrlTable + '<td class="table__content" data-heading="Url" scope="col" contenteditable="true">' + u['url'] + '</td>';
-                    UrlTable = UrlTable + '<td class="table__content" data-heading="Method" scope="col" contenteditable="true">' + u['Method'] + '</td>';
-                    UrlTable = UrlTable + '<td class="table__content" data-heading="Type" scope="col" contenteditable="true">' + u['Type'] + '</td>';
-                    UrlTable = UrlTable + '<td class="table__content" data-heading="Description" scope="col" contenteditable="true">' + u['Description'] + '</td>';
-                    UrlTable = UrlTable + '<td class="table__content" scope="col"><a href="#"><i class="fa fa-trash"></i></a></td>'
-                    UrlTable = UrlTable + '</tr>';
-                    UrlTable = UrlTable + '</tbody>';                      
-                  }                  
-                } else {
-                    console.log('')                      
-                }
-                document.getElementById("UrlTable").innerHTML = UrlTable;
-              }
-          }
+      document.getElementById("PermissionType").value = "{{permission.get('PermissionType','ROLE')}}";
+
+      // nạp URL list vào bảng
+      const urlList = {{ urlpermission | tojson }};
+      renderUrlTable(urlList || []);
+
+      // nạp DataSets nếu có
+      const dataSets = {{ permission.get('DataSets', []) | tojson }};
+      renderDataTable(dataSets || []);
+
+      toggleTables();
+
+      $("#PermissionType").on('change', toggleTables);
+
+      $("#PermissionForm").submit(function() {
+        const type = document.getElementById("PermissionType").value || 'ROLE';
+        if (type === 'DATA') {
+          const rows = Array.from(document.querySelectorAll("#DataTable tbody tr"));
+          const scopes = rows.map(tr => {
+            const tds = tr.querySelectorAll("td");
+            return {
+              SetName: (tds[1].innerText || '').trim(),
+              SetTbl: (tds[2].innerText || '').trim(),
+              SetCol: (tds[3].innerText || '').trim(),
+              SetVal: (tds[4].innerText || '').trim(),
+            };
+          }).filter(s => s.SetTbl && s.SetCol && s.SetVal);
+          document.getElementById("DataSetsJSON").value = JSON.stringify(scopes);
+          document.getElementById("UrlListJSON").value = "[]";
+        } else {
+          const rows = Array.from(document.querySelectorAll("#UrlTable tbody tr"));
+          const urls = rows.map(tr => {
+            const cells = tr.querySelectorAll("td");
+            return {
+              Method: (cells[1].innerText || 'GET').trim(),
+              url: (cells[2].innerText || '').trim(),
+              Type: (cells[3].innerText || 'ROLE').trim() || 'ROLE'
+            };
+          }).filter(u => u.url);
+          document.getElementById("UrlListJSON").value = JSON.stringify(urls);
+          document.getElementById("DataSetsJSON").value = "[]";
+        }
+        return true;
       });
     });
-    function tableToJson(table) {
-        var data = [];
-        var rows = table.rows;
-        var rl = rows.length;    
-        var cols = rows[0].cells;
-        var coll = cols.length;
 
-        console.log(cols)
-        // first row needs to be headers
-        var headers = [];
-        for (var i=0; i<coll; i++) {
-          col = cols[i];
-          headers[i] = col.textContent;
-        }    
-        console.log(headers)
-        // go through cells
-        for (var i=1; i<rl; i++) {
+    function toggleTables(){
+      const type = document.getElementById("PermissionType").value || 'ROLE';
+      document.getElementById("url-wrapper").style.display = (type === 'ROLE') ? 'block' : 'none';
+      document.getElementById("data-wrapper").style.display = (type === 'DATA') ? 'block' : 'none';
+    }
 
-            cells = rows[i].cells;
-            var rowData = {};
+    function renderUrlTable(list) {
+      const tbody = document.querySelector("#UrlTable tbody");
+      tbody.innerHTML = "";
+      list.forEach((u, idx) => appendUrlRow(idx + 1, u.Method || 'GET', u.url || '', u.Type || 'ROLE'));
+      if (!list.length) appendUrlRow(1, 'GET', '', 'ROLE');
+    }
 
-            for (var j=0; j<coll; j++) {
-                cell = cells[j]
-                rowData[ headers[j] ] = cell.textContent;
-                
-            }
-            
-            data.push(rowData);
-        }       
-        console.log(data)
-        return data;
+    function renderDataTable(list) {
+      const tbody = document.querySelector("#DataTable tbody");
+      tbody.innerHTML = "";
+      list.forEach((s, idx) => appendDataRow(idx + 1, s.SetName || '', s.SetTbl || '', s.SetCol || '', s.SetVal || ''));
+      if (!list.length) appendDataRow(1, '', '', '', '');
+    }
+
+    function appendUrlRow(stt, method, url, type) {
+      const tbody = document.querySelector("#UrlTable tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="table__content">${stt}</td>
+        <td class="table__content" contenteditable="true">${method}</td>
+        <td class="table__content" contenteditable="true">${url}</td>
+        <td class="table__content" contenteditable="true">${type}</td>
+        <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function appendDataRow(stt, name, tbl, col, val) {
+      const tbody = document.querySelector("#DataTable tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="table__content">${stt}</td>
+        <td class="table__content" contenteditable="true">${name}</td>
+        <td class="table__content" contenteditable="true">${tbl}</td>
+        <td class="table__content" contenteditable="true">${col}</td>
+        <td class="table__content" contenteditable="true">${val}</td>
+        <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function addUrlRow() {
+      const tbody = document.querySelector("#UrlTable tbody");
+      const stt = tbody.children.length + 1;
+      appendUrlRow(stt, 'GET', '', 'ROLE');
+    }
+
+    function addDataRow() {
+      const tbody = document.querySelector("#DataTable tbody");
+      const stt = tbody.children.length + 1;
+      appendDataRow(stt, '', '', '', '');
+    }
+
+    function deleteRow(anchor) {
+      const row = anchor.closest("tr");
+      row.remove();
+      // re-number
+      Array.from(document.querySelectorAll("#UrlTable tbody tr")).forEach((tr, idx) => {
+        tr.children[0].innerText = idx + 1;
+      });
     }
   </script>  
 {% endblock %}

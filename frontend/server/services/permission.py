@@ -41,7 +41,7 @@ def Permission():
     else:
       page =  request.args.get('page', type=int, default=1)
       data.update({'page':page})
-    res = requests.post(url+'/getPermissionList', data=json.dumps(data), cookies=cookies)  
+    res = requests.post(url+'/getPermissionList', json=data, cookies=cookies, timeout=5)  
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         data= res.json().get('data')
@@ -51,9 +51,14 @@ def Permission():
           total_row = 0
         permissions = []
         for pos,line in enumerate (data):
-          linedata = {}
-          linedata.update({"id":line.get('id'),"STT":pos+1,"PermissionName":line.get('Code'),"PermissionType":line.get('PermissionType'), 'Description':line.get('Description'), 'LastUpdateUserName':line.get('LastUpdateUserName'), 'LastUpdateDateTime':line.get('LastUpdateDateTime')})
-          permissions.append(linedata)
+          permissions.append({
+            "id": line.get('id'),
+            "STT": pos+1,
+            "PermissionName": line.get('Code'),
+            "PermissionType": line.get('PermissionType'),
+            "Description": line.get('Description'),
+            "LastUpdateDateTime": line.get('LastUpdateDateTime')
+          })
         if permissions:
           total_pages = (round(total_row/page_size) + 1 if round(total_row/page_size) < (total_row/page_size) else round(total_row/page_size))
           pagination = {'page':page,'total_pages': total_pages}
@@ -90,22 +95,29 @@ def permission_detail():
     if request.method == 'POST':
       PermissionType = data.get('PermissionType',None)
       Description = data.get('Description',None)
-      UrlTable_base64 = data.get('UrlTable_base64')
+      UrlListJSON = data.get('UrlListJSON')
+      DataSetsJSON = data.get('DataSetsJSON')
       UrlList = []
-      if UrlTable_base64:
-        base64_bytes = UrlTable_base64.encode('utf-8')
-        UrlTable_bytes = base64.b64decode(base64_bytes)
-        UrlTable = UrlTable_bytes.decode('utf-8')
-        UrlList.append(UrlTable)
+      DataSets = []
+      if UrlListJSON:
+        try:
+          UrlList = json.loads(UrlListJSON)
+        except Exception:
+          UrlList = []
+      if DataSetsJSON:
+        try:
+          DataSets = json.loads(DataSetsJSON)
+        except Exception:
+          DataSets = []
       data = {}
-      data.update({'Description':Description,'PermissionType':PermissionType,'UrlList':UrlList})
+      data.update({'Description':Description,'PermissionType':PermissionType,'UrlList':UrlList,'DataSets':DataSets})
       if PermissionId != "New":
         data.update({'PermissionId':PermissionId})
-        res = requests.post(url+'/updatePermission', data=json.dumps(data), cookies=cookies)
+        res = requests.post(url+'/updatePermission', json=data, cookies=cookies, timeout=5)
       else:        
         Code = data.get('PermissionName',None)
         data.update({'Code':Code})
-        res = requests.post(url+'/addPermission', data=json.dumps(data), cookies=cookies)
+        res = requests.post(url+'/addPermission', json=data, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data= res.json().get('data')
@@ -116,7 +128,7 @@ def permission_detail():
          
     if PermissionId !='New':
       '''permission'''
-      res = requests.post(url+'/getPermissionInfo', data=json.dumps({'ids':[PermissionId]}), cookies=cookies)
+      res = requests.post(url+'/getPermissionInfo', json={'ids':[PermissionId]}, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data = res.json().get('data')
@@ -128,7 +140,7 @@ def permission_detail():
         return redirect('home')
       '''url'''
       data = {'PermissionId' : PermissionId}
-      res = requests.post(url+'/getURLbyPermission', data=json.dumps(data), cookies=cookies)
+      res = requests.post(url+'/getURLbyPermission', json=data, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data= res.json().get('data')
@@ -156,7 +168,7 @@ def getURLbyPermission():
     data = json.loads(request.data)
     PermissionId = data.get('PermissionId')
     data = {'PermissionId' : PermissionId}
-    res = requests.post(url+'/getURLbyPermission', data=json.dumps(data), cookies=cookies)
+    res = requests.post(url+'/getURLbyPermission', json=data, cookies=cookies, timeout=5)
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         data= res.json().get('data')
@@ -190,7 +202,7 @@ def permission_deletion():
     data = request.values
     PermissionId = data.get('id')
     data = {'id':PermissionId}
-    res = requests.post(url+'/deletePermissionById', data=json.dumps(data), cookies=cookies)
+    res = requests.post(url+'/deletePermissionById', json=data, cookies=cookies, timeout=5)
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         data= res.json().get('data')
@@ -210,7 +222,7 @@ def getDataPermissionList():
   page = data.get('page',1)
   Code = data.get('Code')
   data = {'Code':Code,'PermissionType':'DATA','page':page,'page_size' : 10}
-  res = requests.post(url+'/getDataPermissionList', data=json.dumps(data), cookies=cookies)
+  res = requests.post(url+'/getDataPermissionList', json=data, cookies=cookies, timeout=5)
   if res.status_code == 200:
     if res.json().get('status','') == 'OK':
       data= res.json().get('data')
@@ -231,7 +243,7 @@ def getRolePermissionList():
   page = data.get('page',1)
   Code = data.get('Code')
   data = {'Code':Code,'PermissionType':'ROLE','page' : page,'page_size' : Config.PAGE_SIZE}
-  res = requests.post(url+'/getRolePermissionList', data=json.dumps(data), cookies=cookies)
+  res = requests.post(url+'/getRolePermissionList', json=data, cookies=cookies, timeout=5)
   if res.status_code == 200:
     if res.json().get('status','') == 'OK':
       data= res.json().get('data') 

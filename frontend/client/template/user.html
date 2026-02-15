@@ -10,61 +10,39 @@
     </div>
     <div>
         <table class="table">
-            {%if users%}
+            {% if users %}
             <thead>
-
-                {% for key in users[0].keys() %}
-                {%if key != 'id'%}
-                <th class="table__heading" scope="col">{{key}}</th>
-                {% endif %}
-                {% endfor %}
+                <th class="table__heading">STT</th>
+                <th class="table__heading">UserName</th>
+                <th class="table__heading">LastSignOnDateTime</th>
+                <th class="table__heading">LastUpdateDateTime</th>
                 <tr>
-                    {% for key in users[0].keys() %}
-                    {%if key != 'id'%}
-                    <td class="table__searching" data-heading={{col}} scope="col">
-                        {%if key == 'UserLocked'%}
-                        <select name="UserLocked" id="UserLocked" onchange="Search()">
-                            <option value="All">All</option>
-                            <option value="Locked">Locked</option>
-                            <option value="UnLocked">UnLocked</option>
-                        </select>
-                        {% endif %}
-
-                        {%if key in ['LastSignOnDateTime','LastUpdateDateTime']%}
-                        <input id={{key}} type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
-                        {% endif %}
-
-                        {%if key not in ['STT','LastSignOnDateTime','LastUpdateDateTime','UserLocked']%}
-                        <input id={{key}} type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" />
-                        {% endif %}
+                    <td class="table__searching"></td>
+                    <td class="table__searching">
+                        <input id="UserName" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" />
                     </td>
-                    {% endif %}
-                    {% endfor %}
-
+                    <td class="table__searching">
+                        <input id="LastSignOnDateTime" type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
+                    </td>
+                    <td class="table__searching">
+                        <input id="LastUpdateDateTime" type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
+                    </td>
                 </tr>
             </thead>
 
-
             <tbody id="userTblBody">
-
                 {% for line in users %}
                 <tr>
-                    {% for col,value in line.items() %}
-                    {%if col != "id"%}
-                    <td class="table__content" data-heading={{col}} scope="col">
-                        {%if col == 'UserName'%}
-                        <a href="{{ url_for('user_blueprint.user_detail', id = line.get('id')) }}">{{value}}</a>
-                        {%else%}
-                        {{value}}
-                        {% endif %}
+                    <td class="table__content">{{ line.get('STT') }}</td>
+                    <td class="table__content">
+                        <a href="{{ url_for('user_blueprint.user_detail', id = line.get('id')) }}">{{ line.get('UserName') }}</a>
                     </td>
-                    {% endif %}
-                    {% endfor %}
+                    <td class="table__content">{{ line.get('LastSignOnDateTime') }}</td>
+                    <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
             {% endif %}
-
         </table>
     </div>
 
@@ -83,15 +61,12 @@
     
     function Search(page = 1) {
         var UserName = document.getElementById('UserName').value || '';
-        var UserLocked = document.getElementById('UserLocked').value || '';
-        var NameDisplay = document.getElementById('NameDisplay').value || '';
         var LastSignOnDateTime = document.getElementById('LastSignOnDateTime').value || '';
-        var LastUpdateUserName = document.getElementById('LastUpdateUserName').value || '';
         var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
         $.ajax({
             type: "POST",
             url: "{{url_for('user_blueprint.User')}}",
-            data: JSON.stringify({'page':page, 'Code': UserName, 'UserLocked': UserLocked, 'NameDisplay': NameDisplay, 'LastUpdateUserName': LastUpdateUserName, 'LastSignOnDateTime': LastSignOnDateTime, 'LastUpdateDateTime': LastUpdateDateTime }),
+            data: JSON.stringify({'page':page, 'UserName': UserName, 'LastSignOnDateTime': LastSignOnDateTime, 'LastUpdateDateTime': LastUpdateDateTime }),
             contentType: "application/json; charset=utf-8",
             success: function (response, textStatus, jqXHR) {
                 if (textStatus == "success") {
@@ -102,25 +77,19 @@
                         for (const u of response['users']) {
                             userTblBody = userTblBody + '<tr>';
 
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="STT" scope="col">' + u['STT'] + '</td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="UserName" scope="col"><a href=' + '{{ url_for("user_blueprint.user_detail")}}' + '?id=' + u['id'] + '>' + u['UserName'] + '</a></td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="UserLocked" scope="col">' + u['UserLocked'] + '</td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="NameDisplay" scope="col">' + u['NameDisplay'] + '</td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="LastSignOnDateTime" scope="col">' + u['LastSignOnDateTime'] + '</td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col">' + u['LastUpdateUserName'] + '</td>';
-                            userTblBody = userTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col">' + u['LastUpdateDateTime'] + '</td>';
+                            userTblBody += '<td class="table__content">' + u['STT'] + '</td>';
+                            userTblBody += '<td class="table__content"><a href=' + '{{ url_for("user_blueprint.user_detail")}}' + '?id=' + u['id'] + '>' + u['UserName'] + '</a></td>';
+                            userTblBody += '<td class="table__content">' + (u['LastSignOnDateTime'] || '') + '</td>';
+                            userTblBody += '<td class="table__content">' + (u['LastUpdateDateTime'] || '') + '</td>';
                         }
                         
                     } else {
                         userTblBody = userTblBody + '<tr>';
 
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="STT" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="UserName" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="UserLocked" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="NameDisplay" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="LastSignOnDateTime" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col"></td>';
-                        userTblBody = userTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col"></td>';
+                        userTblBody += '<td class="table__content"></td>';
+                        userTblBody += '<td class="table__content"></td>';
+                        userTblBody += '<td class="table__content"></td>';
+                        userTblBody += '<td class="table__content"></td>';
                         userTblBody = userTblBody + '</tr>';
 
                         

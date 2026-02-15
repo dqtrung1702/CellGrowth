@@ -40,7 +40,7 @@ def User():
       data.update(json.loads(request.data.decode('utf-8')))
       page = data.get('page')
       isSearch = True
-    res = requests.post(url+'/getUserList', data=json.dumps(data), cookies=cookies)
+    res = requests.post(url+'/getUserList', json=data, cookies=cookies, timeout=5)
 
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
@@ -51,9 +51,13 @@ def User():
           total_row = 0
         users = []
         for pos,line in enumerate (data):
-          linedata = {}
-          linedata.update({"id":line.get('id'),"STT":pos+1,"UserName":line.get('Code'), "UserLocked":('' if line.get('UserLocked') == False else 'Locked'),'NameDisplay':line.get('NameDisplay'), 'LastSignOnDateTime':line.get('LastSignOnDateTime'), 'LastUpdateUserName':line.get('LastUpdateUserName'), 'LastUpdateDateTime':line.get('LastUpdateDateTime')})
-          users.append(linedata)
+          users.append({
+            "id": line.get('id'),
+            "STT": pos+1,
+            "UserName": line.get('UserName'),
+            "LastSignOnDateTime": line.get('LastSignOnDateTime'),
+            "LastUpdateDateTime": line.get('LastUpdateDateTime')
+          })
         if users:
           total_pages = (round(total_row/page_size) + 1 if round(total_row/page_size) < (total_row/page_size) else round(total_row/page_size))
           pagination = {'page':page,'total_pages': total_pages}
@@ -102,7 +106,7 @@ def user_detail():
         data.update({'Password':Password})
       data.update({'NameDisplay':NameDisplay})
       data.update({'DataPermission':DataPermission})
-      res = requests.post(url+'/updateUser', data=json.dumps(data), cookies=cookies)
+      res = requests.post(url+'/updateUser', json=data, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data= res.json().get('data')
@@ -112,7 +116,7 @@ def user_detail():
           return redirect('home')
       xrole =request.form.getlist('xrole')
       data2 ={'UserId':UserId, 'RoleList':xrole}
-      res = requests.post(url+'/updateUserRole', data=json.dumps(data2), cookies=cookies)
+      res = requests.post(url+'/updateUserRole', json=data2, cookies=cookies, timeout=5)
       if res.status_code == 200:
         if res.json().get('status','') == 'OK':
           data= res.json().get('data')
@@ -121,7 +125,7 @@ def user_detail():
         else:
           return redirect('home')      
     '''user'''
-    res = requests.post(url+'/getUserInfo', data=json.dumps({'id':UserId}), cookies=cookies)
+    res = requests.post(url+'/getUserInfo', json={'id':UserId}, cookies=cookies, timeout=5)
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         user = res.json().get('data')[0]
@@ -130,9 +134,11 @@ def user_detail():
     else:
       return redirect('home')
     '''datapermission'''    
-    datapermission = {'id':user.get('DataPermissionId'),'text':user.get('DataPermission')}
+    dp_id = user.get('DataPermissionId')
+    dp_text = user.get('DataPermission') or ''
+    datapermission = {'id': dp_id, 'text': dp_text} if dp_id else {}
     '''roles'''
-    res = requests.post(url+'/getRoleByUser', data=json.dumps({'id':UserId}), cookies=cookies)
+    res = requests.post(url+'/getRoleByUser', json={'id':UserId}, cookies=cookies, timeout=5)
     if res.status_code == 200:
       if res.json().get('status','') == 'OK':
         userrole = res.json().get('data')

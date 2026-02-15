@@ -111,7 +111,7 @@
       $xrole.val(roleids).trigger("change");      
       // DataPermissionList
       const datapermission = {{ datapermission | tojson }};
-      var datapermissionlist = [datapermission];
+      var datapermissionlist = datapermission.id ? [datapermission] : [];
       var $DataPermission = $('#DataPermission');
       $DataPermission.select2({
         placeholder: '--- SELECT ---',
@@ -149,8 +149,11 @@
           }
         }
       });
-      var datapermissionid = datapermission.id;
-      $DataPermission.val(datapermissionid).trigger("change");
+      if(datapermission.id){
+        $DataPermission.val(datapermission.id).trigger("change");
+      } else {
+        $DataPermission.val(null).trigger("change");
+      }
     });
     
     function chg_pass() 
