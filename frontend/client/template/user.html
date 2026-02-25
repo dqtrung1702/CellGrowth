@@ -9,7 +9,7 @@
         <div id = "pagination"></div>
     </div>
     <div>
-        <table class="table">
+        <table class="table sortable">
             {% if users %}
             <thead>
                 <th class="table__heading">STT</th>
@@ -81,6 +81,7 @@
                             userTblBody += '<td class="table__content"><a href=' + '{{ url_for("user_blueprint.user_detail")}}' + '?id=' + u['id'] + '>' + u['UserName'] + '</a></td>';
                             userTblBody += '<td class="table__content">' + (u['LastSignOnDateTime'] || '') + '</td>';
                             userTblBody += '<td class="table__content">' + (u['LastUpdateDateTime'] || '') + '</td>';
+                            userTblBody += '</tr>';
                         }
                         
                     } else {

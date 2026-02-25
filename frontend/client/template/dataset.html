@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" id="pageDataset">
+  <div style="text-align: center;">
+    <h1>Data Sets</h1>
+  </div>
+
+  <div class="pagination">
+    <div id="pagination"></div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table sortable">
+      <thead>
+        <th class="table__heading">STT</th>
+        <th class="table__heading">SetName</th>
+        <th class="table__heading">Services</th>
+        <th class="table__heading">SetCode</th>
+        <th class="table__heading"></th>
+        <tr>
+          <td class="table__searching"></td>
+          <td class="table__searching">
+            <input id="SetName" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('SetName','') }}" />
+          </td>
+          <td class="table__searching">
+            <input id="Services" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('Services','') }}" />
+          </td>
+          <td class="table__searching">
+            <input id="SetCode" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('SetCode','') }}" />
+          </td>
+          <td class="table__searching"></td>
+        </tr>
+      </thead>
+
+      <tbody id="setTblBody">
+        {% for s in sets %}
+        <tr>
+          <td class="table__content">{{ s.get('STT', loop.index) }}</td>
+          <td class="table__content">
+            <a href="{{ url_for('dataset_blueprint.dataset_detail', SetId=s.get('SetId')) }}">{{ s.get('SetName') }}</a>
+          </td>
+          <td class="table__content">{{ s.get('Services') }}</td>
+          <td class="table__content">{{ s.get('SetCode') }}</td>
+          <td class="table__content">
+            <a href="{{ url_for('dataset_blueprint.set_detail', SetId=s.get('SetId')) }}">Edit info</a> |
+            <a href="{{ url_for('dataset_blueprint.dataset_detail', SetId=s.get('SetId')) }}">Datasets</a> |
+            <a href="#" onclick="return deleteSet('{{ s.get('SetId') }}','{{ s.get('SetName') }}')">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not sets %}
+        <tr><td class="table__content" colspan="5">No sets found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <div id="pagination2"></div>
+  </div>
+
+  <div style="text-align: left;">
+    <h4>
+      <a href="{{ url_for('dataset_blueprint.set_detail', SetId='New') }}"><i class="fa fa-plus"> Add</i></a>
+    </h4>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    {% if pagination %}
+    pagination2("{{ pagination.get('page') }}", "{{ pagination.get('total_pages') }}", "pagination");
+    pagination2("{{ pagination.get('page') }}", "{{ pagination.get('total_pages') }}", "pagination2");
+    {% endif %}
+  });
+
+  function Search(page = 1) {
+    const SetName = document.getElementById('SetName').value || '';
+    const Services = document.getElementById('Services').value || '';
+    const SetCode = document.getElementById('SetCode').value || '';
+    const params = new URLSearchParams();
+    params.append('page', page);
+    if (SetName) params.append('SetName', SetName);
+    if (Services) params.append('Services', Services);
+    if (SetCode) params.append('SetCode', SetCode);
+    const url = '{{ url_for("dataset_blueprint.datasets") }}' + (params.toString() ? ('?' + params.toString()) : '');
+    window.location.href = url;
+  }
+
+  function deleteSet(id, name) {
+    if (!id) return false;
+    const confirmed = confirm(`Delete set \"${name || id}\"? This will remove its datasets and permissions.`);
+    if (!confirmed) return false;
+    const url = '{{ url_for("dataset_blueprint.set_deletion") }}' + '?SetId=' + encodeURIComponent(id);
+    window.location.href = url;
+    return false;
+  }
+</script>
+{% endblock %}

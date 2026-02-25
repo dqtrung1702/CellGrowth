@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container col-full">
+  <div>
+    <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('dataset_blueprint.datasets') }}'"> Back to Data Sets</i>
+  </div>
+  <h2>Dataset Detail</h2>
+  <form id="DatasetDetailForm" method="POST" action="{{ url_for('dataset_blueprint.dataset_detail') }}">
+    <input type="hidden" name="SetId" value="{{ SetId }}">
+    <div class="input-group">
+      <label>SetName</label>
+      <input type="text" value="{{ set_info.get('SetName','') }}" disabled>
+    </div>
+    <div class="input-group">
+      <label>Services</label>
+      <input type="text" value="{{ set_info.get('Services','') }}" disabled>
+    </div>
+    <div class="input-group">
+      <label>SetCode</label>
+      <input type="text" value="{{ set_info.get('SetCode','') }}" disabled>
+    </div>
+
+    <div class="input-group">
+      <label>Data rows</label>
+      <div class="table-wrapper">
+        <table id="DataTable" class="table">
+          <thead>
+            <tr>
+              <th class="table__heading">STT</th>
+              <th class="table__heading">Table</th>
+              <th class="table__heading">Column</th>
+              <th class="table__heading">Value</th>
+              <th class="table__heading"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button type="button" class="btn" onclick="addDataRow()"><i class="fa fa-plus"></i> Add</button>
+      </div>
+    </div>
+
+    <input type="hidden" id="DataJSON" name="DataJSON" />
+    <div class="input-group">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const datasets = {{ datasets | tojson }};
+    renderDataTable(datasets || []);
+
+    document.getElementById("DatasetDetailForm").addEventListener('submit', function() {
+      const rows = Array.from(document.querySelectorAll("#DataTable tbody tr"));
+      const data = rows.map(tr => {
+        const tds = tr.querySelectorAll("td");
+        return {
+          Table: (tds[1].innerText || '*').trim(),
+          Column: (tds[2].innerText || '*').trim(),
+          Value: (tds[3].innerText || '*').trim(),
+        };
+      }).filter(d => d.Table && d.Column && d.Value);
+      document.getElementById("DataJSON").value = JSON.stringify(data);
+      return true;
+    });
+  });
+
+  function renderDataTable(list) {
+    const tbody = document.querySelector("#DataTable tbody");
+    tbody.innerHTML = "";
+    list.forEach((d, idx) => appendDataRow(idx + 1, d.Table || '*', d.Column || '*', d.Value || '*'));
+    if (!list.length) appendDataRow(1, '*', '*', '*');
+  }
+
+  function appendDataRow(stt, table, column, value) {
+    const tbody = document.querySelector("#DataTable tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="table__content">${stt}</td>
+      <td class="table__content" contenteditable="true">${table}</td>
+      <td class="table__content" contenteditable="true">${column}</td>
+      <td class="table__content" contenteditable="true">${value}</td>
+      <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function addDataRow() {
+    const tbody = document.querySelector("#DataTable tbody");
+    const stt = tbody.children.length + 1;
+    appendDataRow(stt, '*', '*', '*');
+  }
+
+  function deleteRow(anchor) {
+    const row = anchor.closest("tr");
+    row.remove();
+    Array.from(document.querySelectorAll("#DataTable tbody tr")).forEach((tr, idx) => {
+      tr.children[0].innerText = idx + 1;
+    });
+  }
+</script>
+{% endblock %}

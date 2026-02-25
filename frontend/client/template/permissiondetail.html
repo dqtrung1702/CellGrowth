@@ -4,7 +4,8 @@
     <div>              
       <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('permission_blueprint.Permission') }}'"> Back to Permissions screen</i>
     </div>
-    <form id="PermissionForm" method="POST">        
+    <form id="PermissionForm" method="POST">
+      <input type="hidden" name="id" value="{{ permission.get('id','New') }}">
       <div class="col-full">
         <h4>Permission Info</h4>
         <div class="input-group">
@@ -30,14 +31,14 @@
           <i class="fa fa-check-circle"></i>
           <label>URLs / Data Scopes</label>
           <div class="table-wrapper" id="url-wrapper">
-            <table id="UrlTable" class="table">
+            <table id="UrlTable" class="table sortable">
               <thead>
                 <tr>
                   <th class="table__heading">STT</th>
                   <th class="table__heading">Method</th>
                   <th class="table__heading">URL</th>
                   <th class="table__heading">Type</th>
-                  <th class="table__heading"></th>
+                  <th class="table__heading no-sort"></th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -46,20 +47,9 @@
           </div>
 
           <div class="table-wrapper" id="data-wrapper" style="display:none;">
-            <table id="DataTable" class="table">
-              <thead>
-                <tr>
-                  <th class="table__heading">STT</th>
-                  <th class="table__heading">SetName</th>
-                  <th class="table__heading">SetTbl</th>
-                  <th class="table__heading">SetCol</th>
-                  <th class="table__heading">SetVal</th>
-                  <th class="table__heading"></th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-            <button type="button" class="btn" onclick="addDataRow()"><i class="fa fa-plus"></i> Add Data Scope</button>
+            <label>Data Scopes</label>
+            <select id="DataSetSelect" class="set-select" name="DataSets" multiple style="width:100%"></select>
+            <p style="margin: 6px 0;"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></p>
           </div>
         </div>
         <div class="input-group">
@@ -91,11 +81,31 @@
 
       // nạp URL list vào bảng
       const urlList = {{ urlpermission | tojson }};
+      const setsList = {{ sets | tojson }};
       renderUrlTable(urlList || []);
 
-      // nạp DataSets nếu có
+      // nạp DataSets (unique theo SetId) cho select
       const dataSets = {{ permission.get('DataSets', []) | tojson }};
-      renderDataTable(dataSets || []);
+      const selectedIds = [];
+      const seen = new Set();
+      (dataSets || []).forEach(s => {
+        const key = s.SetId || `${s.SetName}::${s.Services}::${s.SetCode}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          selectedIds.push(String(s.SetId || ''));
+        }
+      });
+      const selectEl = document.getElementById("DataSetSelect");
+      const options = setsList.map(s => {
+        const label = s.SetName || '';
+        const opt = new Option(label, s.SetId, false, selectedIds.includes(String(s.SetId)));
+        opt.dataset.setname = s.SetName || '';
+        opt.dataset.services = s.Services || '';
+        opt.dataset.setcode = s.SetCode || '';
+        return opt;
+      });
+      options.forEach(o => selectEl.appendChild(o));
+      $(".set-select").select2({width:"100%"});
 
       toggleTables();
 
@@ -104,16 +114,10 @@
       $("#PermissionForm").submit(function() {
         const type = document.getElementById("PermissionType").value || 'ROLE';
         if (type === 'DATA') {
-          const rows = Array.from(document.querySelectorAll("#DataTable tbody tr"));
-          const scopes = rows.map(tr => {
-            const tds = tr.querySelectorAll("td");
-            return {
-              SetName: (tds[1].innerText || '').trim(),
-              SetTbl: (tds[2].innerText || '').trim(),
-              SetCol: (tds[3].innerText || '').trim(),
-              SetVal: (tds[4].innerText || '').trim(),
-            };
-          }).filter(s => s.SetTbl && s.SetCol && s.SetVal);
+          const select = document.querySelector(".set-select");
+          const scopes = Array.from(select ? select.selectedOptions : []).map(opt => ({
+            SetId: opt.value
+          })).filter(s => s.SetId);
           document.getElementById("DataSetsJSON").value = JSON.stringify(scopes);
           document.getElementById("UrlListJSON").value = "[]";
         } else {
@@ -146,13 +150,6 @@
       if (!list.length) appendUrlRow(1, 'GET', '', 'ROLE');
     }
 
-    function renderDataTable(list) {
-      const tbody = document.querySelector("#DataTable tbody");
-      tbody.innerHTML = "";
-      list.forEach((s, idx) => appendDataRow(idx + 1, s.SetName || '', s.SetTbl || '', s.SetCol || '', s.SetVal || ''));
-      if (!list.length) appendDataRow(1, '', '', '', '');
-    }
-
     function appendUrlRow(stt, method, url, type) {
       const tbody = document.querySelector("#UrlTable tbody");
       const tr = document.createElement("tr");
@@ -166,39 +163,28 @@
       tbody.appendChild(tr);
     }
 
-    function appendDataRow(stt, name, tbl, col, val) {
-      const tbody = document.querySelector("#DataTable tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="table__content">${stt}</td>
-        <td class="table__content" contenteditable="true">${name}</td>
-        <td class="table__content" contenteditable="true">${tbl}</td>
-        <td class="table__content" contenteditable="true">${col}</td>
-        <td class="table__content" contenteditable="true">${val}</td>
-        <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
-      `;
-      tbody.appendChild(tr);
-    }
-
     function addUrlRow() {
       const tbody = document.querySelector("#UrlTable tbody");
       const stt = tbody.children.length + 1;
       appendUrlRow(stt, 'GET', '', 'ROLE');
     }
 
-    function addDataRow() {
-      const tbody = document.querySelector("#DataTable tbody");
-      const stt = tbody.children.length + 1;
-      appendDataRow(stt, '', '', '', '');
-    }
-
+    function addDataRow() {} // not used for DATA mode (multi-select handled directly)
     function deleteRow(anchor) {
       const row = anchor.closest("tr");
+      const tbody = row && row.parentElement;
+      if (!tbody) return;
       row.remove();
-      // re-number
-      Array.from(document.querySelectorAll("#UrlTable tbody tr")).forEach((tr, idx) => {
-        tr.children[0].innerText = idx + 1;
+      // renumber STT
+      Array.from(tbody.querySelectorAll("tr")).forEach((tr, idx) => {
+        const first = tr.querySelector("td");
+        if (first) first.textContent = idx + 1;
       });
+      // ensure at least one empty row remains for editing
+      if (!tbody.children.length) {
+        appendUrlRow(1, 'GET', '', 'ROLE');
+      }
     }
+    $(function(){ $(".set-select").select2({width:"100%"}); });
   </script>  
 {% endblock %}

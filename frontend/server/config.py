@@ -1,4 +1,3 @@
-from os import environ
 class Config(object):
     SECRET_KEY = 'ERP-as-Services'
     JWT_SECRET = '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW'

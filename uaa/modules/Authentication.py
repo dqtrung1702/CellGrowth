@@ -185,11 +185,11 @@ def register():
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 """
-                INSERT INTO users (username, password, userlocked, last_signon_datetime, created_at, updated_at)
-                VALUES (%s, %s, TRUE, %s, NOW(), NOW())
+                INSERT INTO users (username, password, userlocked, name_display, last_signon_datetime, created_at, updated_at)
+                VALUES (%s, %s, FALSE, %s, %s, NOW(), NOW())
                 RETURNING id;
                 """,
-                (username, hashed, datetime.utcnow()),
+                (username, hashed, name_display, datetime.utcnow()),
             )
             row = cur.fetchone()
             conn.commit()

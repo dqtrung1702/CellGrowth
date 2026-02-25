@@ -12,7 +12,7 @@
     </div>
     <div class="">
         <div class="">
-            <table id="permissionTable" class="table">
+            <table id="permissionTable" class="table sortable">
                 {% if permissions %}
                 <thead>
                     <th class="table__heading">STT</th>
@@ -103,6 +103,7 @@
                             permissionTblBody += '<td class="table__content">' + (p['Description'] || '') + '</td>';
                             permissionTblBody += '<td class="table__content">' + (p['LastUpdateDateTime'] || '') + '</td>';
                             permissionTblBody += '<td class="table__content"><a href=' + '{{ url_for("permission_blueprint.permission_deletion")}}' + '?id=' + p['id'] + '><i class="fa fa-trash"></i></a></td>'
+                            permissionTblBody += '</tr>';
                         }
                         
                     } else {

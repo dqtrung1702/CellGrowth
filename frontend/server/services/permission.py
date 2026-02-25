@@ -1,11 +1,51 @@
 from datetime import datetime
-from flask import Blueprint, request,redirect,url_for,render_template,session,make_response
+import re
+from flask import Blueprint, request,redirect,url_for,render_template
 import requests
 from config import Config
-import jwt
 import json
-from base import check_url,auth
+from base import auth, require_page_access
 import base64
+import sys
+
+def _fmt_dt(val):
+    """Convert various datetime representations (dict/$date, datetime, str, None) to string for UI."""
+    if isinstance(val, dict) and '$date' in val:
+        v = val.get('$date')
+        return v if isinstance(v, str) else str(v)
+    if hasattr(val, 'isoformat'):
+        try:
+            return val.isoformat()
+        except Exception:
+            pass
+    return '' if val is None else str(val)
+
+def _date_key(val):
+    """Normalize date/datetime to ISO date string (YYYY-MM-DD) for filtering."""
+    s = _fmt_dt(val)
+    if not s:
+        return None
+    if not isinstance(s, str):
+        s = str(s)
+    try:
+        return datetime.fromisoformat(s.replace('Z','+00:00')).date().isoformat()
+    except Exception:
+        pass
+    # try split non-digits
+    parts = [p for p in re.split(r'\D+', s) if p]
+    if len(parts) >= 3:
+        try:
+            if len(parts[0]) == 4:  # Y M D
+                y, m, d = int(parts[0]), int(parts[1]), int(parts[2])
+            else:  # assume D M Y
+                d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
+                if len(parts[2]) == 2:
+                    y += 2000 if y < 70 else 1900
+            return f"{y:04d}-{m:02d}-{d:02d}"
+        except Exception:
+            pass
+    return s
+
 permission = Blueprint(
     'permission_blueprint',
     __name__,
@@ -24,11 +64,8 @@ def SsoTs():
 Permissions
 """
 @permission.route('/Permission',methods=['GET'])
+@require_page_access
 def Permission():
-    jwt_token = request.cookies.get('app_token','')
-    xauth = auth(jwt_token)
-    if not xauth:# or not check_url(session['URLList'],request.base_url,Method = request.method, Type = 'page'):
-      return redirect('Accessisdenied')
     cookies = request.cookies
     url = Config.UAA_URL
     page_size = Config.PAGE_SIZE
@@ -42,131 +79,140 @@ def Permission():
       page =  request.args.get('page', type=int, default=1)
       data.update({'page':page})
     res = requests.post(url+'/getPermissionList', json=data, cookies=cookies, timeout=5)  
-    if res.status_code == 200:
-      if res.json().get('status','') == 'OK':
-        data= res.json().get('data')
-        if res.json().get('total_row')[0].get('sum'):
-          total_row= int(res.json().get('total_row')[0].get('sum'))
-        else:
-          total_row = 0
-        permissions = []
-        for pos,line in enumerate (data):
-          permissions.append({
-            "id": line.get('id'),
-            "STT": pos+1,
-            "PermissionName": line.get('Code'),
-            "PermissionType": line.get('PermissionType'),
-            "Description": line.get('Description'),
-            "LastUpdateDateTime": line.get('LastUpdateDateTime')
-          })
-        if permissions:
-          total_pages = (round(total_row/page_size) + 1 if round(total_row/page_size) < (total_row/page_size) else round(total_row/page_size))
-          pagination = {'page':page,'total_pages': total_pages}
-          if isSearch:
-            return {'permissions':permissions, 'pagination':pagination}          
-          template = render_template('permission.html', title='Role', auth=True, permissions = permissions, pagination=pagination)
-          template_bytes = template.encode('utf-8')
-          base64_bytes = base64.b64encode(template_bytes)
-          base64_template = base64_bytes.decode('utf-8')
-          return template
-          # return redirect(url_for('uaa_blueprint.SsoTs',template=base64_template))
-        if isSearch:
-          return {'users':None}
-        template = render_template('role.html', title='Role', auth=True)
-        return template
-        # template_bytes = template.encode('utf-8')
-        # base64_bytes = base64.b64encode(template_bytes)
-        # base64_template = base64_bytes.decode('utf-8')
-        # return redirect(url_for('uaa_blueprint.SsoTs',template=base64_template))  
-      elif res.status_code == 403:
+    if res.status_code != 200:
+      return redirect('home')
+    if res.json().get('status','') != 'OK':
+      if res.status_code == 403:
         return redirect('Accessisdenied')
-      else:
-        return redirect('home')
+      return redirect('home')
+
+    rows = res.json().get('data') or []
+    total_raw = res.json().get('total_row') or []
+    total_row= int(total_raw[0].get('sum')) if total_raw and total_raw[0].get('sum') else 0
+    permissions = []
+    for pos,line in enumerate (rows):
+      permissions.append({
+        "id": line.get('id'),
+        "STT": pos+1,
+        "PermissionName": line.get('Code'),
+        "PermissionType": line.get('PermissionType'),
+        "Description": line.get('Description'),
+        "LastUpdateDateTime": _fmt_dt(line.get('LastUpdateDateTime'))
+      })
+    total_pages = (round(total_row/page_size) + 1 if round(total_row/page_size) < (total_row/page_size) else round(total_row/page_size)) if page_size else 1
+    pagination = {'page':page,'total_pages': total_pages}
+    if isSearch:
+      return {'permissions':permissions, 'pagination':pagination}          
+    template = render_template('permission.html', title='Role', auth=True, permissions = permissions, pagination=pagination)
+    return template
 @permission.route('/permission_detail',methods=['GET','POST'])
+@require_page_access
 def permission_detail():
     cookies = request.cookies
     url = Config.UAA_URL
-    jwt_token = cookies.get('app_token','')  
-    xauth = auth(jwt_token)
-    if not xauth:# or not check_url(session['URLList'],request.base_url): 
-        return redirect('Accessisdenied')    
-    data = request.values    
-    PermissionId = data.get('id')
+    incoming = request.values    
+    PermissionId = incoming.get('id') or "New"
     if request.method == 'POST':
-      PermissionType = data.get('PermissionType',None)
-      Description = data.get('Description',None)
-      UrlListJSON = data.get('UrlListJSON')
-      DataSetsJSON = data.get('DataSetsJSON')
-      UrlList = []
-      DataSets = []
-      if UrlListJSON:
-        try:
-          UrlList = json.loads(UrlListJSON)
-        except Exception:
-          UrlList = []
-      if DataSetsJSON:
-        try:
-          DataSets = json.loads(DataSetsJSON)
-        except Exception:
-          DataSets = []
-      data = {}
-      data.update({'Description':Description,'PermissionType':PermissionType,'UrlList':UrlList,'DataSets':DataSets})
-      if PermissionId != "New":
-        data.update({'PermissionId':PermissionId})
-        res = requests.post(url+'/updatePermission', json=data, cookies=cookies, timeout=5)
-      else:        
-        Code = data.get('PermissionName',None)
-        data.update({'Code':Code})
-        res = requests.post(url+'/addPermission', json=data, cookies=cookies, timeout=5)
-      if res.status_code == 200:
-        if res.json().get('status','') == 'OK':
-          data= res.json().get('data')
-        elif res.status_code == 403:
-          return redirect('Accessisdenied')
+        # pull all request values before we start building the payload
+        PermissionType = incoming.get('PermissionType', 'ROLE')
+        Description = incoming.get('Description', None)
+        PermissionName = incoming.get('PermissionName', None)
+        UrlListJSON = incoming.get('UrlListJSON')
+        DataSetsJSON = incoming.get('DataSetsJSON')
+        UrlList = []
+        DataSets = []
+        if UrlListJSON:
+            try:
+                UrlList = json.loads(UrlListJSON)
+            except Exception:
+                UrlList = []
+        if DataSetsJSON:
+            try:
+                if DataSetsJSON != "__UNCHANGED__":
+                    DataSets = json.loads(DataSetsJSON)
+            except Exception:
+                DataSets = []
+        payload = {'Description': Description, 'PermissionType': PermissionType, 'UrlList': UrlList}
+        if DataSetsJSON != "__UNCHANGED__":
+            payload.update({'DataSets': DataSets})
+        if PermissionId != "New":
+            payload.update({'PermissionId': PermissionId})
+            res = requests.post(url+'/updatePermission', json=payload, cookies=cookies, timeout=5)
         else:
-          return redirect('home')
-         
-    if PermissionId !='New':
-      '''permission'''
-      res = requests.post(url+'/getPermissionInfo', json={'ids':[PermissionId]}, cookies=cookies, timeout=5)
-      if res.status_code == 200:
+            payload.update({'Code': PermissionName})
+            res = requests.post(url+'/addPermission', json=payload, cookies=cookies, timeout=5)
+
+        if res.status_code != 200:
+            try:
+                return res.json(), res.status_code
+            except Exception:
+                return res.text, res.status_code
         if res.json().get('status','') == 'OK':
-          data = res.json().get('data')
-          permission = res.json().get('data')[0]
-          permissions = [{'id':permission.get('id'),'text':permission.get('PermissionName')}]
-      elif res.status_code == 403:
-        return redirect('Accessisdenied')
-      else:
-        return redirect('home')
-      '''url'''
-      data = {'PermissionId' : PermissionId}
-      res = requests.post(url+'/getURLbyPermission', json=data, cookies=cookies, timeout=5)
-      if res.status_code == 200:
-        if res.json().get('status','') == 'OK':
-          data= res.json().get('data')
-          urlpermission = []
-          for pos,line in enumerate (data):
-            linedata = {"STT":pos+1}
-            linedata.update(line)
-            urlpermission.append(linedata)
-      elif res.status_code == 403:
-        return redirect('Accessisdenied')
-      else:
-        return redirect('home')
-    else:
-      permission = {}
-      urlpermission = []
-    return render_template('permissiondetail.html', title='Permission', auth=True, permission = permission, urlpermission = urlpermission)
+            data = res.json().get('data') or {}
+            target_id = PermissionId if PermissionId != "New" else (data.get('id') if isinstance(data, dict) else None)
+            if target_id:
+                return redirect(url_for('permission_blueprint.permission_detail', id=target_id))
+            return redirect('Permission')
+        elif res.status_code == 403:
+            return redirect('Accessisdenied')
+        else:
+            return redirect('home')
+
+    # GET flow
+    permission = {}
+    urlpermission = []
+    sets = []
+    try:
+        res_sets = requests.post(url+'/getSetList', json={}, cookies=cookies, timeout=5)
+        if res_sets.status_code == 200 and res_sets.json().get('status') == 'OK':
+            sets = res_sets.json().get('data', [])
+    except Exception:
+        sets = []
+    if PermissionId != 'New':
+        # permission info
+        res = requests.post(url+'/getPermissionInfo', json={'ids':[PermissionId]}, cookies=cookies, timeout=5)
+        if res.status_code == 200 and res.json().get('status','') == 'OK':
+            data = res.json().get('data')
+            permission = (data or [{}])[0]
+            permission['LastUpdateDateTime'] = _fmt_dt(permission.get('LastUpdateDateTime'))
+            permissions = [{'id':permission.get('id'),'text':permission.get('PermissionName')}]
+        elif res.status_code == 403:
+            return redirect('Accessisdenied')
+        else:
+            return redirect('home')
+        # urls
+        res = requests.post(url+'/getURLbyPermission', json={'PermissionId': PermissionId}, cookies=cookies, timeout=5)
+        if res.status_code == 200 and res.json().get('status','') == 'OK':
+            data= res.json().get('data')
+            for pos,line in enumerate (data):
+                linedata = {"STT":pos+1}
+                linedata.update(line)
+                urlpermission.append(linedata)
+        elif res.status_code == 403:
+            return redirect('Accessisdenied')
+        else:
+            return redirect('home')
+
+    return render_template('permissiondetail.html',
+                           title='Permission',
+                           auth=True,
+                           permission=permission,
+                           urlpermission=urlpermission,
+                           sets=sets)
+
+
 @permission.route('/getURLbyPermission',methods=['GET', 'POST'])
+
+
+@permission.route('/getURLbyPermission',methods=['GET', 'POST'])
+@require_page_access
 def getURLbyPermission():
-    jwt_token = request.cookies.get('app_token','')  
-    xauth = auth(jwt_token)
-    if not xauth:# or not check_url(session['URLList'],request.base_url,Method = request.method, Type = 'page'):
-      return redirect('Accessisdenied')
     cookies = request.cookies
     url = Config.UAA_URL
-    data = json.loads(request.data)
-    PermissionId = data.get('PermissionId')
+    incoming = request.get_json(silent=True) or {}
+    PermissionId = incoming.get('PermissionId') or request.values.get('PermissionId')
+    if not PermissionId:
+        return {"message": "PermissionId is required"}, 400
     data = {'PermissionId' : PermissionId}
     res = requests.post(url+'/getURLbyPermission', json=data, cookies=cookies, timeout=5)
     if res.status_code == 200:
@@ -183,22 +229,82 @@ def getURLbyPermission():
     else:
       return redirect('home')
 @permission.route('/permission_searching',methods=['GET','POST'])
+@require_page_access
 def permission_searching():
-    jwt_token = request.cookies.get('app_token','')  
-    xauth = auth(jwt_token)
-    if not xauth:# or not check_url(session['URLList'],request.base_url,Method = request.method, Type = 'page'):
-      return redirect('Accessisdenied')
-    data = {}
-    data.update(json.loads(request.data.decode('utf-8')))
-    return redirect(url_for('permission_blueprint.Permission',data = json.dumps(data)))
+    # Return JSON so AJAX on UI works for all filters
+    cookies = request.cookies
+    url = Config.UAA_URL
+    ui_page_size = Config.PAGE_SIZE
+    payload = {}
+    try:
+      payload.update(json.loads(request.data.decode('utf-8')))
+    except Exception:
+      pass
+    page = int(payload.get('page', 1) or 1)
+    code_filter = payload.get('Code')
+    ptype_filter = payload.get('PermissionType')
+    desc_filter = (payload.get('Description') or '').lower()
+    date_filter = (payload.get('LastUpdateDateTime') or '').strip()
+    date_filter_key = _date_key(date_filter) if date_filter else None
+    print("[permission_searching] input", json.dumps(payload), "date_key", date_filter_key, file=sys.stderr)
+
+    # fetch all pages (batch) then filter locally on Description/Date
+    all_rows = []
+    page_fetch = 1
+    page_size_fetch = 500
+    while True:
+      fetch_payload = {
+        'page': page_fetch,
+        'page_size': page_size_fetch,
+        'Code': code_filter,
+        'PermissionType': ptype_filter
+      }
+      res = requests.post(url+'/getPermissionList', json=fetch_payload, cookies=cookies, timeout=5)
+      if not (res.status_code == 200 and res.json().get('status') == 'OK'):
+        break
+      batch = res.json().get('data', [])
+      all_rows.extend(batch)
+      if len(batch) < page_size_fetch or page_fetch >= 20:  # safety cap
+        break
+      page_fetch += 1
+    if all_rows:
+      filtered = []
+      for line in all_rows:
+        desc = (line.get('Description') or '').lower()
+        last = (line.get('LastUpdateDateTime') or '')
+        last_key = _date_key(last)
+        if desc_filter and desc_filter not in desc:
+          continue
+        if date_filter_key:
+          # compare normalized date; also allow original string startswith to be safe
+          if date_filter_key != last_key and date_filter not in _fmt_dt(last):
+            continue
+        elif date_filter and date_filter not in last:
+          continue
+        filtered.append(line)
+      total_row = len(filtered)
+      start = (page-1)*ui_page_size
+      end = start + ui_page_size
+      page_items = filtered[start:end]
+      permissions = []
+      for pos,line in enumerate (page_items, start=1+start):
+        permissions.append({
+          "id": line.get('id'),
+          "STT": pos,
+          "PermissionName": line.get('Code'),
+          "PermissionType": line.get('PermissionType'),
+          "Description": line.get('Description'),
+          "LastUpdateDateTime": _fmt_dt(line.get('LastUpdateDateTime'))
+        })
+      total_pages = int((total_row + ui_page_size - 1) / ui_page_size) or 1
+      pagination = {'page':page,'total_pages': total_pages}
+      return {'permissions':permissions, 'pagination':pagination}
+    return {'permissions':[], 'pagination':{'page':1,'total_pages':1}, 'status':'FAIL'}
 @permission.route('/permission_deletion',methods=['GET','POST'])
+@require_page_access
 def permission_deletion():
     cookies = request.cookies
     url = Config.UAA_URL
-    jwt_token = cookies.get('app_token','')  
-    xauth = auth(jwt_token)
-    if not xauth:# or not check_url(session['URLList'],request.base_url): 
-      return redirect('Accessisdenied')    
     data = request.values
     PermissionId = data.get('id')
     data = {'id':PermissionId}
@@ -211,14 +317,11 @@ def permission_deletion():
 select2
 """
 @permission.route('/getDataPermissionList',methods=['POST'])
+@require_page_access
 def getDataPermissionList():
   cookies = request.cookies
-  jwt_token = cookies.get('app_token','')
-  xauth = auth(jwt_token)
-  if not xauth:
-    return redirect('Accessisdenied')    
   url = Config.UAA_URL
-  data = json.loads(request.data.decode('utf-8'))
+  data = request.get_json(silent=True) or {}
   page = data.get('page',1)
   Code = data.get('Code')
   data = {'Code':Code,'PermissionType':'DATA','page':page,'page_size' : 10}
@@ -232,14 +335,11 @@ def getDataPermissionList():
       datapermissions = list({v['id']:v for v in datapermissions}.values())
       return json.dumps(datapermissions)
 @permission.route('/getRolePermissionList',methods=['POST'])
+@require_page_access
 def getRolePermissionList():
   cookies = request.cookies
-  jwt_token = cookies.get('app_token','')
-  xauth = auth(jwt_token)
-  if not xauth:
-    return redirect('Accessisdenied')    
   url = Config.UAA_URL
-  data = json.loads(request.data.decode('utf-8'))
+  data = request.get_json(silent=True) or {}
   page = data.get('page',1)
   Code = data.get('Code')
   data = {'Code':Code,'PermissionType':'ROLE','page' : page,'page_size' : Config.PAGE_SIZE}

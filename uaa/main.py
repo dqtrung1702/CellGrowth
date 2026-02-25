@@ -34,11 +34,14 @@ def _extract_token():
 def enforce_url_permission():
     token = _extract_token()
     path = request.path
+    if request.method.upper() == "OPTIONS":
+        return "", 204
 
-    # Cho phép login/register không cần token; mọi đường khác bắt buộc có token + URL permission
-    public_paths = {"/login", "/register"}
+    # Cho phép một số endpoint công khai (login/register/status/health/ping)
+    public_paths = {"/login", "/register", "/status", "/health", "/ping", "/favicon.ico"}
+    public_prefixes = ("/status", "/health", "/static")  # cho phép cả /status/... hoặc /healthz và toàn bộ static
     if not token:
-        if path in public_paths:
+        if path in public_paths or path.startswith(public_prefixes):
             return
         return jsonify({"message": "Unauthorized"}), 401
     try:
@@ -58,6 +61,7 @@ def enforce_url_permission():
     ok = None
     try:
         with conn.cursor() as cur:
+            # Kiểm tra quyền truy cập URL: khớp chính xác hoặc theo pattern (up.url có thể chứa wildcard %/_).
             cur.execute(
                 """
                 SELECT 1
@@ -69,7 +73,7 @@ def enforce_url_permission():
                   AND (up.url = %s OR %s LIKE up.url)
                 LIMIT 1;
                 """,
-                (user_id, method, '%', path),
+                (user_id, method, path, path),
             )
             ok = cur.fetchone()
             print("AUTHZ_CHECK", {"user_id": user_id, "path": path, "method": method, "ok": ok})

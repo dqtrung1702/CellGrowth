@@ -3,9 +3,12 @@ from werkzeug.wrappers import Response
 import json
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
+import re
+import jwt
 
 from bson import json_util
 
+from config import Config
 from models.database import db
 
 user_bp = Blueprint("user_api", __name__)
@@ -25,6 +28,96 @@ def _hash_password(plain_password: str):
         return plain_password.encode("utf-8")
 
 
+def _current_user_id():
+    token = request.cookies.get("app_token")
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        parts = auth_header.split(None, 1)
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            token = parts[1]
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, Config.JWT_SECRET, algorithms=[Config.JWT_ALGORITHM])
+        return payload.get("UserId")
+    except Exception:
+        return None
+
+
+def _data_scope_filters(user_id, service_name="uaa", table_name="users", alias=None):
+    """
+    Row-level filter for DATA permission attached directly to user (data_permission_id).
+    Returns (where_sql, params) or (None, None) for full access.
+    """
+    if not user_id:
+        return None, None
+
+    conn = _db.conn_pool.getconn()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT data_permission_id FROM users WHERE id=%s;", (user_id,))
+            row = cur.fetchone()
+            if not row or not row.get("data_permission_id"):
+                return None, None
+            perm_id = row["data_permission_id"]
+
+            cur.execute(
+                """
+                SELECT s.services AS "Services",
+                       COALESCE(d.tablename, '*') AS "Table",
+                       COALESCE(d.colname, '*')   AS "Column",
+                       COALESCE(d.colval, '*')    AS "Value"
+                FROM data_permissions dp
+                JOIN permissions p ON p.id = dp.permission_id AND p.permission_type = 'DATA'
+                JOIN sets s ON s.id = dp.set_id
+                LEFT JOIN datasets d ON d.set_id = s.id
+                WHERE dp.permission_id = %s;
+                """,
+                (perm_id,),
+            )
+            scopes = cur.fetchall()
+    finally:
+        _db.conn_pool.putconn(conn)
+
+    if not scopes:
+        return None, None
+
+    service_name = (service_name or "").lower()
+    table_name = (table_name or "").lower()
+
+    filters = []
+    wildcard = False
+    for sc in scopes:
+        svc = (sc.get("Services") or "*").lower()
+        tbl = (sc.get("Table") or "*").lower()
+        col = sc.get("Column") or "*"
+        val = sc.get("Value") or "*"
+
+        if svc not in ("*", service_name):
+            continue
+        if tbl not in ("*", table_name):
+            continue
+        if col == "*" or val == "*":
+            wildcard = True
+            continue
+        if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", col):
+            continue
+        filters.append((col, val))
+
+    if wildcard and not filters:
+        return None, None  # full access
+    if not filters:
+        return "1=0", []   # deny all if no usable scope
+
+    clauses = []
+    params = []
+    prefix = f"{alias}." if alias else ""
+    for col, val in filters:
+        clauses.append(f"{prefix}{col} = %s")
+        params.append(val)
+    return "(" + " OR ".join(clauses) + ")", params
+
+
 @user_bp.route("/getUserList", methods=["POST"])
 def get_user_list():
     data = request.get_json(silent=True) or {}
@@ -33,44 +126,38 @@ def get_user_list():
     username_filter = data.get("UserName")
     offset = (page - 1) * page_size
 
+    requester_id = _current_user_id()
+    scope_sql, scope_params = _data_scope_filters(requester_id, service_name="uaa", table_name="users", alias="users")
+
     conn = _db.conn_pool.getconn()
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            where = []
+            params = []
             if username_filter:
-                cur.execute(
-                    "SELECT COUNT(*) AS count FROM users WHERE username ILIKE %s;",
-                    (f"%{username_filter}%",),
-                )
-                total_row = cur.fetchone()["count"]
-                cur.execute(
-                    """
-                    SELECT id,
-                           username AS "UserName",
-                           last_signon_datetime AS "LastSignOnDateTime",
-                           updated_at AS "LastUpdateDateTime"
-                    FROM users
-                    WHERE username ILIKE %s
-                    ORDER BY id
-                    LIMIT %s OFFSET %s;
-                    """,
-                    (f"%{username_filter}%", page_size, offset),
-                )
-            else:
-                cur.execute("SELECT COUNT(*) AS count FROM users;")
-                total_row = cur.fetchone()["count"]
+                where.append("username ILIKE %s")
+                params.append(f"%{username_filter}%")
+            if scope_sql:
+                where.append(scope_sql)
+                params.extend(scope_params)
+            where_sql = "WHERE " + " AND ".join(where) if where else ""
 
-                cur.execute(
-                    """
-                    SELECT id,
-                           username AS "UserName",
-                           last_signon_datetime AS "LastSignOnDateTime",
-                           updated_at AS "LastUpdateDateTime"
-                    FROM users
-                    ORDER BY id
-                    LIMIT %s OFFSET %s;
-                    """,
-                    (page_size, offset),
-                )
+            cur.execute(f"SELECT COUNT(*) AS count FROM users {where_sql};", params)
+            total_row = cur.fetchone()["count"]
+
+            cur.execute(
+                f"""
+                SELECT id,
+                       username AS "UserName",
+                       last_signon_datetime AS "LastSignOnDateTime",
+                       updated_at AS "LastUpdateDateTime"
+                FROM users
+                {where_sql}
+                ORDER BY id
+                LIMIT %s OFFSET %s;
+                """,
+                params + [page_size, offset],
+            )
             rows = cur.fetchall()
             conn.commit()
     finally:
@@ -86,11 +173,19 @@ def get_user_info():
     if not user_id:
         return _json_response({"message": "id is required", "status": "FAIL"}, status=400)
 
+    requester_id = _current_user_id()
+    scope_sql, scope_params = _data_scope_filters(requester_id, service_name="uaa", table_name="users", alias="u")
+
     conn = _db.conn_pool.getconn()
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            params = [user_id]
+            extra = ""
+            if scope_sql:
+                extra = " AND " + scope_sql
+                params.extend(scope_params)
             cur.execute(
-                """
+                f"""
                 SELECT u.id,
                        u.username AS "UserName",
                        u.userlocked AS "UserLocked",
@@ -102,9 +197,9 @@ def get_user_info():
                        p.code AS "DataPermissionCode"
                 FROM users u
                 LEFT JOIN permissions p ON p.id = u.data_permission_id
-                WHERE u.id = %s;
+                WHERE u.id = %s {extra};
                 """,
-                (user_id,),
+                params,
             )
             row = cur.fetchone()
             conn.commit()

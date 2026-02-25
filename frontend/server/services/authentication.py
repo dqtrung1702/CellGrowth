@@ -1,11 +1,7 @@
-from datetime import datetime
-from flask import Blueprint, request,redirect,url_for,render_template,session,make_response
+from flask import Blueprint, request,redirect,url_for,render_template,session
 import requests
 from config import Config
-import jwt
-import json
-from base import check_url,auth
-import base64
+from base import auth
 authentication = Blueprint('auth_blueprint',__name__)
 
 @authentication.route('/login',methods=['GET', 'POST'])
@@ -37,7 +33,7 @@ def login():
 
         if res.status_code == 200 and res_body.get('status','') == 'OK':
           jwt_token = res_body.get('token','')
-          resp.set_cookie('app_token', jwt_token, path='/', httponly=True)
+          resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
           return resp
 
         # Build a user-friendly error when the upstream response is not JSON or status is unexpected.
@@ -64,7 +60,7 @@ def register():
         if res.json().get('status','') == 'OK':
           jwt_token = res.json().get('token','')
           resp = redirect(url_for('home_blueprint.home'))
-          resp.set_cookie('app_token', jwt_token, path='/', httponly=True)
+          resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
           return resp
         else:
           return render_template('register.html', title='Error', error=res.text, auth=False)

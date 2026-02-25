@@ -295,6 +295,9 @@ td { font-family: sans-serif; }
 
 .table__heading { border-bottom: 2px solid #fae2a0; }
 .table__searching { border-bottom: 1px solid #fae2a0; }
+.sortable__heading { cursor: pointer; }
+.table th[data-sort-dir="asc"]::after { content: " ▲"; font-size: 0.8rem; }
+.table th[data-sort-dir="desc"]::after { content: " ▼"; font-size: 0.8rem; }
 .table-scroll {
   height:50%;
   overflow:auto;  

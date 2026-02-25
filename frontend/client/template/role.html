@@ -14,7 +14,7 @@
         
         <div class="">
             
-            <table id="roleTable" class="table">
+            <table id="roleTable" class="table sortable">
                 {% if roles %}
                 <thead>
                     <th class="table__heading">STT</th>
@@ -101,6 +101,7 @@
                             roleTblBody += '<td class="table__content">' + (r['Description'] || '') + '</td>';
                             roleTblBody += '<td class="table__content">' + (r['LastUpdateDateTime'] || '') + '</td>';
                             roleTblBody += '<td class="table__content"><a href=' + '{{ url_for("role_blueprint.role_deletion")}}' + '?id=' + r['id'] + '><i class="fa fa-trash"></i></a></td>';
+                            roleTblBody += '</tr>';
                         }
                         
                     } else {

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container col-full">
+  <div>
+    <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('dataset_blueprint.datasets') }}'"> Back to Data Sets</i>
+  </div>
+  <h2>Set Detail</h2>
+  {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+  <form method="POST" action="{{ url_for('dataset_blueprint.set_detail') }}">
+    <input type="hidden" name="SetId" value="{{ SetId }}">
+    <div class="input-group">
+      <label>SetName</label>
+      <input type="text" name="SetName" value="{{ set_info.get('SetName','') }}" required>
+    </div>
+    <div class="input-group">
+      <label>Services</label>
+      <input type="text" name="Services" value="{{ set_info.get('Services','') }}" required>
+    </div>
+    <div class="input-group">
+      <label>SetCode</label>
+      <input type="text" name="SetCode" value="{{ set_info.get('SetCode','') }}" required>
+    </div>
+    <div class="input-group">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a class="btn" href="{{ url_for('dataset_blueprint.dataset_detail', SetId=SetId) }}">Datasets</a>
+      {% if SetId and SetId != 'New' %}
+      <a class="btn btn-danger" href="#" onclick="return deleteSet('{{ SetId }}','{{ set_info.get('SetName','') }}')">Delete</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+<script>
+  function deleteSet(id, name) {
+    if (!id) return false;
+    const confirmed = confirm(`Delete set \"${name || id}\"? This will remove its datasets and permissions.`);
+    if (!confirmed) return false;
+    const url = '{{ url_for("dataset_blueprint.set_deletion") }}' + '?SetId=' + encodeURIComponent(id);
+    window.location.href = url;
+    return false;
+  }
+</script>
+{% endblock %}

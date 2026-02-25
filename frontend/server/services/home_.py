@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, make_response, session
+from flask import Blueprint, render_template, request, redirect, session
 from base import auth_info
 from config import Config
 import requests
@@ -28,5 +28,18 @@ def home():
             if res.json().get('status','') == 'OK':                
                 URLList = res.json().get('data')
                 session['URLList'] = URLList
+    if 'DataScopes' not in session:
+        url = Config.UAA_URL
+        payload = {'UserId': xinfo.get('UserId')}
+        try:
+            res = requests.post(url+'/getDataSetByUser', json=payload, cookies=cookies, timeout=5)
+            if res.status_code == 200 and res.json().get('status') == 'OK':
+                session['DataScopes'] = res.json().get('data', [])
+        except Exception:
+            pass
     return render_template('home.html', title='Home', auth=True)
 
+
+@home_.route('/Accessisdenied')
+def Accessisdenied():
+    return render_template('Accessisdenied.html', title='Access is denied', auth=False), 403

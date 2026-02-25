@@ -12,6 +12,35 @@
         <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='js/pagination.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
+        <script>
+          // CSRF helper: đọc cookie và gắn vào mọi AJAX + form POST
+          function getCookie(name) {
+            const value = (`; ${document.cookie}`).split(`; ${name}=`).pop();
+            return value ? value.split(';')[0] : '';
+          }
+          if (window.jQuery) {
+            $.ajaxSetup({
+              beforeSend: function(xhr) {
+                const token = getCookie('csrf_token');
+                if (token) xhr.setRequestHeader('X-CSRFToken', token);
+              }
+            });
+          }
+          document.addEventListener('DOMContentLoaded', () => {
+            const token = getCookie('csrf_token');
+            if (!token) return;
+            document.querySelectorAll('form[method="POST"]').forEach(form => {
+              if (!form.querySelector('input[name="_csrf"]')) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '_csrf';
+                input.value = token;
+                form.appendChild(input);
+              }
+            });
+          });
+        </script>
 
         <!-- Image -->
         <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/ico" />
@@ -55,6 +84,11 @@
                     <input type="radio" name="accordion" id="Permissions" />
                     <section class="box">
                         <label class="box-title" for="Permissions"><a href="{{ url_for('permission_blueprint.Permission') }}">Permissions</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    <input type="radio" name="accordion" id="DataSets" />
+                    <section class="box">
+        <label class="box-title" for="DataSets"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
                     <input type="radio" name="accordion" id="Logout" />
