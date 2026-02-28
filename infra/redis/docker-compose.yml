@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  redis:
+    image: redis:7.2-alpine
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./certs:/certs:ro
+    ports:
+      - "6380:6380"
