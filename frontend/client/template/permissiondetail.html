@@ -20,6 +20,7 @@
           <label for="PermissionType"><i class="fa">Type</i></label>
           <select name="PermissionType" id="PermissionType">
             <option value="ROLE">ROLE</option>
+            <option value="PAGE">PAGE</option>
             <option value="DATA">DATA</option>
           </select>
         </div>
@@ -29,7 +30,7 @@
         </div>
         <div class="input-group">
           <i class="fa fa-check-circle"></i>
-          <label>URLs / Data Scopes</label>
+          <label>URLs / Pages / Data Scopes</label>
           <div class="table-wrapper" id="url-wrapper">
             <table id="UrlTable" class="table sortable">
               <thead>
@@ -44,6 +45,22 @@
               <tbody></tbody>
             </table>
             <button type="button" class="btn" onclick="addUrlRow()"><i class="fa fa-plus"></i> Add URL</button>
+          </div>
+
+          <div class="table-wrapper" id="page-wrapper" style="display:none;">
+            <table id="PageTable" class="table sortable">
+              <thead>
+                <tr>
+                  <th class="table__heading">STT</th>
+                  <th class="table__heading">Method</th>
+                  <th class="table__heading">Page</th>
+                  <th class="table__heading">Type</th>
+                  <th class="table__heading no-sort"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <button type="button" class="btn" onclick="addPageRow()"><i class="fa fa-plus"></i> Add Page</button>
           </div>
 
           <div class="table-wrapper" id="data-wrapper" style="display:none;">
@@ -77,12 +94,17 @@
   </div>
   <script>
     $(document).ready(function(){
-      document.getElementById("PermissionType").value = "{{permission.get('PermissionType','ROLE')}}";
+      const initialType = "{{permission.get('PermissionType','ROLE')}}";
+      document.getElementById("PermissionType").value = initialType || 'ROLE';
 
-      // nạp URL list vào bảng
+      // nạp URL / Page list vào bảng
       const urlList = {{ urlpermission | tojson }};
       const setsList = {{ sets | tojson }};
-      renderUrlTable(urlList || []);
+      if ((initialType || 'ROLE') === 'PAGE') {
+        renderPageTable(urlList || []);
+      } else {
+        renderUrlTable(urlList || []);
+      }
 
       // nạp DataSets (unique theo SetId) cho select
       const dataSets = {{ permission.get('DataSets', []) | tojson }};
@@ -109,7 +131,18 @@
 
       toggleTables();
 
-      $("#PermissionType").on('change', toggleTables);
+      $("#PermissionType").on('change', function(){
+        toggleTables();
+        const type = document.getElementById("PermissionType").value || 'ROLE';
+        const pageTbody = document.querySelector("#PageTable tbody");
+        const urlTbody = document.querySelector("#UrlTable tbody");
+        if (type === 'PAGE' && pageTbody && pageTbody.children.length === 0) {
+          appendPageRow(1, 'GET', '', 'PAGE');
+        }
+        if (type === 'ROLE' && urlTbody && urlTbody.children.length === 0) {
+          appendUrlRow(1, 'GET', '', 'ROLE');
+        }
+      });
 
       $("#PermissionForm").submit(function() {
         const type = document.getElementById("PermissionType").value || 'ROLE';
@@ -120,6 +153,18 @@
           })).filter(s => s.SetId);
           document.getElementById("DataSetsJSON").value = JSON.stringify(scopes);
           document.getElementById("UrlListJSON").value = "[]";
+        } else if (type === 'PAGE') {
+          const rows = Array.from(document.querySelectorAll("#PageTable tbody tr"));
+          const pages = rows.map(tr => {
+            const cells = tr.querySelectorAll("td");
+            return {
+              Method: (cells[1].innerText || 'GET').trim(),
+              url: (cells[2].innerText || '').trim(),
+              Type: (cells[3].innerText || 'PAGE').trim() || 'PAGE'
+            };
+          }).filter(u => u.url);
+          document.getElementById("UrlListJSON").value = JSON.stringify(pages);
+          document.getElementById("DataSetsJSON").value = "[]";
         } else {
           const rows = Array.from(document.querySelectorAll("#UrlTable tbody tr"));
           const urls = rows.map(tr => {
@@ -140,6 +185,7 @@
     function toggleTables(){
       const type = document.getElementById("PermissionType").value || 'ROLE';
       document.getElementById("url-wrapper").style.display = (type === 'ROLE') ? 'block' : 'none';
+      document.getElementById("page-wrapper").style.display = (type === 'PAGE') ? 'block' : 'none';
       document.getElementById("data-wrapper").style.display = (type === 'DATA') ? 'block' : 'none';
     }
 
@@ -169,6 +215,32 @@
       appendUrlRow(stt, 'GET', '', 'ROLE');
     }
 
+    function renderPageTable(list) {
+      const tbody = document.querySelector("#PageTable tbody");
+      tbody.innerHTML = "";
+      list.forEach((u, idx) => appendPageRow(idx + 1, u.Method || 'GET', u.url || u.Page || '', u.Type || 'PAGE'));
+      if (!list.length) appendPageRow(1, 'GET', '', 'PAGE');
+    }
+
+    function appendPageRow(stt, method, page, type) {
+      const tbody = document.querySelector("#PageTable tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="table__content">${stt}</td>
+        <td class="table__content" contenteditable="true">${method}</td>
+        <td class="table__content" contenteditable="true">${page}</td>
+        <td class="table__content" contenteditable="true">${type || 'PAGE'}</td>
+        <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function addPageRow() {
+      const tbody = document.querySelector("#PageTable tbody");
+      const stt = tbody.children.length + 1;
+      appendPageRow(stt, 'GET', '', 'PAGE');
+    }
+
     function addDataRow() {} // not used for DATA mode (multi-select handled directly)
     function deleteRow(anchor) {
       const row = anchor.closest("tr");
@@ -182,7 +254,13 @@
       });
       // ensure at least one empty row remains for editing
       if (!tbody.children.length) {
-        appendUrlRow(1, 'GET', '', 'ROLE');
+        const table = tbody.closest("table");
+        const tableId = table ? table.id : '';
+        if (tableId === 'PageTable') {
+          appendPageRow(1, 'GET', '', 'PAGE');
+        } else {
+          appendUrlRow(1, 'GET', '', 'ROLE');
+        }
       }
     }
     $(function(){ $(".set-select").select2({width:"100%"}); });

@@ -7,8 +7,6 @@ authentication = Blueprint('auth_blueprint',__name__)
 @authentication.route('/login',methods=['GET', 'POST'])
 def login():
     print('*********************login*********************')
-    if 'URLList' in session:
-      session.pop('URLList',None)
     jwt_token = request.cookies.get('app_token','')  
     xauth = auth(jwt_token)
     if xauth:

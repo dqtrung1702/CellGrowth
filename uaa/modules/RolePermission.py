@@ -881,7 +881,7 @@ def get_permission_info():
 def add_permission():
     data = request.get_json(silent=True) or {}
     code = data.get("Code")
-    ptype = data.get("PermissionType")
+    ptype = (data.get("PermissionType") or "").upper()
     description = data.get("Description")
     url_list = data.get("UrlList") or []
     data_sets = data.get("DataSets") or []
@@ -911,6 +911,32 @@ def add_permission():
                         ON CONFLICT (permission_id, set_id) DO NOTHING;
                         """,
                         (pid, set_id, datetime.utcnow()),
+                    )
+            elif ptype == "PAGE":
+                # Treat page permissions as URL permissions with type='PAGE' to simplify schema.
+                for page_entry in url_list:
+                    if isinstance(page_entry, dict):
+                        page_val = (
+                            page_entry.get("page")
+                            or page_entry.get("Page")
+                            or page_entry.get("url")
+                            or page_entry.get("Url")
+                            or ""
+                        )
+                        method_val = (page_entry.get("Method") or page_entry.get("method") or "GET").upper()
+                        type_val = page_entry.get("Type") or "PAGE"
+                    else:
+                        page_val = str(page_entry)
+                        method_val = "GET"
+                        type_val = "PAGE"
+                    if not page_val:
+                        continue
+                    cur.execute(
+                        """
+                        INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
+                        VALUES (%s, %s, %s, %s, %s);
+                        """,
+                        (pid, page_val, method_val, type_val, datetime.utcnow()),
                     )
             else:
                 for url_entry in url_list:
@@ -967,6 +993,7 @@ def update_permission():
                 cur.execute("SELECT permission_type FROM permissions WHERE id=%s;", (pid,))
                 row = cur.fetchone()
                 ptype = row[0] if row else "ROLE"
+            ptype = (ptype or "ROLE").upper()
             if description is not None or ptype is not None:
                 cur.execute(
                     """
@@ -978,9 +1005,10 @@ def update_permission():
                     """,
                     (description, ptype, datetime.utcnow(), pid),
                 )
-            # reset url or data list
+            # reset url/data/page list
             cur.execute("DELETE FROM url_permissions WHERE permission_id=%s;", (pid,))
             cur.execute("DELETE FROM data_permissions WHERE permission_id=%s;", (pid,))
+            cur.execute("DELETE FROM page_permissions WHERE permission_id=%s;", (pid,))
             if ptype == "DATA":
                 for ds in data_sets:
                     set_id = _resolve_set_id(cur, ds if isinstance(ds, dict) else {})
@@ -991,6 +1019,27 @@ def update_permission():
                         ON CONFLICT (permission_id, set_id) DO NOTHING;
                         """,
                         (pid, set_id, datetime.utcnow()),
+                    )
+            elif ptype == "PAGE":
+                for page_entry in url_list:
+                    if isinstance(page_entry, dict):
+                        page_val = (
+                            page_entry.get("page")
+                            or page_entry.get("Page")
+                            or page_entry.get("url")
+                            or page_entry.get("Url")
+                            or ""
+                        )
+                    else:
+                        page_val = str(page_entry)
+                    if not page_val:
+                        continue
+                    cur.execute(
+                        """
+                        INSERT INTO page_permissions (permission_id, page, last_update_datetime)
+                        VALUES (%s, %s, %s);
+                        """,
+                        (pid, page_val, datetime.utcnow()),
                     )
             else:
                 for url_entry in url_list:
@@ -1034,6 +1083,9 @@ def delete_permission():
     conn = _db.conn_pool.getconn()
     try:
         with conn.cursor() as cur:
+            cur.execute("DELETE FROM url_permissions WHERE permission_id=%s;", (pid,))
+            cur.execute("DELETE FROM data_permissions WHERE permission_id=%s;", (pid,))
+            cur.execute("DELETE FROM page_permissions WHERE permission_id=%s;", (pid,))
             cur.execute("DELETE FROM permissions WHERE id=%s;", (pid,))
             conn.commit()
     finally:
@@ -1056,9 +1108,13 @@ def get_url_by_permission():
                 """
                 SELECT id, url, method AS "Method", type AS "Type"
                 FROM url_permissions
+                WHERE permission_id = %s
+                UNION ALL
+                SELECT id, page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
+                FROM page_permissions
                 WHERE permission_id = %s;
                 """,
-                (pid,),
+                (pid, pid),
             )
             rows = cur.fetchall()
             conn.commit()
@@ -1141,10 +1197,21 @@ def get_role_permission_list():
     page = int(data.get("page", 1))
     page_size = int(data.get("page_size", 10))
     code = data.get("Code")
+    ptype = data.get("PermissionType") or data.get("PermissionTypes")
     offset = (page - 1) * page_size
 
-    where = ["permission_type = 'ROLE'"]
+    where = []
     params = []
+    if ptype:
+        if isinstance(ptype, (list, tuple, set)):
+            where.append("permission_type = ANY(%s)")
+            params.append(list(ptype))
+        else:
+            where.append("permission_type = %s")
+            params.append(ptype)
+    else:
+        where.append("permission_type = ANY(%s)")
+        params.append(["ROLE", "PAGE"])
     if code:
         where.append("code ILIKE %s")
         params.append(f"%{code}%")
@@ -1203,18 +1270,27 @@ def get_url_by_permission_list():
                     SELECT up.url, up.method AS "Method", up.type AS "Type"
                     FROM url_permissions up
                     JOIN permissions p ON p.id = up.permission_id
+                    WHERE p.id = ANY(%s) OR p.code = ANY(%s)
+                    UNION ALL
+                    SELECT pp.page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
+                    FROM page_permissions pp
+                    JOIN permissions p ON p.id = pp.permission_id
                     WHERE p.id = ANY(%s) OR p.code = ANY(%s);
                     """,
-                    (perm_ids, perm_codes),
+                    (perm_ids, perm_codes, perm_ids, perm_codes),
                 )
             elif perm_ids:
                 cur.execute(
                     """
-                    SELECT up.url, up.method AS "Method", up.type AS "Type"
-                    FROM url_permissions up
-                    WHERE up.permission_id = ANY(%s);
+                    SELECT url, method AS "Method", type AS "Type"
+                    FROM url_permissions
+                    WHERE permission_id = ANY(%s)
+                    UNION ALL
+                    SELECT page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
+                    FROM page_permissions
+                    WHERE permission_id = ANY(%s);
                     """,
-                    (perm_ids,),
+                    (perm_ids, perm_ids),
                 )
             else:
                 cur.execute(
@@ -1222,10 +1298,44 @@ def get_url_by_permission_list():
                     SELECT up.url, up.method AS "Method", up.type AS "Type"
                     FROM url_permissions up
                     JOIN permissions p ON p.id = up.permission_id
+                    WHERE p.code = ANY(%s)
+                    UNION ALL
+                    SELECT pp.page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
+                    FROM page_permissions pp
+                    JOIN permissions p ON p.id = pp.permission_id
                     WHERE p.code = ANY(%s);
                     """,
-                    (perm_codes,),
+                    (perm_codes, perm_codes),
                 )
+            rows = cur.fetchall()
+            conn.commit()
+    finally:
+        _db.conn_pool.putconn(conn)
+
+    return _json_response({"data": rows, "status": "OK"})
+
+
+@rp_bp.route("/getPageByUser", methods=["POST"])
+def get_page_by_user():
+    """Return distinct pages a user can access based on roles -> permissions -> page_permissions."""
+    data = request.get_json(silent=True) or {}
+    uid = data.get("UserId")
+    if not uid:
+        return _json_response({"message": "UserId is required", "status": "FAIL"}, status=400)
+
+    conn = _db.conn_pool.getconn()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT DISTINCT pp.page AS "Page", pp.permission_id AS "PermissionId"
+                FROM user_roles ur
+                JOIN role_permissions rp ON rp.role_id = ur.role_id
+                JOIN page_permissions pp ON pp.permission_id = rp.permission_id
+                WHERE ur.user_id = %s;
+                """,
+                (uid,),
+            )
             rows = cur.fetchall()
             conn.commit()
     finally:

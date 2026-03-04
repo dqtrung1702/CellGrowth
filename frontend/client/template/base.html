@@ -66,31 +66,49 @@
                         <label class="box-close" for="acc-close"></label>
                     </section>
                     {% else %}
+                    {% set menu = menu_flags or {} %}
+                    {% if menu.get('Home', True) %}
                     <input type="radio" name="accordion" id="Home" />
                     <section class="box">
                         <label class="box-title" for="Home"><a href="{{ url_for('home_blueprint.home') }}">Home</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
+                    {% endif %}
+                    {% if menu.get('Users') %}
                     <input type="radio" name="accordion" id="Users" />
                     <section class="box">
                         <label class="box-title" for="Users"><a href="{{ url_for('user_blueprint.User') }}">Users</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
+                    {% endif %}
+                    {% if menu.get('Roles') %}
                     <input type="radio" name="accordion" id="Roles" />
                     <section class="box">
                         <label class="box-title" for="Roles"><a href="{{ url_for('role_blueprint.Role') }}">Roles</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
+                    {% endif %}
+                    {% if menu.get('Permissions') %}
                     <input type="radio" name="accordion" id="Permissions" />
                     <section class="box">
                         <label class="box-title" for="Permissions"><a href="{{ url_for('permission_blueprint.Permission') }}">Permissions</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
+                    {% endif %}
+                    {% if menu.get('DataSets') %}
                     <input type="radio" name="accordion" id="DataSets" />
                     <section class="box">
         <label class="box-title" for="DataSets"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
+                    {% endif %}
+                    {% if menu.get('Person') %}
+                    <input type="radio" name="accordion" id="Person" />
+                    <section class="box">
+                        <label class="box-title" for="Person"><a href="{{ url_for('person_blueprint.person_list') }}">Person</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    {% endif %}
                     <input type="radio" name="accordion" id="Logout" />
                     <section class="box">
                         <label class="box-title" for="Logout"><a href="{{ url_for('auth_blueprint.logout') }}">Logout</a></label>

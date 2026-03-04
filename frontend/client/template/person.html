@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" id="pagePerson">
+  <div style="text-align: center;">
+    <h1>Person</h1>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-body">
+      <form method="get" action="{{ url_for('person_blueprint.person_list') }}" class="row g-2">
+        <div class="col-md-3">
+          <label class="form-label">Code</label>
+          <input name="Code" type="text" class="form-control" value="{{ filters.Code }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Full name</label>
+          <input name="FullName" type="text" class="form-control" value="{{ filters.FullName }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100" type="submit">Tìm kiếm</button>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <a class="btn btn-success w-100" href="{{ url_for('person_blueprint.person_detail') }}">+ Thêm mới</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="table-wrapper mt-3">
+    <table class="table sortable">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Code</th>
+          <th>Họ tên</th>
+          <th>Ngày sinh</th>
+          <th>Người cập nhật</th>
+          <th>Lần cập nhật cuối</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in persons %}
+        <tr>
+          <td>{{ p.STT }}</td>
+          <td>{{ p.Code }}</td>
+          <td>{{ p.FullName }}</td>
+          <td>{{ p.BirthDate }}</td>
+          <td>{{ p.LastUpdateUserName }}</td>
+          <td>{{ p.LastUpdateDateTime }}</td>
+          <td><a href="{{ url_for('person_blueprint.person_detail', id=p.id) }}">Chi tiết</a></td>
+        </tr>
+        {% endfor %}
+        {% if not persons %}
+        <tr><td colspan="7">Không có dữ liệu.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <div id="pagination"></div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    {% if pagination %}
+    pagination2("{{ pagination.get('page') }}", "{{ pagination.get('total_pages') }}", "pagination");
+    {% endif %}
+  });
+</script>
+{% endblock %}

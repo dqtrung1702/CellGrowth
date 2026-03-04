@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS uaa.url_permissions (
     last_update_datetime TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Page permissions: minimal mapping page <-> permission_id for UI/menu
+CREATE TABLE IF NOT EXISTS uaa.page_permissions (
+    id            BIGSERIAL PRIMARY KEY,
+    permission_id BIGINT NOT NULL,
+    page          TEXT NOT NULL,
+    last_update_datetime TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(permission_id, page)
+);
+
 CREATE TABLE IF NOT EXISTS uaa.sets (
     id        BIGSERIAL PRIMARY KEY,
     setname   TEXT NOT NULL,

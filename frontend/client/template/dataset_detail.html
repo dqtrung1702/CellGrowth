@@ -23,7 +23,7 @@
     <div class="input-group">
       <label>Data rows</label>
       <div class="table-wrapper">
-        <table id="DataTable" class="table">
+        <table id="DataTable" class="table sortable">
           <thead>
             <tr>
               <th class="table__heading">STT</th>
@@ -31,6 +31,13 @@
               <th class="table__heading">Column</th>
               <th class="table__heading">Value</th>
               <th class="table__heading"></th>
+            </tr>
+            <tr>
+              <td class="table__searching"></td>
+              <td class="table__searching"><input id="filterTable" type="text" placeholder="Filter table.." oninput="filterDataRows()" /></td>
+              <td class="table__searching"><input id="filterColumn" type="text" placeholder="Filter column.." oninput="filterDataRows()" /></td>
+              <td class="table__searching"><input id="filterValue" type="text" placeholder="Filter value.." oninput="filterDataRows()" /></td>
+              <td class="table__searching"></td>
             </tr>
           </thead>
           <tbody></tbody>
@@ -49,6 +56,11 @@
   document.addEventListener('DOMContentLoaded', function() {
     const datasets = {{ datasets | tojson }};
     renderDataTable(datasets || []);
+
+    // Re-apply filter (and visible-row numbering) after a sort click.
+    document.querySelectorAll('#DataTable thead th').forEach(th => {
+      th.addEventListener('click', () => setTimeout(filterDataRows, 0));
+    });
 
     document.getElementById("DatasetDetailForm").addEventListener('submit', function() {
       const rows = Array.from(document.querySelectorAll("#DataTable tbody tr"));
@@ -70,6 +82,7 @@
     tbody.innerHTML = "";
     list.forEach((d, idx) => appendDataRow(idx + 1, d.Table || '*', d.Column || '*', d.Value || '*'));
     if (!list.length) appendDataRow(1, '*', '*', '*');
+    filterDataRows();
   }
 
   function appendDataRow(stt, table, column, value) {
@@ -89,13 +102,37 @@
     const tbody = document.querySelector("#DataTable tbody");
     const stt = tbody.children.length + 1;
     appendDataRow(stt, '*', '*', '*');
+    filterDataRows();
   }
 
   function deleteRow(anchor) {
     const row = anchor.closest("tr");
     row.remove();
-    Array.from(document.querySelectorAll("#DataTable tbody tr")).forEach((tr, idx) => {
-      tr.children[0].innerText = idx + 1;
+    filterDataRows();
+  }
+
+  function filterDataRows() {
+    const tableFilter = (document.getElementById('filterTable').value || '').toLowerCase();
+    const columnFilter = (document.getElementById('filterColumn').value || '').toLowerCase();
+    const valueFilter = (document.getElementById('filterValue').value || '').toLowerCase();
+
+    const rows = Array.from(document.querySelectorAll('#DataTable tbody tr'));
+    let counter = 1;
+    rows.forEach(tr => {
+      const tds = tr.querySelectorAll('td');
+      const tableVal = (tds[1].innerText || '').toLowerCase();
+      const columnVal = (tds[2].innerText || '').toLowerCase();
+      const valueVal = (tds[3].innerText || '').toLowerCase();
+
+      const visible = (!tableFilter || tableVal.includes(tableFilter)) &&
+                      (!columnFilter || columnVal.includes(columnFilter)) &&
+                      (!valueFilter || valueVal.includes(valueFilter));
+
+      tr.style.display = visible ? '' : 'none';
+      if (visible) {
+        tds[0].innerText = counter;
+        counter += 1;
+      }
     });
   }
 </script>

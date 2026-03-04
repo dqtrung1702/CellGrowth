@@ -342,7 +342,7 @@ def getRolePermissionList():
   data = request.get_json(silent=True) or {}
   page = data.get('page',1)
   Code = data.get('Code')
-  data = {'Code':Code,'PermissionType':'ROLE','page' : page,'page_size' : Config.PAGE_SIZE}
+  data = {'Code':Code,'PermissionType':['ROLE','PAGE'],'page' : page,'page_size' : Config.PAGE_SIZE}
   res = requests.post(url+'/getRolePermissionList', json=data, cookies=cookies, timeout=5)
   if res.status_code == 200:
     if res.json().get('status','') == 'OK':

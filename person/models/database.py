@@ -3,6 +3,7 @@ person = PyMongo()
 from datetime import date
 from dateutil import tz
 import pytz
+from bson import json_util
 local_zone = tz.tzlocal()
 
 class transf:    
@@ -50,8 +51,19 @@ class transf:
             result = str(self.obj,'utf-8')
         elif isinstance(self.obj, list):
             result = transf(self.obj).jsonflobject()
-        elif isinstance(val, dict):
+        elif isinstance(self.obj, dict):
             result = transf(self.obj).jsonfdobject()
         else:
-            result = val
+            result = self.obj
         return result
+
+
+class transf2:
+    """
+    Lightweight converter used by some routes to return JSON-serializable data.
+    """
+    def __init__(self, obj):
+        self.obj = obj
+
+    def json_str(self):
+        return json_util.loads(json_util.dumps(self.obj))

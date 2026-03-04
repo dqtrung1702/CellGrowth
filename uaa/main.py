@@ -13,6 +13,20 @@ app.config.from_object(Config)  # đưa các thông tin từ config vào app
 # Kích hoạt server-side session (Redis theo cấu hình trong Config)
 Session(app)
 
+
+def _ensure_redis_alive():
+    redis_client = app.config.get("SESSION_REDIS")
+    if not redis_client:
+        raise SystemExit("SESSION_REDIS is not configured")
+    try:
+        redis_client.ping()
+    except Exception as exc:  # pragma: no cover - defensive
+        print("REDIS_HEALTHCHECK_FAIL", exc)
+        raise SystemExit(1)
+
+
+_ensure_redis_alive()
+
 app.register_blueprint(authentication)
 app.register_blueprint(user_bp)
 app.register_blueprint(rp_bp)

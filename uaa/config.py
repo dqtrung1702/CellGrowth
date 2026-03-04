@@ -1,5 +1,39 @@
+import os
+import ssl
 import redis
+from urllib.parse import urlparse, urlunparse
 from datetime import timedelta
+
+
+def _build_redis_url(default_url: str) -> str:
+        """Return the hard-coded Redis URL; ignore OS environment overrides."""
+        return default_url
+
+
+def _bool_env(name: str, default: bool) -> bool:
+        val = os.getenv(name)
+        if val is None:
+                return default
+        return val.strip().lower() in ("1", "true", "yes", "on")
+
+
+_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+
+def _redis_ssl_kwargs():
+        """
+        Build SSL kwargs for redis.from_url.
+        - UAA_REDIS_SSL_VERIFY=false disables verification (CERT_NONE).
+        - UAA_REDIS_CA_CERT overrides path to CA file; default points to infra/redis/certs/ca.crt.
+        """
+        verify = _bool_env("UAA_REDIS_SSL_VERIFY", True)
+        if not verify:
+                return {"ssl_cert_reqs": ssl.CERT_NONE}
+
+        ca_cert = os.getenv("UAA_REDIS_CA_CERT") or os.path.join(_ROOT_DIR, "infra", "redis", "certs", "ca.crt")
+        return {"ssl_cert_reqs": ssl.CERT_REQUIRED, "ssl_ca_certs": ca_cert}
+
+
 class Config(object):
         UAA_IP = '0.0.0.0'
         UAA_PORT = 8082
@@ -14,18 +48,33 @@ class Config(object):
         POSTGRES_MINCONN= 1
         POSTGRES_MAXCONN= 10
 
-        SECRET_KEY = 'ERP-as-Services'
+        SECRET_KEY = os.getenv('UAA_SECRET_KEY', 'ERP-as-Services')
         SESSION_EXPIRE_AT_BROWSER_CLOSE = True
         SESSION_TYPE = 'redis'
-        SESSION_REDIS = redis.from_url('redis://127.0.0.1:6379')
-        PERMANENT_SESSION_LIFETIME = timedelta(hours=12)
+        SESSION_COOKIE_NAME = os.getenv('UAA_SESSION_COOKIE', 'uaa_session')
+        SESSION_KEY_PREFIX = os.getenv('UAA_SESSION_PREFIX', 'uaa_sess:')
+        SESSION_USE_SIGNER = True
+        SESSION_COOKIE_DOMAIN = os.getenv('UAA_SESSION_DOMAIN')
+        SESSION_COOKIE_SECURE = _bool_env('UAA_SESSION_COOKIE_SECURE', False)
+        SESSION_COOKIE_HTTPONLY = True
+        SESSION_COOKIE_SAMESITE = os.getenv('UAA_SESSION_COOKIE_SAMESITE', 'Lax')
+        PERMANENT_SESSION_LIFETIME = timedelta(hours=int(os.getenv('SESSION_TTL_HOURS', 12)))
+        SESSION_REDIS = redis.from_url(
+                _build_redis_url('rediss://:123456%40@localhost:6380/0'),
+                socket_connect_timeout=2,
+                socket_timeout=2,
+                **_redis_ssl_kwargs(),
+        )
 
-        JWT_SECRET = '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW'
+        JWT_SECRET = os.getenv('UAA_JWT_SECRET', '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW')
         JWT_ALGORITHM = 'HS256'
-        JWT_EXP_DELTA_SECONDS = 6000000
+        JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXP_SECONDS', 6000000))
 
-        SQLALCHEMY_DATABASE_URI = 'postgresql://admin:admin@localhost:5432/dev?options=-c%20search_path=uaa'
+        SQLALCHEMY_DATABASE_URI = os.getenv(
+                'UAA_DATABASE_URI',
+                'postgresql://admin:admin@localhost:5432/dev?options=-c%20search_path=uaa'
+        )
         SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-        UAA_URL = 'http://localhost:8082/'
+        UAA_URL = os.getenv('UAA_URL', 'http://localhost:8082/')
         BOOLEAN = {'False':False,'True':True,'false':False,'true':True,'on':True,'off':False}

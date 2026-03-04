@@ -13,6 +13,20 @@ app.config.from_object(Config) # đưa các thông tin từ config vào app
 Session(app) # khởi tạo Flask-Session object sau khi app đã có config
 dept.init_app(app)
 
+
+def _ensure_redis_alive():
+    redis_client = app.config.get("SESSION_REDIS")
+    if not redis_client:
+        raise SystemExit("SESSION_REDIS is not configured")
+    try:
+        redis_client.ping()
+    except Exception as exc:  # pragma: no cover - defensive
+        print("REDIS_HEALTHCHECK_FAIL", exc)
+        raise SystemExit(1)
+
+
+_ensure_redis_alive()
+
 app.register_blueprint(route_dept)
 app.register_blueprint(route_action)
 

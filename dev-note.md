@@ -141,3 +141,29 @@ ng new A-frontend
 * sudo netstat -tulpn
 * pgrep python3
 * kill -9 PID
+
+## Redis bảo mật (TLS + password)
+* Cấu hình môi trường cho các service:
+```
+# .env (gợi ý)
+REDIS_URL=rediss://:change-me-redis@localhost:6380/0
+UAA_REDIS_DB=0
+DEPT_REDIS_DB=1
+PERSON_REDIS_DB=2
+SESSION_TTL_HOURS=12
+UAA_SESSION_DOMAIN=localhost
+DEPT_SESSION_DOMAIN=localhost
+PERSON_SESSION_DOMAIN=localhost
+```
+* Khởi chạy Redis TLS nội bộ:
+```
+cd infra/redis
+cp .env.example .env   # sửa REDIS_PASSWORD
+./gen-certs.sh
+docker compose up -d
+```
+* Dọn khóa session cũ (prefix `session:`) sau khi deploy:
+```
+cd scripts
+CONFIRM=YES REDIS_URL=rediss://:change-me-redis@localhost:6380/0 ./cleanup_old_sessions.sh
+```

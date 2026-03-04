@@ -1,0 +1,285 @@
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 242-739-223
+127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /getURLbyPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getDatasetByPermission HTTP/1.1" 200 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+Address already in use
+Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
+ * Serving Flask app 'main'
+ * Debug mode: on
+Address already in use
+Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
+127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /getURLbyPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:38] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:47] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:47] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:59] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [28/Feb/2026 20:52:59] "POST /getURLbyPermissionList HTTP/1.1" 200 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 135-157-692
+127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /getURLbyPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:44] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:53] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:53] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:27:53] "[35m[1mPOST /getURLbyPermission HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/CellGrowth/uaa/modules/RolePermission.py", line 1110, in get_url_by_permission
+    cur.execute(
+  File "/home/CellGrowth/venv/lib/python3.10/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.UndefinedTable: relation "page_permissions" does not exist
+LINE 7:                 FROM page_permissions
+                             ^
+
+127.0.0.1 - - [01/Mar/2026 20:48:09] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [01/Mar/2026 20:48:24] "POST /getPermissionList HTTP/1.1" 200 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+127.0.0.1 - - [03/Mar/2026 20:13:15] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:13:15] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:13:22] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:13:29] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:13:47] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:13:55] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:34] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:43] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:45] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:01] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:10] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:32] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:15:58] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:28:41] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getURLbyPermission HTTP/1.1" 200 -
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 117-360-622
+127.0.0.1 - - [03/Mar/2026 20:49:30] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 20:49:30] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:13:51] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:14:06] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 21:14:06] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:18:43] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:18:48] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:19:03] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 21:19:03] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+Address already in use
+Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
+127.0.0.1 - - [03/Mar/2026 21:24:16] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:24:33] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 21:24:33] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 21:24:38] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 820-849-970
+127.0.0.1 - - [03/Mar/2026 22:13:44] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 22:13:48] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [03/Mar/2026 22:39:55] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:39:55] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:38] "POST /getDataPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:51] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /updateUser HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /updateUserRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:00] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:01] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:04] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:04] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:07] "POST /getRolePermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /updateRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:15] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:41:22] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:43:52] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:44:11] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:46:07] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:28] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:34] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:34] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:39] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:43] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:43] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:47] "POST /getRolePermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:49] "POST /updateRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:49] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:47:50] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:06] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:16] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:49:03] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getURLbyPermission HTTP/1.1" 200 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 325-553-511
+127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /getDataSetByUser HTTP/1.1" 200 -

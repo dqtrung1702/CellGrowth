@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" id="pagePersonDetail">
+  <div style="text-align: center;">
+    <h1>{{ 'Thêm mới' if is_new else 'Chi tiết người' }}</h1>
+  </div>
+
+  {% if message %}
+  <div class="alert alert-info" role="alert">{{ message }}</div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('person_blueprint.person_detail', id=person.get('_id') or person.get('id')) }}">
+    <input type="hidden" name="_csrf" value="{{ request.cookies.get('csrf_token','') }}">
+    {% if person.get('_id') or person.get('id') %}
+    <input type="hidden" name="id" value="{{ person.get('_id') or person.get('id') }}">
+    {% endif %}
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Code *</label>
+        <input name="Code" type="text" class="form-control" value="{{ person.get('Code','') }}" required>
+      </div>
+      <div class="col-md-8">
+        <label class="form-label">Họ tên *</label>
+        <input name="FullName" type="text" class="form-control" value="{{ person.get('FullName','') }}" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Ngày sinh (dd/mm/YYYY)</label>
+        <input name="BirthDate" type="text" class="form-control" value="{{ person.get('BirthDate','') }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Nơi sinh</label>
+        <input name="BirthPlace" type="text" class="form-control" value="{{ person.get('BirthPlace','') }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Quốc tịch (mã)</label>
+        <input name="Nationallity" type="text" class="form-control" value="{{ person.get('Nationallity',{}).get('Code','') }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Dân tộc (mã)</label>
+        <input name="Ethenic" type="text" class="form-control" value="{{ person.get('Ethenic',{}).get('Code','') }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Loại gia đình</label>
+        <input name="FamilyType" type="text" class="form-control" value="{{ person.get('FamilyType','') }}">
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Lưu</button>
+      <a class="btn btn-secondary" href="{{ url_for('person_blueprint.person_list') }}">Quay lại</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

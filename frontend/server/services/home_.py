@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, session
 from base import auth_info
 from config import Config
 import requests
-import json
 
 home_ = Blueprint(
     'home_blueprint'
@@ -10,6 +9,27 @@ home_ = Blueprint(
     # ,static_folder="../../client/static/home"
     # ,template_folder= "../../client/template/home"
 )
+
+
+PAGE_MENU_MAP = {
+    "home": "Home",
+    "role": "Roles",
+    "permission": "Permissions",
+    "user": "Users",
+    "datasets": "DataSets",
+    "person": "Person",
+}
+
+
+def _build_menu_flags(page_items):
+    flags = {"Home": True}  # default show Home
+    for item in page_items or []:
+        page = (item or {}).get("Page") or (item or {}).get("page") or ""
+        norm = page.strip().strip("/").lower()
+        menu_id = PAGE_MENU_MAP.get(norm)
+        if menu_id:
+            flags[menu_id] = True
+    return flags
 
 
 @home_.route('/')
@@ -20,14 +40,17 @@ def home():
     xauth,xinfo = auth_info(jwt_token)
     if not xauth:        
         return redirect('login')
-    if 'URLList' not in session:
+    # Load page permissions -> MenuFlags
+    if 'MenuFlags' not in session:
         url = Config.UAA_URL
-        data = json.dumps({'PermissionList' : xinfo.get('Permissions')})
-        res = requests.post(url+'/getURLbyPermissionList', data=data, cookies=cookies)
-        if res.status_code == 200:
-            if res.json().get('status','') == 'OK':                
-                URLList = res.json().get('data')
-                session['URLList'] = URLList
+        payload = {'UserId': xinfo.get('UserId')}
+        try:
+            res = requests.post(url+'/getPageByUser', json=payload, cookies=cookies, timeout=5)
+            if res.status_code == 200 and res.json().get('status') == 'OK':
+                pages = res.json().get('data', [])
+                session['MenuFlags'] = _build_menu_flags(pages)
+        except Exception:
+            pass
     if 'DataScopes' not in session:
         url = Config.UAA_URL
         payload = {'UserId': xinfo.get('UserId')}

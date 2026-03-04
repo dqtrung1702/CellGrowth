@@ -104,6 +104,17 @@ BEGIN
             (pid, '/updateDatasetBySet', 'POST', 'ROLE'),
             (pid, '/getDatasetByPermission', 'POST', 'ROLE')
         ON CONFLICT DO NOTHING;
+
+        -- Page mapping for menu visibility
+        INSERT INTO uaa.page_permissions (permission_id, page) VALUES
+            (pid, '/home'),
+            (pid, '/Role'),
+            (pid, '/Permission'),
+            (pid, '/User'),
+            (pid, '/datasets'),
+            (pid, '/person')
+        ON CONFLICT DO NOTHING;
+
     END IF;
 
     -- Assign DATA permission directly to user (role cannot grant DATA)

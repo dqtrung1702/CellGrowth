@@ -4,55 +4,54 @@ import secrets
 from flask import request, redirect, session, abort
 from config import Config
 import jwt
+
+
+def _menu_flags_from_session():
+    """Normalize menu flag storage into a dict of {MenuId: bool}."""
+    raw = session.get("MenuFlags") or session.get("MenuList")
+    print("Raw menu flags:", raw)
+    if isinstance(raw, dict):
+        return {str(k): bool(v) for k, v in raw.items()}
+    flags = {}
+    for item in raw or []:
+        flags[str(item)] = True
+    return flags
+
+
+def inject_menu_flags():
+    """Context processor to expose menu flags to all templates."""
+    return {"menu_flags": _menu_flags_from_session()}
+
+
 def auth(jwt_token):
     try:
-      auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-      if auth_info:
-        return True
-    except:
-      return False
+        auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
+        return bool(auth_info)
+    except Exception:
+        return False
+
 
 def auth_info(jwt_token):
     try:
-      auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
-      if auth_info:
-        return True,auth_info
-    except:
-      return False,None
-def check_url(URLList, url, **kwargs):
-    url_norm = (url or '').strip().lower()
-    for xURL in URLList:
-      if (xURL.get('url') or '').strip().lower() == url_norm:
-        xlist = []
-        ylist = []
-        for key, value in kwargs.items():
-          xlist.append(xURL.get(key))
-          ylist.append(value)
-        pairs = zip(xlist, ylist)
-        if not any(x != y for x, y in pairs):
-          return True
-    return False
+        auth_info = jwt.decode(jwt_token, Config.JWT_SECRET, algorithms=Config.JWT_ALGORITHM)
+        if auth_info:
+            return True, auth_info
+    except Exception:
+        pass
+    return False, None
 
 
 def require_page_access(view_func):
     """
-    Decorator: kiểm tra JWT + quyền URL dựa trên URLList lưu trong session.
-    - Nếu chưa đăng nhập: redirect Accessisdenied.
-    - Nếu có URLList và không khớp quyền: redirect Accessisdenied.
-    - Nếu không có URLList (chưa nạp), cho phép tạm để tránh kẹt vòng lặp; UAA vẫn chặn ở backend.
+    Decorator: chỉ kiểm tra đăng nhập bằng JWT; phân quyền trang chi tiết đã gỡ bỏ.
     """
     @wraps(view_func)
     def wrapper(*args, **kwargs):
-        jwt_token = request.cookies.get('app_token','')
+        jwt_token = request.cookies.get("app_token", "")
         if not auth(jwt_token):
-            return redirect('Accessisdenied')
-        url_list = session.get('URLList')
-        # Chỉ enforce page-level ACL nếu backend thực sự cung cấp rule Type='page'
-        has_page_rules = url_list and any((item or {}).get('Type') == 'page' for item in url_list)
-        # Use path instead of full base_url to match entries stored from backend
-        if has_page_rules and not check_url(url_list, request.path, Method=request.method, Type='page'):
-            return redirect('Accessisdenied')
+            return redirect("Accessisdenied")
         return view_func(*args, **kwargs)
+
     return wrapper
 
 
@@ -95,5 +94,3 @@ def attach_csrf_cookie(response):
     token = issue_csrf_token()
     response.set_cookie("csrf_token", token, path="/", httponly=False, samesite="Lax")
     return response
-          
-# def Pagination():
