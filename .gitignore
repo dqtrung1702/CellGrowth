@@ -9,3 +9,4 @@ venv
 log.txt
 runtime.log
 test_venv
+infra/mongo/data
