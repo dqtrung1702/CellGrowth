@@ -40,26 +40,24 @@ def home():
     xauth,xinfo = auth_info(jwt_token)
     if not xauth:        
         return redirect('login')
-    # Load page permissions -> MenuFlags
-    if 'MenuFlags' not in session:
-        url = Config.UAA_URL
-        payload = {'UserId': xinfo.get('UserId')}
-        try:
-            res = requests.post(url+'/getPageByUser', json=payload, cookies=cookies, timeout=5)
-            if res.status_code == 200 and res.json().get('status') == 'OK':
-                pages = res.json().get('data', [])
-                session['MenuFlags'] = _build_menu_flags(pages)
-        except Exception:
-            pass
-    if 'DataScopes' not in session:
-        url = Config.UAA_URL
-        payload = {'UserId': xinfo.get('UserId')}
-        try:
-            res = requests.post(url+'/getDataSetByUser', json=payload, cookies=cookies, timeout=5)
-            if res.status_code == 200 and res.json().get('status') == 'OK':
-                session['DataScopes'] = res.json().get('data', [])
-        except Exception:
-            pass
+    # Always refresh page permissions -> MenuFlags to reflect recent changes
+    url = Config.UAA_URL
+    payload = {'UserId': xinfo.get('UserId')}
+    try:
+        res = requests.post(url+'/getPageByUser', json=payload, cookies=cookies, timeout=5)
+        if res.status_code == 200 and res.json().get('status') == 'OK':
+            pages = res.json().get('data', [])
+            session['MenuFlags'] = _build_menu_flags(pages)
+    except Exception:
+        pass
+
+    # Refresh DataScopes as well (kept consistent with page refresh)
+    try:
+        res = requests.post(url+'/getDataSetByUser', json=payload, cookies=cookies, timeout=5)
+        if res.status_code == 200 and res.json().get('status') == 'OK':
+            session['DataScopes'] = res.json().get('data', [])
+    except Exception:
+        pass
     return render_template('home.html', title='Home', auth=True)
 
 

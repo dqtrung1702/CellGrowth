@@ -8,20 +8,20 @@
   <form id="DatasetDetailForm" method="POST" action="{{ url_for('dataset_blueprint.dataset_detail') }}">
     <input type="hidden" name="SetId" value="{{ SetId }}">
     <div class="input-group">
-      <label>SetName</label>
+      <label><i class="fa fa-tag"> SetName</i></label>
       <input type="text" value="{{ set_info.get('SetName','') }}" disabled>
     </div>
     <div class="input-group">
-      <label>Services</label>
+      <label><i class="fa fa-cogs"> Services</i></label>
       <input type="text" value="{{ set_info.get('Services','') }}" disabled>
     </div>
     <div class="input-group">
-      <label>SetCode</label>
+      <label><i class="fa fa-key"> SetCode</i></label>
       <input type="text" value="{{ set_info.get('SetCode','') }}" disabled>
     </div>
 
-    <div class="input-group">
-      <label>Data rows</label>
+    <div class="input-group data-rows-block">
+      <label><i class="fa fa-table"> Data rows</i></label>
       <div class="table-wrapper">
         <table id="DataTable" class="table sortable">
           <thead>

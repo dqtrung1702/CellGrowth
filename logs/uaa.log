@@ -1,38 +1,11 @@
  * Serving Flask app 'main'
  * Debug mode: on
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:8082
- * Running on http://172.22.62.54:8082
-[33mPress CTRL+C to quit[0m
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 242-739-223
-127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /getURLbyPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 17:32:51] "POST /getDataSetByUser HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 17:32:56] "POST /getDatasetByPermission HTTP/1.1" 200 -
- * Serving Flask app 'main'
- * Debug mode: on
 Address already in use
 Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
  * Serving Flask app 'main'
  * Debug mode: on
 Address already in use
 Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
-127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 18:15:02] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /getURLbyPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:22] "POST /getDataSetByUser HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:38] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:47] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:47] "POST /getDatasetBySet HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:59] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [28/Feb/2026 20:52:59] "POST /getURLbyPermissionList HTTP/1.1" 200 -
  * Serving Flask app 'main'
  * Debug mode: on
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
@@ -42,244 +15,1224 @@ Port 8082 is in use by another program. Either identify and stop that program, o
 [33mPress CTRL+C to quit[0m
  * Restarting with stat
  * Debugger is active!
- * Debugger PIN: 135-157-692
-127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /getURLbyPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:37] "POST /getDataSetByUser HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:44] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:53] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:53] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:27:53] "[35m[1mPOST /getURLbyPermission HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
-    return self.wsgi_app(environ, start_response)
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1514, in wsgi_app
-    response = self.handle_exception(e)
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "/home/CellGrowth/uaa/modules/RolePermission.py", line 1110, in get_url_by_permission
-    cur.execute(
-  File "/home/CellGrowth/venv/lib/python3.10/site-packages/psycopg2/extras.py", line 236, in execute
-    return super().execute(query, vars)
-psycopg2.errors.UndefinedTable: relation "page_permissions" does not exist
-LINE 7:                 FROM page_permissions
-                             ^
-
-127.0.0.1 - - [01/Mar/2026 20:48:09] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:48:13] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 20:48:24] "POST /getPermissionList HTTP/1.1" 200 -
- * Serving Flask app 'main'
- * Debug mode: on
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:8082
- * Running on http://172.22.62.54:8082
-[33mPress CTRL+C to quit[0m
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
-127.0.0.1 - - [03/Mar/2026 20:13:15] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:13:15] "POST /getDataSetByUser HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:13:22] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:13:29] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:13:47] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:13:55] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:14] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:34] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:39] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:43] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:45] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:14:47] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:01] "POST /updatePermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:02] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:06] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:10] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:18] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:32] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:15:58] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:16:02] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:28:41] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:28:45] "POST /getURLbyPermission HTTP/1.1" 200 -
+ * Debugger PIN: 586-677-739
+127.0.0.1 - - [04/Mar/2026 21:47:07] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:09] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:13] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:13] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:13] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:36] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:36] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:36] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:47:36] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:51:47] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:51:47] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:51:47] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:53:59] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:53:59] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:53:59] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:01] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:01] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:01] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:10] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:10] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:10] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:10] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:25] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:25] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:25] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:25] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:32] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:32] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:32] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:54:49] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:01] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:03] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:03] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:03] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:14] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:14] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:14] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:14] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:18] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:18] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:33] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:53] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:55:59] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:56:09] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:56:30] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:56:30] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:56:30] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:17] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:17] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:17] "POST /getURLbyPermission HTTP/1.1" 200 -
  * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+127.0.0.1 - - [04/Mar/2026 22:10:37] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:10:37] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:10:37] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:10] "[35m[1mPOST /updatePermission HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:12:20] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:23] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:23] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:23] "POST /getURLbyPermission HTTP/1.1" 200 -
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+127.0.0.1 - - [04/Mar/2026 22:16:02] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:02] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:02] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:34] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:34] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:34] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:16:42] "[35m[1mPOST /updatePermission HTTP/1.1[0m" 500 -
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+127.0.0.1 - - [04/Mar/2026 22:18:58] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:18:58] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:18:58] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:04] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:05] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:05] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:18] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:18] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:18] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:33] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:38] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:41] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:41] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:41] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:55] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:56] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:56] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:56] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:59] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:59] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:59] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:20:11] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:25:58] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:01] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:01] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:01] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:10] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:10] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:10] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:10] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:15] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:15] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:15] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:26:26] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:41] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:44] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:44] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:44] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:55] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:56] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:56] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:43:56] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:13] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:22] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:25] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:25] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:25] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:28] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:31] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:31] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:51] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:54] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:54] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:44:54] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:03] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:03] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:03] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:03] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:14] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:20] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:35] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:35] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:45:35] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:08] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:08] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:22] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:22] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:26] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:29] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:29] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:29] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:40] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:40] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:40] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:47] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:47] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:50] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:53] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:53] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:11:53] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:12:08] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:12:08] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:12:08] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:12:08] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:23] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:27] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:29] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:29] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:35] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:40] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:15:40] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:18:12] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:18:12] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:18:17] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:18:19] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:18:19] "POST /getPermissionInfo HTTP/1.1" 200 -
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK 127.0.0.1 - - [04/Mar/2026 23:18:19] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:19:10] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:19:13] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:19:13] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:19:13] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:19:29] "POST /getPermissionList HTTP/1.1" 200 -
+ * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
+{'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 586-677-739
+127.0.0.1 - - [04/Mar/2026 23:21:28] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:31] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:31] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:31] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:39] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:40] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:40] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:45] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:47] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:47] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:47] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:21:56] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 23:22:00] "POST /getSetList HTTP/1.1" 200 -
+ * Serving Flask app 'main'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8082
+ * Running on http://172.22.62.54:8082
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 106-603-087
+127.0.0.1 - - [05/Mar/2026 23:40:43] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:44] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:44] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:48] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:48] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:48] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:53] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:53] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:56] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:40:56] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:41:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:41:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:41:56] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:41:56] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:42:06] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:42:12] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:42:12] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:42:12] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:42:34] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:47:28] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:28] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:31] "[31m[1mPOST /getUserList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:42] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:42] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:48] "[31m[1mPOST /getUserList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:53] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:53] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:55] "[31m[1mPOST /getRoleList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:56] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:56] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:48:00] "[31m[1mPOST /getRoleList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:59] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:47:59] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:48:01] "[31m[1mPOST /getPermissionList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:48:01] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:48:01] "[31m[1mPOST /getDataSetByUser HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:48:03] "[31m[1mPOST /getSetList HTTP/1.1[0m" 403 -
+127.0.0.1 - - [05/Mar/2026 23:50:07] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:07] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:07] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:11] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:11] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:11] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:15] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:19] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:23] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:34] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:37] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:37] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:37] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:44] "POST /updatePermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:45] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:45] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:45] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:54] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:54] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:57] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:50:59] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:51:05] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:51:07] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:51:07] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:51:07] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:33] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:33] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:46] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:46] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:46] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:49] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:49] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:53] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:53] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:53] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:57:56] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:00] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:02] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:16] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:16] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [05/Mar/2026 23:58:16] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:16] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:18] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:18] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:41] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:46] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:46] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:02:46] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:07:17] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:07:21] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:07:21] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:07:21] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:31] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:34] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:34] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:38] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:40] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:40] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:47] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:47] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:47] "POST /getDatasetByPermission HTTP/1.1" 200 -
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getUserList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getRoleList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPermissionList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getPageByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 4, 'path': '/getSetList', 'method': 'POST', 'ok': None}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+127.0.0.1 - - [06/Mar/2026 00:08:50] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:50] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:50] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:50] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:54] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:58] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:08:58] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:09:08] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:38] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:38] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:40] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:44] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:44] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:16:44] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:01] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:03] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:03] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:09] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:16] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:17:16] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:17] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:17] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:22] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:25] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:25] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:19:25] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:22:06] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:22:06] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:22:06] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:23:56] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:23:56] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:23:56] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:10] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:10] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:10] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:11] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:11] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:11] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:20] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:20] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:20] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:49] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:52] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:52] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:58] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:58] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:24:58] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:00] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:00] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:00] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:00] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:11] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:12] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:25:12] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:27:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:27:05] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:28:30] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:28:30] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:29:50] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:29:53] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:29:53] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:29:53] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:00] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:03] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:03] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:06] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:09] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:09] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:12] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:16] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:17] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:17] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:17] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:23] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:23] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:23] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:26] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:26] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:26] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:26] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:31] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:34] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:34] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:34] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:36] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:39] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:39] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:39] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:45] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:49] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:30:49] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:31:41] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:31:41] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:31:44] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:31:44] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:00] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:00] "POST /getDatasetBySet HTTP/1.1" 200 -
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK 127.0.0.1 - - [06/Mar/2026 00:33:14] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:14] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:14] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:17] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:17] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:17] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:17] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:22] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:26] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:26] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:29] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:31] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:31] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:33] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:37] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:37] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:37] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:51] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:52] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:33:52] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:30] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:30] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:38] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:41] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:42] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:42] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:42] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:46] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:35:48] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:36:03] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:36:03] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:36:03] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:36:08] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:36:11] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:25] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:44] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:52] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:52] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:52] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:55] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:37:57] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:00] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:00] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:00] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:24] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:27] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:27] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:29] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:32] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:32] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:32] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:37] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:39] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:38:39] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:39:14] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:39:17] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:39:17] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:39:17] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:40:18] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:00] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:42] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:46] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:48] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:53] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:41:57] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:42:01] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:46] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:49] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:49] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:51] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:51] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:51] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:52] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:56] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:43:59] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:04] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:05] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:05] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:17] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:26] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:26] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:29] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:29] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:29] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:44:31] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:44] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:44] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:46] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:46] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:46] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:50] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:50] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:50] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:50] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:53] "POST /getDataPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:58] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:45:58] "POST /getUserInfo HTTP/1.1" 200 -
+{'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetBySet', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPageByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataSetByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDataPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK 127.0.0.1 - - [06/Mar/2026 00:45:58] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:02] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:02] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:02] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:02] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:06] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:36] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:46:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:15] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:15] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:15] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:18] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:06:18] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:07:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:07:56] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:07:56] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:07:56] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:12] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:12] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:12] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:12] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:27] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:27] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:27] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:08:27] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:09:11] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:09:11] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:09:11] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:09:11] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:10:58] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:10:58] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:10:58] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:10:58] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:12:03] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:12:03] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:12:03] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:12:03] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:13:36] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:13:38] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:13:38] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:13:38] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:14:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:14:40] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:14:40] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:15:24] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:15:24] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:15:24] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:17] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:17] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:17] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:31] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:31] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:31] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:44] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:44] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:44] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:46] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:46] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:46] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:19:46] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:21:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:21:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:21:18] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:21:18] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:18] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:18] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:18] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:48] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:55] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:22:55] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:23:35] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:23:35] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:24:49] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:24:49] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:17] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:17] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:17] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:20] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:20] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:20] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:20] "POST /getRoleByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:30] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:33] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:33] "POST /getPermissionByRole HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:25:58] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:26:01] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:26:01] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:26:01] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:27:36] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:27:36] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:27:36] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:28:52] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:28:52] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:28:52] "POST /getURLbyPermission HTTP/1.1" 200 -
+{'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
 AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/updatePermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
-AUTHZ_CHECK {'user_id': 3, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
- * Detected change in '/home/CellGrowth/uaa/modules/RolePermission.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 117-360-622
-127.0.0.1 - - [03/Mar/2026 20:49:30] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 20:49:30] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:13:51] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:14:06] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 21:14:06] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:18:43] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:18:48] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:19:03] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 21:19:03] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
- * Serving Flask app 'main'
- * Debug mode: on
-Address already in use
-Port 8082 is in use by another program. Either identify and stop that program, or start the server with a different port.
-127.0.0.1 - - [03/Mar/2026 21:24:16] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:24:33] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 21:24:33] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 21:24:38] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
- * Serving Flask app 'main'
- * Debug mode: on
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:8082
- * Running on http://172.22.62.54:8082
-[33mPress CTRL+C to quit[0m
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 820-849-970
-127.0.0.1 - - [03/Mar/2026 22:13:44] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 22:13:48] "[31m[1mPOST /getPageByUser HTTP/1.1[0m" 403 -
-127.0.0.1 - - [03/Mar/2026 22:39:55] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:39:55] "POST /getPageByUser HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getUserList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:32] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:35] "POST /getRoleByUser HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:38] "POST /getDataPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:51] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /updateUser HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /updateUserRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getUserInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:40:59] "POST /getDatasetByPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:00] "POST /getRoleByUser HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:01] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:04] "POST /getRoleInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:04] "POST /getPermissionByRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:07] "POST /getRolePermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /updateRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /getRoleInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:09] "POST /getPermissionByRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:15] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:41:22] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:43:52] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:44:11] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:46:07] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:46:09] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:19] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:28] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:34] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:34] "POST /getDatasetBySet HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:39] "POST /getRoleList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:43] "POST /getRoleInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:43] "POST /getPermissionByRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:47] "POST /getRolePermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:49] "POST /updateRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:49] "POST /getRoleInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:47:50] "POST /getPermissionByRole HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:06] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:09] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:16] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:48:19] "POST /getURLbyPermission HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:49:03] "POST /getPermissionList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getSetList HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getPermissionInfo HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 22:49:05] "POST /getURLbyPermission HTTP/1.1" 200 -
- * Serving Flask app 'main'
- * Debug mode: on
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:8082
- * Running on http://172.22.62.54:8082
-[33mPress CTRL+C to quit[0m
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 325-553-511
-127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /login HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /getPageByUser HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 07:03:13] "POST /getDataSetByUser HTTP/1.1" 200 -
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getUserInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getDatasetByPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleByUser', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getRoleInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionByRole', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getSetList', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getPermissionInfo', 'method': 'POST', 'ok': (1,)}
+AUTHZ_CHECK {'user_id': 1, 'path': '/getURLbyPermission', 'method': 'POST', 'ok': (1,)}
+127.0.0.1 - - [06/Mar/2026 01:29:36] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:29:38] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:29:38] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:29:38] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:26] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:26] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:26] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:46] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:46] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:30:46] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:06] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:06] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:06] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:27] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:27] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:31:27] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:33:03] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:33:06] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:33:06] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:33:06] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:41] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:41] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:41] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:43] "POST /getPageByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:43] "POST /getDataSetByUser HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:46] "POST /getUserList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:46] "POST /getUserInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:46] "POST /getDatasetByPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:34:48] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:36:51] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:37:01] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:37:01] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:38:33] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:38:33] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:39:05] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:39:05] "POST /getDatasetBySet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:39:40] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:42:35] "POST /getPermissionList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:42:37] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:42:37] "POST /getPermissionInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:42:37] "POST /getURLbyPermission HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:42:56] "POST /getSetList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:43:01] "POST /getRoleList HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:43:06] "POST /getRoleInfo HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:43:06] "POST /getPermissionByRole HTTP/1.1" 200 -

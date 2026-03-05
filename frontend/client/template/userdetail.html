@@ -9,7 +9,7 @@
           <h4>User Info</h4>
           <div>
             <div class="input-group">
-              <label for="UserName"><i class="fa fa-user col-third"> User Name</i></label>                
+              <label for="UserName"><i class="fa fa-user"> User Name</i></label>                
               <input id="UserName" type="text" disabled value="{{user.get('UserName')}}"  placeholder="User Name" name="UserName"/>              
             </div>
             <div class="input-group">
@@ -18,7 +18,7 @@
               {% else %}
                 <input id="UserLocked" type="checkbox" name="UserLocked" />
               {% endif %}
-              <label for="UserLocked"> UserLocked</label>
+              <label for="UserLocked"><i class="fa fa-lock"> User Locked</i></label>
             </div>
           </div>
           <div class="input-group">
@@ -35,21 +35,20 @@
             <select id="DataPermission" name="DataPermission"></select>            
           </div>
           <div class="input-group">
-            <i class="fa fa-history"></i>
-            <label for="LastSignOnDateTime"> Last SignOn</label>
+            <label for="LastSignOnDateTime"><i class="fa fa-history"> Last SignOn</i></label>
             <input id = "LastSignOnDateTime" type="text" disabled value="{{user.get('LastSignOnDateTime')}}"  placeholder="Last SignOn DateTime" name="LastSignOnDateTime" />
             
             <div class="input-group col-half">
-              <label for="LastUpdateDateTime">Last Update</label>
+              <label for="LastUpdateDateTime"><i class="fa fa-clock-o"> Last Update</i></label>
               <input id = "LastUpdateDateTime" type="text" disabled value="{{user.get('LastUpdateDateTime')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
             </div>
             <div class="input-group col-half">
-              <label for="LastUpdateUserName">by</label>
+              <label for="LastUpdateUserName"><i class="fa fa-user"> by</i></label>
               <input id = "LastUpdateUserName" type="text" disabled value="{{user.get('LastUpdateUserName')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
             </div>
           </div>
           <div class="input-group">
-            <label for="xrole"><i class="fa fa-lock"> Roles</i></label>            
+            <label for="xrole"><i class="fa fa-list"> Roles</i></label>            
             <select id="xrole" name="xrole"></select>            
           </div>
         </div>

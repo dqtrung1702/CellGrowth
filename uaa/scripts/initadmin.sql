@@ -16,7 +16,7 @@ VALUES
 ON CONFLICT (code) DO NOTHING;
 INSERT INTO uaa.permissions (code, permission_type, description)
 VALUES 
-('ALL', 'ROLE', 'Full access'),
+('ALL_ROLE', 'ROLE', 'Full access'),
 ('UAA', 'ROLE', 'uaa access'),
 ('FULL_DATA', 'DATA', 'Full data access')
 ON CONFLICT (code, permission_type) DO NOTHING;
@@ -39,7 +39,7 @@ DECLARE
     dsid BIGINT;
 BEGIN
     SELECT id INTO rid FROM uaa.roles WHERE code = 'Admin';
-    SELECT id INTO pid FROM uaa.permissions WHERE code = 'ALL';
+    SELECT id INTO pid FROM uaa.permissions WHERE code = 'ALL_ROLE' AND permission_type = 'ROLE';
     SELECT id INTO pid_data FROM uaa.permissions WHERE code = 'FULL_DATA';
     SELECT id INTO uid FROM uaa.users WHERE username = 'admin';
     SELECT id INTO dsid FROM uaa.sets WHERE setname='ALL' AND services='*' AND setcode='*';

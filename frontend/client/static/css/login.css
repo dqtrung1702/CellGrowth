@@ -1,7 +1,67 @@
-.container {
-  background-color: $primary-color;
+.auth-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  place-items: center;
+  gap: 2rem;
+  align-items: center;
+}
+
+.auth-illustration img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.auth-form h1,
+.auth-form h2 {
+  margin-bottom: 0.35em;
+  color: #3b3426;
+}
+
+.auth-form p {
+  margin-top: 0;
+  margin-bottom: 0.75em;
+  color: #6b655d;
+}
+
+.auth-form form {
+  margin-top: 0.5em;
+}
+
+.auth-form .input-group {
+  margin-bottom: 0.9em;
+}
+
+.auth-form input[type=\"text\"],
+.auth-form input[type=\"password\"],
+.auth-form input[type=\"submit\"] {
+  border: 1px solid #e8ddc4;
+}
+
+.auth-form input[type=\"submit\"] {
+  cursor: pointer;
+  background: #f0b429;
+  color: #2f2f2f;
+  font-weight: 600;
+}
+
+.auth-form input[type=\"submit\"]:hover {
+  background: #d89c1f;
+}
+
+.auth-error {
+  color: #e45757;
+  margin-top: 0.5em;
+}
+
+@media (max-width: 960px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .auth-illustration img {
+    max-width: 300px;
   }
 }

@@ -23,13 +23,16 @@ CREATE TABLE IF NOT EXISTS uaa.roles (
     last_update_datetime TIMESTAMPTZ DEFAULT NOW()
 );
 
+drop table if exists uaa.permissions cascade;
+
 CREATE TABLE IF NOT EXISTS uaa.permissions (
     id        BIGSERIAL PRIMARY KEY,
-    code      VARCHAR(100) NOT NULL UNIQUE,
+    code      VARCHAR(100) NOT NULL,
     permission_type VARCHAR(50) NOT NULL,
     description VARCHAR(255),
     last_update_username VARCHAR(50),
-    last_update_datetime TIMESTAMPTZ DEFAULT NOW()
+    last_update_datetime TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(code, permission_type)
 );
 
 CREATE TABLE IF NOT EXISTS uaa.role_permissions (

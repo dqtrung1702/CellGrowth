@@ -1,6 +1,8 @@
-from flask import Flask
+from flask import Flask, Blueprint
 from importlib import import_module
 from base import csrf_protect, attach_csrf_cookie, inject_menu_flags
+import pkgutil
+from pathlib import Path
 
 def create_app(config):
   app = Flask(
@@ -16,9 +18,19 @@ def create_app(config):
   return app
 
 def register_blueprints(app):
-  lstModule = ['authentication','home_','user','role','permission','dataset','person']
   pkg = __name__  # typically "services"
-  for item in lstModule:
-    module = import_module(f'{pkg}.{item}')
-    app.register_blueprint(getattr(module, item))
-    # app.secret_key = 'nhập từ khóa tùy thích’
+  pkg_path = Path(__file__).parent
+  for _, name, ispkg in pkgutil.iter_modules([str(pkg_path)]):
+    if name.startswith('_') or name.endswith('_test'):
+      continue
+    module = import_module(f'{pkg}.{name}')
+    _register_blueprints_from_module(app, module)
+    if ispkg:
+      # ensure package submodules are loaded via its __init__
+      continue
+
+def _register_blueprints_from_module(app, module):
+  for attr in dir(module):
+    obj = getattr(module, attr)
+    if isinstance(obj, Blueprint):
+      app.register_blueprint(obj)

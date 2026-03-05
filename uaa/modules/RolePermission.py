@@ -739,7 +739,13 @@ def get_permission_list():
     page = int(data.get("page", 1))
     page_size = int(data.get("page_size", 10))
     code = data.get("Code")
-    ptype = data.get("PermissionType")
+    ptype_raw = data.get("PermissionType")
+    ptype_list = None
+    if isinstance(ptype_raw, (list, tuple, set)):
+        ptype_list = [str(p).upper() for p in ptype_raw]
+    elif ptype_raw:
+        p = str(ptype_raw).upper()
+        ptype_list = [p] if p else None
     offset = (page - 1) * page_size
 
     requester_id = _current_user_id()
@@ -750,9 +756,13 @@ def get_permission_list():
     if code:
         where.append("code ILIKE %s")
         params.append(f"%{code}%")
-    if ptype:
-        where.append("permission_type = %s")
-        params.append(ptype)
+    if ptype_list:
+        if len(ptype_list) == 1:
+            where.append("permission_type = %s")
+            params.append(ptype_list[0])
+        else:
+            where.append("permission_type = ANY(%s)")
+            params.append(ptype_list)
     if scope_sql:
         where.append(scope_sql)
         params.extend(scope_params)
@@ -881,7 +891,8 @@ def get_permission_info():
 def add_permission():
     data = request.get_json(silent=True) or {}
     code = data.get("Code")
-    ptype = (data.get("PermissionType") or "").upper()
+    ptype_raw = (data.get("PermissionType") or "ROLE").upper()
+    ptype = "DATA" if ptype_raw == "DATA" else "ROLE"
     description = data.get("Description")
     url_list = data.get("UrlList") or []
     data_sets = data.get("DataSets") or []
@@ -912,51 +923,52 @@ def add_permission():
                         """,
                         (pid, set_id, datetime.utcnow()),
                     )
-            elif ptype == "PAGE":
-                # Treat page permissions as URL permissions with type='PAGE' to simplify schema.
-                for page_entry in url_list:
-                    if isinstance(page_entry, dict):
+            else:
+                for entry in url_list:
+                    is_page = False
+                    if isinstance(entry, dict):
+                        type_val_raw = (entry.get("Type") or entry.get("type") or "").upper()
                         page_val = (
-                            page_entry.get("page")
-                            or page_entry.get("Page")
-                            or page_entry.get("url")
-                            or page_entry.get("Url")
+                            entry.get("page")
+                            or entry.get("Page")
                             or ""
                         )
-                        method_val = (page_entry.get("Method") or page_entry.get("method") or "GET").upper()
-                        type_val = page_entry.get("Type") or "PAGE"
+                        is_page = type_val_raw == "PAGE" or bool(page_val)
                     else:
-                        page_val = str(page_entry)
-                        method_val = "GET"
-                        type_val = "PAGE"
-                    if not page_val:
-                        continue
-                    cur.execute(
-                        """
-                        INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
-                        VALUES (%s, %s, %s, %s, %s);
-                        """,
-                        (pid, page_val, method_val, type_val, datetime.utcnow()),
-                    )
-            else:
-                for url_entry in url_list:
-                    if isinstance(url_entry, dict):
-                        url_val = url_entry.get("url") or url_entry.get("Url") or ""
-                        method_val = (url_entry.get("Method") or url_entry.get("method") or "GET").upper()
-                        type_val = url_entry.get("Type") or ptype or "ROLE"
+                        page_val = ""
+                        type_val_raw = ""
+                    if is_page:
+                        if isinstance(entry, dict):
+                            page_val = page_val or entry.get("url") or entry.get("Url") or ""
+                        else:
+                            page_val = str(entry)
+                        if not page_val:
+                            continue
+                        cur.execute(
+                            """
+                            INSERT INTO page_permissions (permission_id, page, last_update_datetime)
+                            VALUES (%s, %s, %s);
+                            """,
+                            (pid, page_val, datetime.utcnow()),
+                        )
                     else:
-                        url_val = str(url_entry)
-                        method_val = "GET"
-                        type_val = ptype
-                    if not url_val:
-                        continue
-                    cur.execute(
-                        """
-                        INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
-                        VALUES (%s, %s, %s, %s, %s);
-                        """,
-                        (pid, url_val, method_val, type_val, datetime.utcnow()),
-                    )
+                        if isinstance(entry, dict):
+                            url_val = entry.get("url") or entry.get("Url") or ""
+                            method_val = (entry.get("Method") or entry.get("method") or "GET").upper()
+                            type_val = type_val_raw or "ROLE"
+                        else:
+                            url_val = str(entry)
+                            method_val = "GET"
+                            type_val = "ROLE"
+                        if not url_val:
+                            continue
+                        cur.execute(
+                            """
+                            INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
+                            VALUES (%s, %s, %s, %s, %s);
+                            """,
+                            (pid, url_val, method_val, type_val, datetime.utcnow()),
+                        )
             conn.commit()
     except errors.UniqueViolation:
         conn.rollback()
@@ -981,7 +993,10 @@ def update_permission():
         return _json_response({"message": "PermissionId is required", "status": "FAIL"}, status=400)
 
     description = data.get("Description")
-    ptype = data.get("PermissionType")
+    ptype_raw = data.get("PermissionType")
+    if ptype_raw is not None:
+        ptype_raw = str(ptype_raw).upper()
+    ptype = "DATA" if ptype_raw == "DATA" else ("ROLE" if ptype_raw else None)
     url_list = data.get("UrlList") or []
     data_sets = data.get("DataSets") or []
 
@@ -992,8 +1007,8 @@ def update_permission():
             if ptype is None:
                 cur.execute("SELECT permission_type FROM permissions WHERE id=%s;", (pid,))
                 row = cur.fetchone()
-                ptype = row[0] if row else "ROLE"
-            ptype = (ptype or "ROLE").upper()
+                current_ptype = (row[0] if row else "ROLE")
+                ptype = "DATA" if str(current_ptype).upper() == "DATA" else "ROLE"
             if description is not None or ptype is not None:
                 cur.execute(
                     """
@@ -1020,46 +1035,48 @@ def update_permission():
                         """,
                         (pid, set_id, datetime.utcnow()),
                     )
-            elif ptype == "PAGE":
-                for page_entry in url_list:
-                    if isinstance(page_entry, dict):
-                        page_val = (
-                            page_entry.get("page")
-                            or page_entry.get("Page")
-                            or page_entry.get("url")
-                            or page_entry.get("Url")
-                            or ""
+            else:
+                for entry in url_list:
+                    is_page = False
+                    if isinstance(entry, dict):
+                        type_val_raw = (entry.get("Type") or entry.get("type") or "").upper()
+                        page_val = entry.get("page") or entry.get("Page") or ""
+                        is_page = type_val_raw == "PAGE" or bool(page_val)
+                    else:
+                        type_val_raw = ""
+                        page_val = ""
+                    if is_page:
+                        if isinstance(entry, dict):
+                            page_val = page_val or entry.get("url") or entry.get("Url") or ""
+                        else:
+                            page_val = str(entry)
+                        if not page_val:
+                            continue
+                        cur.execute(
+                            """
+                            INSERT INTO page_permissions (permission_id, page, last_update_datetime)
+                            VALUES (%s, %s, %s);
+                            """,
+                            (pid, page_val, datetime.utcnow()),
                         )
                     else:
-                        page_val = str(page_entry)
-                    if not page_val:
-                        continue
-                    cur.execute(
-                        """
-                        INSERT INTO page_permissions (permission_id, page, last_update_datetime)
-                        VALUES (%s, %s, %s);
-                        """,
-                        (pid, page_val, datetime.utcnow()),
-                    )
-            else:
-                for url_entry in url_list:
-                    if isinstance(url_entry, dict):
-                        url_val = url_entry.get("url") or url_entry.get("Url") or ""
-                        method_val = (url_entry.get("Method") or url_entry.get("method") or "GET").upper()
-                        type_val = url_entry.get("Type") or ptype or "ROLE"
-                    else:
-                        url_val = str(url_entry)
-                        method_val = "GET"
-                        type_val = ptype or "ROLE"
-                    if not url_val:
-                        continue
-                    cur.execute(
-                        """
-                        INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
-                        VALUES (%s, %s, %s, %s, %s);
-                        """,
-                        (pid, url_val, method_val, type_val, datetime.utcnow()),
-                    )
+                        if isinstance(entry, dict):
+                            url_val = entry.get("url") or entry.get("Url") or ""
+                            method_val = (entry.get("Method") or entry.get("method") or "GET").upper()
+                            type_val = type_val_raw or "ROLE"
+                        else:
+                            url_val = str(entry)
+                            method_val = "GET"
+                            type_val = "ROLE"
+                        if not url_val:
+                            continue
+                        cur.execute(
+                            """
+                            INSERT INTO url_permissions (permission_id, url, method, type, last_update_datetime)
+                            VALUES (%s, %s, %s, %s, %s);
+                            """,
+                            (pid, url_val, method_val, type_val, datetime.utcnow()),
+                        )
             conn.commit()
     except ValueError as e:
         conn.rollback()
@@ -1108,7 +1125,7 @@ def get_url_by_permission():
                 """
                 SELECT id, url, method AS "Method", type AS "Type"
                 FROM url_permissions
-                WHERE permission_id = %s
+                WHERE permission_id = %s AND UPPER(type) <> 'PAGE'
                 UNION ALL
                 SELECT id, page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
                 FROM page_permissions
@@ -1269,6 +1286,7 @@ def get_url_by_permission_list():
                     """
                     SELECT up.url, up.method AS "Method", up.type AS "Type"
                     FROM url_permissions up
+                    WHERE UPPER(up.type) <> 'PAGE'
                     JOIN permissions p ON p.id = up.permission_id
                     WHERE p.id = ANY(%s) OR p.code = ANY(%s)
                     UNION ALL
@@ -1284,7 +1302,7 @@ def get_url_by_permission_list():
                     """
                     SELECT url, method AS "Method", type AS "Type"
                     FROM url_permissions
-                    WHERE permission_id = ANY(%s)
+                    WHERE permission_id = ANY(%s) AND UPPER(type) <> 'PAGE'
                     UNION ALL
                     SELECT page AS url, 'GET' AS "Method", 'PAGE' AS "Type"
                     FROM page_permissions
@@ -1297,6 +1315,7 @@ def get_url_by_permission_list():
                     """
                     SELECT up.url, up.method AS "Method", up.type AS "Type"
                     FROM url_permissions up
+                    WHERE UPPER(up.type) <> 'PAGE'
                     JOIN permissions p ON p.id = up.permission_id
                     WHERE p.code = ANY(%s)
                     UNION ALL

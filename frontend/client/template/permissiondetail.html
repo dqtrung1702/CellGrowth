@@ -9,7 +9,7 @@
       <div class="col-full">
         <h4>Permission Info</h4>
         <div class="input-group">
-          <label for="PermissionName"><i class="fa fa-tag col-third">Permission Name</i></label>
+          <label for="PermissionName"><i class="fa fa-tag"> Permission Name</i></label>
           {% if permission.get('PermissionName') %} 
             <input id="PermissionName" type="text" disabled value="{{permission.get('PermissionName')}}"  placeholder="Permission Name" name="PermissionName"/>
           {% else %}
@@ -17,20 +17,21 @@
           {%endif%}
         </div>
         <div class="input-group">
-          <label for="PermissionType"><i class="fa">Type</i></label>
+          <label for="PermissionType"><i class="fa fa-flag"> Type</i></label>
           <select name="PermissionType" id="PermissionType">
             <option value="ROLE">ROLE</option>
-            <option value="PAGE">PAGE</option>
             <option value="DATA">DATA</option>
           </select>
         </div>
         <div class="input-group">
-          <label for="Description"><i class="fa fa-align-center">Description</i></label>
+          <label for="Description"><i class="fa fa-align-center"> Description</i></label>
           <input id="Description" type="text" value="{{permission.get('Description','')}}" placeholder="Description" name="Description" />
         </div>
-        <div class="input-group">
-          <i class="fa fa-check-circle"></i>
-          <label>URLs / Pages / Data Scopes</label>
+        <div class="input-group scope-block">
+          <div class="scope-label">
+            <i class="fa fa-check-circle"></i>
+            <span id="PermissionScopeLabel"> URLs / Pages</span>
+          </div>
           <div class="table-wrapper" id="url-wrapper">
             <table id="UrlTable" class="table sortable">
               <thead>
@@ -38,7 +39,6 @@
                   <th class="table__heading">STT</th>
                   <th class="table__heading">Method</th>
                   <th class="table__heading">URL</th>
-                  <th class="table__heading">Type</th>
                   <th class="table__heading no-sort"></th>
                 </tr>
               </thead>
@@ -47,14 +47,12 @@
             <button type="button" class="btn" onclick="addUrlRow()"><i class="fa fa-plus"></i> Add URL</button>
           </div>
 
-          <div class="table-wrapper" id="page-wrapper" style="display:none;">
+          <div class="table-wrapper" id="page-wrapper">
             <table id="PageTable" class="table sortable">
               <thead>
                 <tr>
                   <th class="table__heading">STT</th>
-                  <th class="table__heading">Method</th>
                   <th class="table__heading">Page</th>
-                  <th class="table__heading">Type</th>
                   <th class="table__heading no-sort"></th>
                 </tr>
               </thead>
@@ -64,18 +62,17 @@
           </div>
 
           <div class="table-wrapper" id="data-wrapper" style="display:none;">
-            <label>Data Scopes</label>
             <select id="DataSetSelect" class="set-select" name="DataSets" multiple style="width:100%"></select>
             <p style="margin: 6px 0;"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></p>
           </div>
         </div>
         <div class="input-group">
           <div class="col-half">
-            <label>Last Update</label>
+            <label><i class="fa fa-user"> Last Update</i></label>
             <input type="text" disabled value="{{permission.get('LastUpdateDateTime','')}}" />
           </div>
           <div class="col-half">
-            <label>by</label>
+            <label><i class="fa fa-user"> by</i></label>
             <input type="text" disabled value="{{permission.get('LastUpdateUserName','')}}" />
           </div>
         </div>
@@ -94,17 +91,33 @@
   </div>
   <script>
     $(document).ready(function(){
-      const initialType = "{{permission.get('PermissionType','ROLE')}}";
+      const initialTypeRaw = "{{permission.get('PermissionType','ROLE')}}";
+      const initialType = (initialTypeRaw === 'DATA') ? 'DATA' : 'ROLE';
       document.getElementById("PermissionType").value = initialType || 'ROLE';
 
       // nạp URL / Page list vào bảng
-      const urlList = {{ urlpermission | tojson }};
+      const urlListRaw = {{ urlpermission | tojson }};
+      const urlList = [];
+      const pageList = [];
+      (urlListRaw || []).forEach(u => {
+        const type = (u.Type || u.type || 'ROLE').toUpperCase();
+        const pageVal = u.Page || u.page || '';
+        if (type === 'PAGE' || pageVal) {
+          pageList.push({
+            ...u,
+            Page: pageVal || u.url || u.URL || u.page || u.Page,
+            Type: 'PAGE'
+          });
+        } else {
+          urlList.push({
+            ...u,
+            Type: 'ROLE'
+          });
+        }
+      });
       const setsList = {{ sets | tojson }};
-      if ((initialType || 'ROLE') === 'PAGE') {
-        renderPageTable(urlList || []);
-      } else {
-        renderUrlTable(urlList || []);
-      }
+      renderUrlTable(urlList || []);
+      renderPageTable(pageList || []);
 
       // nạp DataSets (unique theo SetId) cho select
       const dataSets = {{ permission.get('DataSets', []) | tojson }};
@@ -133,15 +146,6 @@
 
       $("#PermissionType").on('change', function(){
         toggleTables();
-        const type = document.getElementById("PermissionType").value || 'ROLE';
-        const pageTbody = document.querySelector("#PageTable tbody");
-        const urlTbody = document.querySelector("#UrlTable tbody");
-        if (type === 'PAGE' && pageTbody && pageTbody.children.length === 0) {
-          appendPageRow(1, 'GET', '', 'PAGE');
-        }
-        if (type === 'ROLE' && urlTbody && urlTbody.children.length === 0) {
-          appendUrlRow(1, 'GET', '', 'ROLE');
-        }
       });
 
       $("#PermissionForm").submit(function() {
@@ -153,18 +157,6 @@
           })).filter(s => s.SetId);
           document.getElementById("DataSetsJSON").value = JSON.stringify(scopes);
           document.getElementById("UrlListJSON").value = "[]";
-        } else if (type === 'PAGE') {
-          const rows = Array.from(document.querySelectorAll("#PageTable tbody tr"));
-          const pages = rows.map(tr => {
-            const cells = tr.querySelectorAll("td");
-            return {
-              Method: (cells[1].innerText || 'GET').trim(),
-              url: (cells[2].innerText || '').trim(),
-              Type: (cells[3].innerText || 'PAGE').trim() || 'PAGE'
-            };
-          }).filter(u => u.url);
-          document.getElementById("UrlListJSON").value = JSON.stringify(pages);
-          document.getElementById("DataSetsJSON").value = "[]";
         } else {
           const rows = Array.from(document.querySelectorAll("#UrlTable tbody tr"));
           const urls = rows.map(tr => {
@@ -172,10 +164,22 @@
             return {
               Method: (cells[1].innerText || 'GET').trim(),
               url: (cells[2].innerText || '').trim(),
-              Type: (cells[3].innerText || 'ROLE').trim() || 'ROLE'
+              Type: 'ROLE'
             };
           }).filter(u => u.url);
-          document.getElementById("UrlListJSON").value = JSON.stringify(urls);
+          const pageRows = Array.from(document.querySelectorAll("#PageTable tbody tr"));
+          const pages = pageRows.map(tr => {
+            const cells = tr.querySelectorAll("td");
+            const pageVal = (cells[1].innerText || '').trim();
+            return {
+              Method: 'GET',
+              url: pageVal,   // compatibility
+              Page: pageVal,  // explicit page column
+              Type: 'PAGE'
+            };
+          }).filter(u => u.url);
+          const merged = [...urls, ...pages];
+          document.getElementById("UrlListJSON").value = JSON.stringify(merged);
           document.getElementById("DataSetsJSON").value = "[]";
         }
         return true;
@@ -184,15 +188,28 @@
 
     function toggleTables(){
       const type = document.getElementById("PermissionType").value || 'ROLE';
-      document.getElementById("url-wrapper").style.display = (type === 'ROLE') ? 'block' : 'none';
-      document.getElementById("page-wrapper").style.display = (type === 'PAGE') ? 'block' : 'none';
-      document.getElementById("data-wrapper").style.display = (type === 'DATA') ? 'block' : 'none';
+      const isData = (type === 'DATA');
+      const scopeLabel = document.getElementById("PermissionScopeLabel");
+      if (scopeLabel) {
+        scopeLabel.textContent = isData ? "Data Scopes" : "URLs / Pages";
+      }
+      document.getElementById("url-wrapper").style.display = isData ? 'none' : 'block';
+      document.getElementById("page-wrapper").style.display = isData ? 'none' : 'block';
+      document.getElementById("data-wrapper").style.display = isData ? 'block' : 'none';
+      const urlTbody = document.querySelector("#UrlTable tbody");
+      const pageTbody = document.querySelector("#PageTable tbody");
+      if (!isData && urlTbody && urlTbody.children.length === 0) {
+        appendUrlRow(1, 'GET', '', 'ROLE');
+      }
+      if (!isData && pageTbody && pageTbody.children.length === 0) {
+        appendPageRow(1, 'GET', '', 'PAGE');
+      }
     }
 
     function renderUrlTable(list) {
       const tbody = document.querySelector("#UrlTable tbody");
       tbody.innerHTML = "";
-      list.forEach((u, idx) => appendUrlRow(idx + 1, u.Method || 'GET', u.url || '', u.Type || 'ROLE'));
+      list.forEach((u, idx) => appendUrlRow(idx + 1, u.Method || 'GET', u.url || '', 'ROLE'));
       if (!list.length) appendUrlRow(1, 'GET', '', 'ROLE');
     }
 
@@ -203,7 +220,6 @@
         <td class="table__content">${stt}</td>
         <td class="table__content" contenteditable="true">${method}</td>
         <td class="table__content" contenteditable="true">${url}</td>
-        <td class="table__content" contenteditable="true">${type}</td>
         <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
       `;
       tbody.appendChild(tr);
@@ -218,7 +234,7 @@
     function renderPageTable(list) {
       const tbody = document.querySelector("#PageTable tbody");
       tbody.innerHTML = "";
-      list.forEach((u, idx) => appendPageRow(idx + 1, u.Method || 'GET', u.url || u.Page || '', u.Type || 'PAGE'));
+      list.forEach((u, idx) => appendPageRow(idx + 1, u.Method || 'GET', u.Page || u.url || '', u.Type || 'PAGE'));
       if (!list.length) appendPageRow(1, 'GET', '', 'PAGE');
     }
 
@@ -227,9 +243,7 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td class="table__content">${stt}</td>
-        <td class="table__content" contenteditable="true">${method}</td>
         <td class="table__content" contenteditable="true">${page}</td>
-        <td class="table__content" contenteditable="true">${type || 'PAGE'}</td>
         <td class="table__content"><a href="#" onclick="deleteRow(this); return false;"><i class="fa fa-trash"></i></a></td>
       `;
       tbody.appendChild(tr);

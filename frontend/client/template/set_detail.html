@@ -9,19 +9,19 @@
   <form method="POST" action="{{ url_for('dataset_blueprint.set_detail') }}">
     <input type="hidden" name="SetId" value="{{ SetId }}">
     <div class="input-group">
-      <label>SetName</label>
+      <label><i class="fa fa-tag"> SetName</i></label>
       <input type="text" name="SetName" value="{{ set_info.get('SetName','') }}" required>
     </div>
     <div class="input-group">
-      <label>Services</label>
+      <label><i class="fa fa-cogs"> Services</i></label>
       <input type="text" name="Services" value="{{ set_info.get('Services','') }}" required>
     </div>
     <div class="input-group">
-      <label>SetCode</label>
+      <label><i class="fa fa-key"> SetCode</i></label>
       <input type="text" name="SetCode" value="{{ set_info.get('SetCode','') }}" required>
     </div>
     <div class="input-group">
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary"><i class="fa fa-save"> Save</i></button>
       <a class="btn" href="{{ url_for('dataset_blueprint.dataset_detail', SetId=SetId) }}">Datasets</a>
       {% if SetId and SetId != 'New' %}
       <a class="btn btn-danger" href="#" onclick="return deleteSet('{{ SetId }}','{{ set_info.get('SetName','') }}')">Delete</a>

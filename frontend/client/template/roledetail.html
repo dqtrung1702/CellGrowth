@@ -9,7 +9,7 @@
         <div class="">
           <h4>Role Info</h4>
           <div class="input-group">
-              <label for="RoleName"><i class="fa fa-tag col-third">Role Name</i></label>
+              <label for="RoleName"><i class="fa fa-tag"> Role Name</i></label>
               {% if role.get('RoleName') %} 
                 <input id="RoleName" type="text" disabled value="{{role.get('RoleName')}}"  placeholder="Role Name" name="RoleName"/>
               {% else %}
@@ -18,24 +18,23 @@
           </div>
           
           <div class="input-group">
-            <label for="Description"><i class="fa fa-align-center">Description</i></label>
+            <label for="Description"><i class="fa fa-align-center"> Description</i></label>
             <input id ="Description" type="text" value="{{role.get('Description','')}}"  placeholder="Description" name="Description" />
           </div>
           
           <div class="input-group">
             
             <div class="input-group col-half">
-              <i class="fa fa-history"></i>
-              <label for="LastUpdateDateTime">Last Update</label>
+              <label for="LastUpdateDateTime"><i class="fa fa-history"> Last Update</i></label>
               <input id = "LastUpdateDateTime" type="text" disabled value="{{role.get('LastUpdateDateTime','')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
             </div>
             <div class="input-group col-half">
-              <label for="LastUpdateUserName">by</label>
+              <label for="LastUpdateUserName"><i class="fa fa-user"> by</i></label>
               <input id = "LastUpdateUserName" type="text" disabled value="{{role.get('LastUpdateUserName','')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
             </div>
           </div>
           <div class="input-group">
-            <label for="xpermission"><i class="fa fa-check-circle">Permissions</i></label>            
+            <label for="xpermission"><i class="fa fa-check-circle"> Permissions</i></label>            
             <select id="xpermission" name="Permission">
               
             </select>            

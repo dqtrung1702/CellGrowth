@@ -2,14 +2,13 @@
 {% block content %}
 <!-- CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-<div class="container col-half">
-    <div class="">
-        <img src="/static/images/login.jfif" height="350px">
-    </div>   
-    
-    <div>
-        <h2>Slogan!</h2>
-        <p>Introduction.</p>
+<div class="container auth-grid">
+    <div class="auth-illustration">
+        <img src="/static/images/login.jfif" alt="Login" height="350">
+    </div>
+    <div class="auth-form">
+        <h2>Đăng nhập</h2>
+        <p>Chào mừng bạn quay lại.</p>
         <form method="post">
             <div class="input-group">
                 <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
@@ -17,14 +16,14 @@
             <div class="input-group">
                 <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
             </div>
-            <div class="input-group">                
+            <div class="input-group">
                 <input type="submit" value="Login">
-            </div>            
+            </div>
         </form>
         {% if error %}
-            <p class="error"><strong>Error:</strong> {{ error }}
-        {% endif %}  
+            <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
+        {% endif %}
     </div>
-  </div>
+</div>
 
 {% endblock %}
