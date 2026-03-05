@@ -43,7 +43,7 @@ def _date_key(val):
                 d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
                 if len(parts[2]) == 2:
                     y += 2000 if y < 70 else 1900
-            return f\"{y:04d}-{m:02d}-{d:02d}\"
+            return f"{y:04d}-{m:02d}-{d:02d}"
         except Exception:
             pass
     return s
