@@ -69,6 +69,7 @@ def permission_detail():
     url = Config.UAA_URL
     incoming = request.values
     PermissionId = incoming.get('id') or "New"
+    is_ajax = incoming.get('ajax')
     if request.method == 'POST':
         # pull all request values before we start building the payload
         PermissionType = incoming.get('PermissionType', 'ROLE')
@@ -143,13 +144,27 @@ def permission_detail():
         if res.status_code == 200 and res.json().get('status', '') == 'OK':
             data = res.json().get('data')
             for pos, line in enumerate(data):
-                linedata = {"STT": pos + 1}
-                linedata.update(line)
+                method = line.get('Method') or line.get('method') or 'GET'
+                url_val = line.get('URL') or line.get('url') or ''
+                page_val = line.get('Page') or line.get('page') or ''
+                ptype = (line.get('Type') or line.get('type') or ('PAGE' if page_val else 'ROLE')).upper()
+                linedata = {
+                    "STT": pos + 1,
+                    "Method": method,
+                    "url": url_val,
+                    "URL": url_val,
+                    "Page": page_val or url_val,
+                    "Type": ptype
+                }
+                # keep each row; append must be inside the loop
                 urlpermission.append(linedata)
         elif res.status_code == 403:
             return redirect('Accessisdenied')
         else:
             return redirect('home')
+
+    if is_ajax:
+        return {'permission': permission_data, 'urlpermission': urlpermission, 'sets': sets}
 
     return render_template('permissiondetail.html',
                            title='Permission',
@@ -281,9 +296,18 @@ def getURLbyPermission():
             data = res.json().get('data')
             urlpermission = []
             for pos, line in enumerate(data):
-                linedata = {"STT": pos + 1}
-                linedata.update(line)
-                urlpermission.append(linedata)
+                method = line.get('Method') or line.get('method') or 'GET'
+                url_val = line.get('URL') or line.get('url') or ''
+                page_val = line.get('Page') or line.get('page') or ''
+                ptype = (line.get('Type') or line.get('type') or ('PAGE' if page_val else 'ROLE')).upper()
+                urlpermission.append({
+                    "STT": pos + 1,
+                    "Method": method,
+                    "url": url_val,
+                    "URL": url_val,
+                    "Page": page_val or url_val,
+                    "Type": ptype
+                })
             return json.dumps(urlpermission)
     elif res.status_code == 403:
         return redirect('Accessisdenied')

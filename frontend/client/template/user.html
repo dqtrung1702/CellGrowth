@@ -52,58 +52,37 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', () => {
         flatpickr("#LastSignOnDateTime", { dateFormat: "d/m/Y" });
         flatpickr("#LastUpdateDateTime", { dateFormat: "d/m/Y" });
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('user_blueprint.User')}}","pagination");
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('user_blueprint.User')}}","pagination2");
-    });
-    
-    function Search(page = 1) {
-        var UserName = document.getElementById('UserName').value || '';
-        var LastSignOnDateTime = document.getElementById('LastSignOnDateTime').value || '';
-        var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
-        $.ajax({
-            type: "POST",
+
+        const renderUserRow = (u) => `
+            <tr>
+              <td class="table__content">${u.STT || ''}</td>
+              <td class="table__content"><a href="{{ url_for("user_blueprint.user_detail") }}?id=${u.id || ''}">${u.UserName || ''}</a></td>
+              <td class="table__content">${u.LastSignOnDateTime || ''}</td>
+              <td class="table__content">${u.LastUpdateDateTime || ''}</td>
+            </tr>`;
+
+        const search = ListPage.setupAjaxTable({
             url: "{{url_for('user_blueprint.User')}}",
-            data: JSON.stringify({'page':page, 'UserName': UserName, 'LastSignOnDateTime': LastSignOnDateTime, 'LastUpdateDateTime': LastUpdateDateTime }),
-            contentType: "application/json; charset=utf-8",
-            success: function (response, textStatus, jqXHR) {
-                if (textStatus == "success") {
-                    var k, v;
-                    var userTblBody = '';
-                    var id;
-                    if (response['users']) {
-                        for (const u of response['users']) {
-                            userTblBody = userTblBody + '<tr>';
-
-                            userTblBody += '<td class="table__content">' + u['STT'] + '</td>';
-                            userTblBody += '<td class="table__content"><a href=' + '{{ url_for("user_blueprint.user_detail")}}' + '?id=' + u['id'] + '>' + u['UserName'] + '</a></td>';
-                            userTblBody += '<td class="table__content">' + (u['LastSignOnDateTime'] || '') + '</td>';
-                            userTblBody += '<td class="table__content">' + (u['LastUpdateDateTime'] || '') + '</td>';
-                            userTblBody += '</tr>';
-                        }
-                        
-                    } else {
-                        userTblBody = userTblBody + '<tr>';
-
-                        userTblBody += '<td class="table__content"></td>';
-                        userTblBody += '<td class="table__content"></td>';
-                        userTblBody += '<td class="table__content"></td>';
-                        userTblBody += '<td class="table__content"></td>';
-                        userTblBody = userTblBody + '</tr>';
-
-                        
-                    }
-                    document.getElementById("userTblBody").innerHTML = userTblBody;
-                    if (response['pagination']){
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination");
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination2");
-                    }
-                }
-            }
+            tbodySelector: "#userTblBody",
+            rowsKey: "users",
+            buildPayload: (page) => ({
+                page,
+                UserName: document.getElementById('UserName').value || '',
+                LastSignOnDateTime: document.getElementById('LastSignOnDateTime').value || '',
+                LastUpdateDateTime: document.getElementById('LastUpdateDateTime').value || ''
+            }),
+            rowRenderer: renderUserRow,
+            emptyRow: '<tr><td class="table__content" colspan="4">Không có dữ liệu</td></tr>',
+            pagination: ListPage.renderPagination(["pagination","pagination2"])
         });
-    }
+
+        window.Search = search;
+    });
 </script>
 
 {% endblock %}

@@ -9,39 +9,14 @@
         <link href="http://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet" />
         
         <!-- jQuery -->
-        <script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+        <!-- Core libs must load immediately so inline scripts can call $/select2/flatpickr -->
         <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>        
-        <script src="{{ url_for('static', filename='js/pagination.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
-        <script>
-          // CSRF helper: đọc cookie và gắn vào mọi AJAX + form POST
-          function getCookie(name) {
-            const value = (`; ${document.cookie}`).split(`; ${name}=`).pop();
-            return value ? value.split(';')[0] : '';
-          }
-          if (window.jQuery) {
-            $.ajaxSetup({
-              beforeSend: function(xhr) {
-                const token = getCookie('csrf_token');
-                if (token) xhr.setRequestHeader('X-CSRFToken', token);
-              }
-            });
-          }
-          document.addEventListener('DOMContentLoaded', () => {
-            const token = getCookie('csrf_token');
-            if (!token) return;
-            document.querySelectorAll('form[method="POST"]').forEach(form => {
-              if (!form.querySelector('input[name="_csrf"]')) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = '_csrf';
-                input.value = token;
-                form.appendChild(input);
-              }
-            });
-          });
-        </script>
+        <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/pagination.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='js/table-sort.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='js/base-helpers.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='js/list-pages.js') }}" defer></script>
 
         <!-- Image -->
         <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/ico" />

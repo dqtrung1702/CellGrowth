@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Welcome!</h1>
+  <div class="container col-full">
+    <h2>Architecture</h2>
+    <p style="margin: 0.3em 0 1em; color:#666;">Tổng quan hệ thống hiển thị trực tiếp từ tài liệu <code>docs/architecture-diagrams.html</code>.</p>
+    <iframe
+      src="{{ url_for('static', filename='docs/architecture-diagrams.html') }}"
+      style="width: 100%; min-height: 900px; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);"
+      loading="lazy"
+      title="Architecture Diagrams"
+    ></iframe>
+  </div>
 {% endblock %}

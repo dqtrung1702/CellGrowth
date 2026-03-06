@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiến trúc giải pháp</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --danger: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,212,255,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 80% 80%, rgba(124,58,237,0.07) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 60px; }
+  header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  header h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; line-height: 1.1; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); margin-top: 10px; font-size: 15px; }
+
+  .section { margin-bottom: 60px; }
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── DIAGRAM CARD ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 700; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 28px;
+  }
+
+  /* ─── SVG DIAGRAMS ─── */
+  svg { width: 100%; height: auto; font-family: 'JetBrains Mono', monospace; overflow: visible; }
+
+  /* ─── 1. HIGH-LEVEL COMPONENT ─── */
+  .node rect, .node ellipse, .node path { stroke-width: 1.5; }
+  .node text { font-size: 12px; font-family: 'JetBrains Mono', monospace; fill: #e2e8f0; }
+
+  /* ─── SEQUENCE DIAGRAM ─── */
+  .seq-actor rect {
+    fill: var(--surface2); stroke: var(--border); stroke-width: 1.5; rx: 8;
+  }
+  .seq-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 4; }
+  .seq-arrow { fill: none; stroke-width: 1.5; marker-end: url(#arr); }
+  .seq-arrow.return { stroke-dasharray: 5 3; }
+  .seq-label { font-size: 11px; fill: var(--text); }
+  .seq-step { font-size: 10px; fill: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── DEPLOYMENT ─── */
+  .deploy-box { fill: var(--surface2); stroke: var(--border); stroke-width: 1.5; rx: 12; }
+  .deploy-inner { fill: rgba(0,212,255,0.06); stroke: rgba(0,212,255,0.2); stroke-width: 1; rx: 8; }
+  .deploy-label { font-size: 10px; fill: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .deploy-name { font-size: 13px; fill: var(--text); font-weight: 700; }
+  .deploy-port { font-size: 10px; fill: var(--accent); }
+
+  /* ─── DATA FLOW ─── */
+  .flow-node { fill: var(--surface2); stroke: var(--border); stroke-width: 1.5; rx: 10; }
+
+  /* ─── SECURITY ─── */
+  .sec-zone { stroke-width: 1.5; stroke-dasharray: 6 3; rx: 12; fill-opacity: 0.04; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="label">Solution Architecture</div>
+    <h1>Kiến trúc <span>Giải pháp</span></h1>
+    <p>Flask UAA · Frontend Server · Redis TLS · PostgreSQL</p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       1. COMPONENT OVERVIEW
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">01 — Component Overview</div>
+    <div class="card">
+      <div class="card-title">Kiến trúc tổng quan các thành phần</div>
+      <svg viewBox="0 0 900 340">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff" opacity="0.8"/>
+          </marker>
+          <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#10b981"/>
+          </marker>
+          <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"/>
+          </marker>
+          <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+          </marker>
+        </defs>
+
+        <!-- Browser -->
+        <g transform="translate(30,120)">
+          <rect width="130" height="90" rx="10" fill="#1a2235" stroke="#1e2d45" stroke-width="1.5"/>
+          <rect x="10" y="10" width="110" height="10" rx="3" fill="#2d3f5a"/>
+          <rect x="10" y="26" width="110" height="48" rx="3" fill="#0f1927"/>
+          <text x="65" y="98" text-anchor="middle" font-size="11" fill="#64748b" font-family="JetBrains Mono, monospace">Client Browser</text>
+          <text x="65" y="110" text-anchor="middle" font-size="10" fill="#475569" font-family="JetBrains Mono, monospace">HTTP :80</text>
+        </g>
+
+        <!-- Frontend -->
+        <g transform="translate(240,100)">
+          <rect width="150" height="110" rx="10" fill="#1a2235" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.5"/>
+          <rect x="0" y="0" width="150" height="30" rx="10" fill="rgba(0,212,255,0.1)"/>
+          <text x="75" y="19" text-anchor="middle" font-size="11" fill="#00d4ff" font-family="JetBrains Mono, monospace" font-weight="700">Frontend</text>
+          <text x="75" y="54" text-anchor="middle" font-size="11" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Flask Server</text>
+          <text x="75" y="70" text-anchor="middle" font-size="10" fill="#00d4ff" font-family="JetBrains Mono, monospace">:5003</text>
+          <text x="75" y="90" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">UI / API Proxy</text>
+        </g>
+
+        <!-- UAA -->
+        <g transform="translate(490,100)">
+          <rect width="150" height="110" rx="10" fill="#1a2235" stroke="#7c3aed" stroke-width="1.5" stroke-opacity="0.6"/>
+          <rect x="0" y="0" width="150" height="30" rx="10" fill="rgba(124,58,237,0.1)"/>
+          <text x="75" y="19" text-anchor="middle" font-size="11" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-weight="700">UAA Service</text>
+          <text x="75" y="54" text-anchor="middle" font-size="11" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Flask Auth</text>
+          <text x="75" y="70" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="JetBrains Mono, monospace">:8082</text>
+          <text x="75" y="90" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">JWT / RBAC</text>
+        </g>
+
+        <!-- Redis -->
+        <g transform="translate(490,260)">
+          <rect width="150" height="65" rx="10" fill="#1a2235" stroke="#ef4444" stroke-width="1.5" stroke-opacity="0.5"/>
+          <rect x="0" y="0" width="150" height="22" rx="10" fill="rgba(239,68,68,0.1)"/>
+          <text x="75" y="15" text-anchor="middle" font-size="11" fill="#f87171" font-family="JetBrains Mono, monospace" font-weight="700">Redis</text>
+          <text x="75" y="40" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Docker TLS</text>
+          <text x="75" y="55" text-anchor="middle" font-size="10" fill="#f87171" font-family="JetBrains Mono, monospace">:6380</text>
+        </g>
+
+        <!-- PostgreSQL -->
+        <g transform="translate(720,100)">
+          <rect width="150" height="110" rx="10" fill="#1a2235" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5"/>
+          <rect x="0" y="0" width="150" height="30" rx="10" fill="rgba(16,185,129,0.1)"/>
+          <text x="75" y="19" text-anchor="middle" font-size="11" fill="#34d399" font-family="JetBrains Mono, monospace" font-weight="700">PostgreSQL</text>
+          <text x="75" y="54" text-anchor="middle" font-size="11" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Database</text>
+          <text x="75" y="70" text-anchor="middle" font-size="10" fill="#34d399" font-family="JetBrains Mono, monospace">:5432</text>
+          <text x="75" y="90" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">DB: dev</text>
+        </g>
+
+        <!-- Arrows -->
+        <!-- Browser → Frontend -->
+        <line x1="161" y1="155" x2="238" y2="155" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr)" opacity="0.7"/>
+        <text x="197" y="148" text-anchor="middle" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace">HTTP</text>
+
+        <!-- Frontend ↔ UAA -->
+        <line x1="391" y1="148" x2="488" y2="148" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-purple)" opacity="0.7"/>
+        <line x1="488" y1="162" x2="391" y2="162" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr-purple)" opacity="0.7"/>
+        <text x="440" y="143" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace">JWT req</text>
+        <text x="440" y="175" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace">JWT / RBAC</text>
+
+        <!-- UAA → Redis -->
+        <line x1="565" y1="211" x2="565" y2="258" stroke="#f87171" stroke-width="1.5" marker-end="url(#arr)" opacity="0.7"/>
+        <text x="580" y="240" font-size="9" fill="#f87171" font-family="JetBrains Mono, monospace">Sessions</text>
+
+        <!-- UAA → PG -->
+        <line x1="641" y1="155" x2="718" y2="155" stroke="#34d399" stroke-width="1.5" marker-end="url(#arr-green)" opacity="0.7"/>
+        <text x="676" y="148" text-anchor="middle" font-size="9" fill="#34d399" font-family="JetBrains Mono, monospace">SQL</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       2. SEQUENCE DIAGRAM
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">02 — Authentication Sequence</div>
+    <div class="card">
+      <div class="card-title">Luồng đăng nhập & xác thực JWT</div>
+      <svg viewBox="0 0 860 460">
+        <defs>
+          <marker id="sa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff"/>
+          </marker>
+          <marker id="sa2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+          </marker>
+        </defs>
+
+        <!-- Actors -->
+        <!-- Browser @90 | Frontend @290 | UAA @490 | Redis @660 | PG @820 -->
+        <g>
+          <!-- browser -->
+          <rect x="30" y="10" width="120" height="36" rx="8" fill="#1a2235" stroke="#1e2d45" stroke-width="1.5"/>
+          <text x="90" y="33" text-anchor="middle" font-size="11" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Browser</text>
+          <!-- frontend -->
+          <rect x="230" y="10" width="120" height="36" rx="8" fill="#1a2235" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+          <text x="290" y="33" text-anchor="middle" font-size="11" fill="#00d4ff" font-family="JetBrains Mono, monospace">Frontend</text>
+          <!-- uaa -->
+          <rect x="430" y="10" width="120" height="36" rx="8" fill="#1a2235" stroke="rgba(124,58,237,0.5)" stroke-width="1.5"/>
+          <text x="490" y="33" text-anchor="middle" font-size="11" fill="#a78bfa" font-family="JetBrains Mono, monospace">UAA</text>
+          <!-- redis -->
+          <rect x="600" y="10" width="120" height="36" rx="8" fill="#1a2235" stroke="rgba(239,68,68,0.4)" stroke-width="1.5"/>
+          <text x="660" y="33" text-anchor="middle" font-size="11" fill="#f87171" font-family="JetBrains Mono, monospace">Redis</text>
+          <!-- pg -->
+          <rect x="760" y="10" width="80" height="36" rx="8" fill="#1a2235" stroke="rgba(16,185,129,0.5)" stroke-width="1.5"/>
+          <text x="800" y="33" text-anchor="middle" font-size="11" fill="#34d399" font-family="JetBrains Mono, monospace">PG</text>
+        </g>
+
+        <!-- Lifelines -->
+        <line x1="90" y1="46" x2="90" y2="455" stroke="#1e2d45" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="290" y1="46" x2="290" y2="455" stroke="#1e2d45" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="490" y1="46" x2="490" y2="455" stroke="#1e2d45" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="660" y1="46" x2="660" y2="455" stroke="#1e2d45" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="800" y1="46" x2="800" y2="455" stroke="#1e2d45" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- Steps -->
+        <!-- Step labels helper: [y, from, to, label, return?] -->
+
+        <!-- 1: POST /login -->
+        <text x="16" y="83" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace">①</text>
+        <line x1="90" y1="80" x2="288" y2="80" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="190" y="73" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /login {user, pass}</text>
+
+        <!-- 2: forward to UAA -->
+        <text x="216" y="113" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace">②</text>
+        <line x1="290" y1="110" x2="488" y2="110" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="390" y="103" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /uaa/token</text>
+
+        <!-- 3: UAA → PG validate user -->
+        <text x="416" y="143" font-size="9" fill="#34d399" font-family="JetBrains Mono, monospace">③</text>
+        <line x1="490" y1="140" x2="798" y2="140" stroke="#34d399" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="645" y="133" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">SELECT user + roles</text>
+
+        <!-- 4: PG returns -->
+        <line x1="800" y1="158" x2="492" y2="158" stroke="#34d399" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="645" y="170" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">user record + RBAC roles</text>
+
+        <!-- 5: UAA store session Redis -->
+        <text x="416" y="195" font-size="9" fill="#f87171" font-family="JetBrains Mono, monospace">④</text>
+        <line x1="490" y1="192" x2="658" y2="192" stroke="#f87171" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="575" y="185" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">SET session_id → data</text>
+
+        <!-- 6: Redis OK -->
+        <line x1="660" y1="208" x2="492" y2="208" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="575" y="220" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">OK</text>
+
+        <!-- 7: UAA returns JWT -->
+        <text x="216" y="245" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace">⑤</text>
+        <line x1="490" y1="242" x2="292" y2="242" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="390" y="235" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">access_token + refresh_token</text>
+
+        <!-- 8: Frontend returns to browser -->
+        <text x="16" y="275" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace">⑥</text>
+        <line x1="290" y1="272" x2="92" y2="272" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="190" y="265" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Set-Cookie: JWT</text>
+
+        <!-- divider -->
+        <line x1="30" y1="295" x2="850" y2="295" stroke="#1e2d45" stroke-width="1" stroke-dasharray="2 6"/>
+        <text x="440" y="308" text-anchor="middle" font-size="9" fill="#475569" font-family="JetBrains Mono, monospace">— Protected Request —</text>
+
+        <!-- 9: GET /protected -->
+        <text x="16" y="333" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace">⑦</text>
+        <line x1="90" y1="330" x2="288" y2="330" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="190" y="323" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">GET /api/resource + JWT</text>
+
+        <!-- 10: Frontend verify token via UAA -->
+        <text x="216" y="363" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace">⑧</text>
+        <line x1="290" y1="360" x2="488" y2="360" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="390" y="353" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /uaa/verify + token</text>
+
+        <!-- 11: UAA check Redis session -->
+        <text x="416" y="393" font-size="9" fill="#f87171" font-family="JetBrains Mono, monospace">⑨</text>
+        <line x1="490" y1="390" x2="658" y2="390" stroke="#f87171" stroke-width="1.5" marker-end="url(#sa)"/>
+        <text x="575" y="383" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">GET session_id</text>
+
+        <line x1="660" y1="406" x2="492" y2="406" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="575" y="418" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">valid / expired</text>
+
+        <!-- 12: 200 OK back -->
+        <text x="16" y="445" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace">⑩</text>
+        <line x1="490" y1="440" x2="292" y2="440" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+        <text x="390" y="433" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono, monospace">200 OK / 401 Unauthorized</text>
+        <line x1="290" y1="452" x2="92" y2="452" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#sa)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       3. DEPLOYMENT DIAGRAM
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">03 — Deployment Topology</div>
+    <div class="card">
+      <div class="card-title">Cấu trúc triển khai và phân lớp hạ tầng</div>
+      <svg viewBox="0 0 880 420">
+
+        <!-- HOST MACHINE box -->
+        <rect x="10" y="10" width="860" height="395" rx="14" fill="none" stroke="#1e2d45" stroke-width="1.5" stroke-dasharray="6 3"/>
+        <text x="26" y="28" font-size="9" fill="#475569" font-family="JetBrains Mono, monospace" letter-spacing="2">HOST MACHINE (localhost)</text>
+
+        <!-- run.sh strip -->
+        <rect x="30" y="40" width="820" height="32" rx="6" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <text x="440" y="60" text-anchor="middle" font-size="11" fill="#64748b" font-family="JetBrains Mono, monospace">🚀  run.sh — orchestration: Redis → UAA → Frontend  |  logs/ → logs/uaa.log, logs/frontend.log</text>
+
+        <!-- DOCKER COMPOSE zone -->
+        <rect x="30" y="90" width="200" height="290" rx="10" fill="rgba(239,68,68,0.03)" stroke="rgba(239,68,68,0.3)" stroke-width="1" stroke-dasharray="5 3"/>
+        <text x="130" y="108" text-anchor="middle" font-size="9" fill="#f87171" font-family="JetBrains Mono, monospace" letter-spacing="2">DOCKER COMPOSE</text>
+        <text x="130" y="120" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">infra/redis/</text>
+
+        <!-- Redis container -->
+        <rect x="50" y="130" width="160" height="100" rx="8" fill="#1a2235" stroke="rgba(239,68,68,0.4)" stroke-width="1.5"/>
+        <text x="130" y="150" text-anchor="middle" font-size="10" fill="#f87171" font-family="JetBrains Mono, monospace" font-weight="700">redis</text>
+        <text x="130" y="168" text-anchor="middle" font-size="9" fill="#e2e8f0" font-family="JetBrains Mono, monospace">image: redis:alpine</text>
+        <rect x="65" y="178" width="130" height="18" rx="4" fill="rgba(239,68,68,0.1)"/>
+        <text x="130" y="190" text-anchor="middle" font-size="9" fill="#f87171" font-family="JetBrains Mono, monospace">TLS :6380 → :6380</text>
+        <text x="130" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">pass: 123456@</text>
+        <text x="130" y="228" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">certs: infra/redis/tls/</text>
+
+        <!-- TLS cert note -->
+        <rect x="50" y="245" width="160" height="50" rx="6" fill="rgba(255,255,255,0.02)" stroke="#1e2d45" stroke-width="1"/>
+        <text x="130" y="263" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">TLS Certs</text>
+        <text x="130" y="277" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">ca.crt / server.crt</text>
+        <text x="130" y="289" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">server.key</text>
+
+        <!-- UAA process -->
+        <rect x="280" y="90" width="200" height="270" rx="10" fill="rgba(124,58,237,0.03)" stroke="rgba(124,58,237,0.3)" stroke-width="1" stroke-dasharray="5 3"/>
+        <text x="380" y="108" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace" letter-spacing="2">PROCESS</text>
+        <text x="380" y="120" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">uaa/</text>
+
+        <rect x="298" y="130" width="164" height="200" rx="8" fill="#1a2235" stroke="rgba(124,58,237,0.4)" stroke-width="1.5"/>
+        <text x="380" y="150" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-weight="700">UAA Service</text>
+        <text x="380" y="168" text-anchor="middle" font-size="9" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Flask :8082</text>
+        <line x1="308" y1="176" x2="452" y2="176" stroke="#1e2d45" stroke-width="1"/>
+        <text x="380" y="193" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">Endpoints:</text>
+        <text x="380" y="208" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /uaa/token</text>
+        <text x="380" y="221" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /uaa/refresh</text>
+        <text x="380" y="234" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /uaa/verify</text>
+        <text x="380" y="247" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">GET  /uaa/roles</text>
+        <line x1="308" y1="256" x2="452" y2="256" stroke="#1e2d45" stroke-width="1"/>
+        <text x="380" y="272" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">DB: dev@localhost:5432</text>
+        <text x="380" y="285" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Redis: localhost:6380 TLS</text>
+        <text x="380" y="298" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">JWT secret: env var</text>
+        <text x="380" y="315" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">log → logs/uaa.log</text>
+
+        <!-- Frontend process -->
+        <rect x="530" y="90" width="200" height="270" rx="10" fill="rgba(0,212,255,0.03)" stroke="rgba(0,212,255,0.3)" stroke-width="1" stroke-dasharray="5 3"/>
+        <text x="630" y="108" text-anchor="middle" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace" letter-spacing="2">PROCESS</text>
+        <text x="630" y="120" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">frontend/server/</text>
+
+        <rect x="548" y="130" width="164" height="200" rx="8" fill="#1a2235" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+        <text x="630" y="150" text-anchor="middle" font-size="10" fill="#00d4ff" font-family="JetBrains Mono, monospace" font-weight="700">Frontend Server</text>
+        <text x="630" y="168" text-anchor="middle" font-size="9" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Flask :5003</text>
+        <line x1="558" y1="176" x2="702" y2="176" stroke="#1e2d45" stroke-width="1"/>
+        <text x="630" y="193" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">Endpoints:</text>
+        <text x="630" y="208" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">GET / (UI views)</text>
+        <text x="630" y="221" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /login</text>
+        <text x="630" y="234" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">GET /api/*</text>
+        <text x="630" y="247" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">POST /logout</text>
+        <line x1="558" y1="256" x2="702" y2="256" stroke="#1e2d45" stroke-width="1"/>
+        <text x="630" y="272" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">UAA: localhost:8082</text>
+        <text x="630" y="285" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Static: frontend/static/</text>
+        <text x="630" y="315" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">log → logs/frontend.log</text>
+
+        <!-- PG external -->
+        <rect x="770" y="130" width="90" height="120" rx="8" fill="#1a2235" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
+        <text x="815" y="152" text-anchor="middle" font-size="9" fill="#34d399" font-family="JetBrains Mono, monospace" font-weight="700">PostgreSQL</text>
+        <text x="815" y="170" text-anchor="middle" font-size="8" fill="#e2e8f0" font-family="JetBrains Mono, monospace">:5432</text>
+        <line x1="780" y1="178" x2="850" y2="178" stroke="#1e2d45" stroke-width="1"/>
+        <text x="815" y="194" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">DB: dev</text>
+        <text x="815" y="207" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">user: admin</text>
+        <text x="815" y="220" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">pass: admin</text>
+        <text x="815" y="240" text-anchor="middle" font-size="7" fill="#475569" font-family="JetBrains Mono, monospace">host-native</text>
+
+        <!-- Connection arrows -->
+        <defs>
+          <marker id="da" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#1e2d45"/>
+          </marker>
+          <marker id="da-r" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#f87171"/>
+          </marker>
+          <marker id="da-g" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#34d399"/>
+          </marker>
+        </defs>
+
+        <!-- UAA → Redis -->
+        <path d="M298 210 Q250 210 250 280 Q250 350 210 350" fill="none" stroke="#f87171" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 3" marker-end="url(#da-r)"/>
+
+        <!-- UAA → PG -->
+        <line x1="462" y1="230" x2="768" y2="230" stroke="#34d399" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 3" marker-end="url(#da-g)"/>
+
+        <!-- Frontend → UAA -->
+        <line x1="548" y1="190" x2="462" y2="190" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="4 3" marker-end="url(#da)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       4. DATA FLOW — Token Lifecycle
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">04 — Token Lifecycle & Data Flow</div>
+    <div class="card">
+      <div class="card-title">Vòng đời token JWT và luồng dữ liệu</div>
+      <svg viewBox="0 0 860 240">
+        <defs>
+          <marker id="fa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+          </marker>
+        </defs>
+
+        <!-- Nodes -->
+        <!-- User Login -->
+        <rect x="20" y="90" width="110" height="50" rx="8" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.6"/>
+        <text x="75" y="112" text-anchor="middle" font-size="10" fill="#fbbf24" font-family="JetBrains Mono, monospace">User Login</text>
+        <text x="75" y="128" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">credentials</text>
+
+        <!-- Validate PG -->
+        <rect x="180" y="70" width="110" height="90" rx="8" fill="#1a2235" stroke="#34d399" stroke-width="1.5" stroke-opacity="0.6"/>
+        <text x="235" y="92" text-anchor="middle" font-size="10" fill="#34d399" font-family="JetBrains Mono, monospace">Validate</text>
+        <text x="235" y="107" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">PostgreSQL</text>
+        <text x="235" y="122" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">user record</text>
+        <text x="235" y="135" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">RBAC roles</text>
+        <text x="235" y="148" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">permissions</text>
+
+        <!-- Generate JWT -->
+        <rect x="340" y="70" width="120" height="90" rx="8" fill="#1a2235" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.6"/>
+        <text x="400" y="92" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="JetBrains Mono, monospace">Generate JWT</text>
+        <text x="400" y="107" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">access_token</text>
+        <text x="400" y="120" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">exp: 15min</text>
+        <text x="400" y="135" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">refresh_token</text>
+        <text x="400" y="148" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">exp: 7d</text>
+
+        <!-- Store Redis -->
+        <rect x="510" y="70" width="110" height="90" rx="8" fill="#1a2235" stroke="#f87171" stroke-width="1.5" stroke-opacity="0.6"/>
+        <text x="565" y="92" text-anchor="middle" font-size="10" fill="#f87171" font-family="JetBrains Mono, monospace">Store Session</text>
+        <text x="565" y="107" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">Redis TLS</text>
+        <text x="565" y="122" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">session_id</text>
+        <text x="565" y="135" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">user_data</text>
+        <text x="565" y="148" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">ttl: 7d</text>
+
+        <!-- Return -->
+        <rect x="670" y="90" width="110" height="50" rx="8" fill="#1a2235" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.6"/>
+        <text x="725" y="112" text-anchor="middle" font-size="10" fill="#00d4ff" font-family="JetBrains Mono, monospace">Return Tokens</text>
+        <text x="725" y="128" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">to client</text>
+
+        <!-- Arrows -->
+        <line x1="131" y1="115" x2="178" y2="115" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#fa)"/>
+        <line x1="291" y1="115" x2="338" y2="115" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#fa)"/>
+        <line x1="461" y1="115" x2="508" y2="115" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#fa)"/>
+        <line x1="621" y1="115" x2="668" y2="115" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#fa)"/>
+
+        <!-- Refresh flow -->
+        <text x="430" y="190" text-anchor="middle" font-size="9" fill="#475569" font-family="JetBrains Mono, monospace">─── refresh_token flow ────────────────────────────────────────────────────</text>
+        <text x="430" y="210" text-anchor="middle" font-size="9" fill="#64748b" font-family="JetBrains Mono, monospace">access_token hết hạn  →  POST /uaa/refresh  →  verify Redis session  →  issue new access_token</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       5. SECURITY ZONES
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">05 — Security Boundaries</div>
+    <div class="card">
+      <div class="card-title">Phân vùng bảo mật & kiểm soát truy cập</div>
+      <svg viewBox="0 0 860 280">
+
+        <!-- Public zone -->
+        <rect x="10" y="20" width="200" height="240" rx="10" fill="rgba(239,68,68,0.04)" stroke="#ef4444" stroke-width="1" stroke-dasharray="5 3" stroke-opacity="0.4"/>
+        <text x="110" y="38" text-anchor="middle" font-size="9" fill="#ef4444" font-family="JetBrains Mono, monospace" letter-spacing="2" opacity="0.7">PUBLIC ZONE</text>
+
+        <rect x="30" y="48" width="160" height="55" rx="7" fill="#1a2235" stroke="#1e2d45" stroke-width="1.5"/>
+        <text x="110" y="70" text-anchor="middle" font-size="10" fill="#e2e8f0" font-family="JetBrains Mono, monospace">Browser</text>
+        <text x="110" y="85" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Un-authenticated</text>
+        <text x="110" y="97" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">GET / · POST /login</text>
+
+        <!-- DMZ -->
+        <rect x="240" y="20" width="200" height="240" rx="10" fill="rgba(0,212,255,0.03)" stroke="#00d4ff" stroke-width="1" stroke-dasharray="5 3" stroke-opacity="0.4"/>
+        <text x="340" y="38" text-anchor="middle" font-size="9" fill="#00d4ff" font-family="JetBrains Mono, monospace" letter-spacing="2" opacity="0.7">APPLICATION ZONE</text>
+
+        <rect x="258" y="48" width="164" height="90" rx="7" fill="#1a2235" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+        <text x="340" y="70" text-anchor="middle" font-size="10" fill="#00d4ff" font-family="JetBrains Mono, monospace">Frontend :5003</text>
+        <text x="340" y="87" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">HTTP input validation</text>
+        <text x="340" y="100" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">JWT cookie management</text>
+        <text x="340" y="113" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">CSRF protection</text>
+        <text x="340" y="126" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Rate limiting (optional)</text>
+
+        <!-- Auth zone -->
+        <rect x="470" y="20" width="200" height="240" rx="10" fill="rgba(124,58,237,0.04)" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5 3" stroke-opacity="0.4"/>
+        <text x="570" y="38" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="JetBrains Mono, monospace" letter-spacing="2" opacity="0.7">AUTH ZONE</text>
+
+        <rect x="488" y="48" width="164" height="110" rx="7" fill="#1a2235" stroke="rgba(124,58,237,0.4)" stroke-width="1.5"/>
+        <text x="570" y="70" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="JetBrains Mono, monospace">UAA :8082</text>
+        <text x="570" y="87" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">JWT signing (HS256)</text>
+        <text x="570" y="100" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">RBAC enforcement</text>
+        <text x="570" y="113" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Bcrypt password hash</text>
+        <text x="570" y="126" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Session revocation</text>
+        <text x="570" y="139" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Token blacklisting</text>
+
+        <!-- Data zone -->
+        <rect x="700" y="20" width="150" height="240" rx="10" fill="rgba(16,185,129,0.04)" stroke="#10b981" stroke-width="1" stroke-dasharray="5 3" stroke-opacity="0.4"/>
+        <text x="775" y="38" text-anchor="middle" font-size="9" fill="#34d399" font-family="JetBrains Mono, monospace" letter-spacing="2" opacity="0.7">DATA ZONE</text>
+
+        <rect x="718" y="48" width="115" height="70" rx="7" fill="#1a2235" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
+        <text x="775" y="70" text-anchor="middle" font-size="10" fill="#34d399" font-family="JetBrains Mono, monospace">PostgreSQL</text>
+        <text x="775" y="85" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Parameterized SQL</text>
+        <text x="775" y="99" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Role-based access</text>
+        <text x="775" y="110" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Connection pool</text>
+
+        <rect x="718" y="132" width="115" height="70" rx="7" fill="#1a2235" stroke="rgba(239,68,68,0.4)" stroke-width="1.5"/>
+        <text x="775" y="154" text-anchor="middle" font-size="10" fill="#f87171" font-family="JetBrains Mono, monospace">Redis TLS</text>
+        <text x="775" y="169" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Encrypted in-transit</text>
+        <text x="775" y="183" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">Password auth</text>
+        <text x="775" y="195" text-anchor="middle" font-size="8" fill="#64748b" font-family="JetBrains Mono, monospace">TTL auto-expire</text>
+
+        <!-- Arrows between zones -->
+        <defs>
+          <marker id="za" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#475569"/>
+          </marker>
+        </defs>
+        <line x1="210" y1="140" x2="238" y2="140" stroke="#475569" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#za)"/>
+        <text x="224" y="132" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">HTTP</text>
+
+        <line x1="440" y1="140" x2="468" y2="140" stroke="#475569" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#za)"/>
+        <text x="454" y="132" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">internal</text>
+
+        <line x1="670" y1="140" x2="698" y2="140" stroke="#475569" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#za)"/>
+        <text x="684" y="132" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">TLS/SQL</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding: 20px 0 10px; border-top: 1px solid #1e2d45;">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #334155; letter-spacing: 2px;">
+      SOLUTION ARCHITECTURE — Flask UAA + Frontend v1.0
+    </span>
+  </div>
+
+</div>
+</body>
+</html>

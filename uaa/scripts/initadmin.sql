@@ -18,17 +18,37 @@ INSERT INTO uaa.permissions (code, permission_type, description)
 VALUES 
 ('ALL_ROLE', 'ROLE', 'Full access'),
 ('UAA', 'ROLE', 'uaa access'),
-('FULL_DATA', 'DATA', 'Full data access')
+('FULL_DATA', 'DATA', 'Full data access'),
+('UAA_DATA', 'DATA', 'Scope for UAA user')
 ON CONFLICT (code, permission_type) DO NOTHING;
 
 -- Data scopes
 INSERT INTO uaa.sets (setname, services, setcode)
-VALUES ('ALL', '*', '*') ON CONFLICT (setname, services, setcode) DO NOTHING;
+VALUES 
+('ALL', '*', '*'),
+('UAA', 'UAA', 'UAA'),
+('PERSON', 'PERSON', 'PERSON')
+ON CONFLICT (setname, services, setcode) DO NOTHING;
+
 INSERT INTO uaa.datasets (set_id, tablename, colname, colval)
-SELECT s.id, '*', '*', '*'
+WITH DT AS (
+    SELECT 'UAA' AS SETCODE, 'USERS' AS TABLENAME, 'USERNAME' AS COLNAME, '*' AS COLVAL
+    UNION ALL
+    SELECT 'UAA', 'ROLES', 'CODE', '*'
+    UNION ALL
+    SELECT 'UAA', 'PERMISSIONS', 'CODE', '*'
+    UNION ALL
+    SELECT 'UAA', 'SETS', 'SETCODE', '*'
+    union all
+    SELECT 'ALL', '*', '*', '*'
+    UNION ALL
+    SELECT 'PERSON', 'PERSON', 'CODE', '*'
+)
+SELECT s.id, DT.tablename, DT.colname, DT.colval
 FROM uaa.sets s
-WHERE s.setname='ALL' AND s.services='*' AND s.setcode='*'
+join DT ON s.setcode = DT.SETCODE
 ON CONFLICT DO NOTHING;
+
 
 DO $$
 DECLARE

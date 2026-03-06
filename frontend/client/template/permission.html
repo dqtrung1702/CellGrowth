@@ -56,77 +56,46 @@
     </div>
 </div>
 <script>
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', () => {
         flatpickr("#LastUpdateDateTime", { dateFormat: "d/m/Y" });
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('permission_blueprint.Permission')}}","pagination");
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('permission_blueprint.Permission')}}","pagination2");
-    });
-    function Delete(id){
-        $.ajax({
-            type: "POST",
-            url: "{{url_for('role_blueprint.getRoleByPermission')}}",
-            data: JSON.stringify({'id': id }),
-            contentType: "application/json; charset=utf-8",
-            success: function (response, textStatus, jqXHR) {
-                var result = confirm(response); 
-                if(result)  {
-                    $.post("{{url_for('permission_blueprint.permission_deletion')}}",{'id':id});
-                    window.location.href = "{{url_for('permission_blueprint.Permission')}}";
-                } else {
-                    alert("Cancel");
-                }
-            }
-        });
-    }
-    function Search(page = 1) {
-        var PermissionName = document.getElementById('PermissionName').value || '';
-        var PermissionType = document.getElementById('PermissionType').value || '';
-        var Description = document.getElementById('Description').value || '';
-        var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
-        $.ajax({
-            type: "POST",
+
+        const renderPermissionRow = (p) => `
+            <tr>
+              <td class="table__content">${p.STT || ''}</td>
+              <td class="table__content"><a href="{{ url_for("permission_blueprint.permission_detail") }}?id=${p.id || ''}">${p.PermissionName || ''}</a></td>
+              <td class="table__content">${p.PermissionType || ''}</td>
+              <td class="table__content">${p.Description || ''}</td>
+              <td class="table__content">${p.LastUpdateDateTime || ''}</td>
+              <td class="table__content"><a href="#" onclick="Delete(${p.id}); return false;"><i class="fa fa-trash"></i></a></td>
+            </tr>`;
+
+        const search = ListPage.setupAjaxTable({
             url: "{{url_for('permission_blueprint.permission_searching')}}",
-            data: JSON.stringify({'page':page, 'Code': PermissionName, "PermissionType":PermissionType,'Description': Description, 'LastUpdateDateTime': LastUpdateDateTime }),
-            contentType: "application/json; charset=utf-8",
-            success: function (response, textStatus, jqXHR) {
-                if (textStatus == "success") {
-                    var k, v;
-                    var permissionTblBody = '';
-                    var id;
-                    if (response['permissions']) {
-                        for (const p of response['permissions']) {
-                            permissionTblBody = permissionTblBody + '<tr>';
-
-                            permissionTblBody += '<td class="table__content">' + p['STT'] + '</td>';
-                            permissionTblBody += '<td class="table__content"><a href=' + '{{ url_for("permission_blueprint.permission_detail")}}' + '?id=' + p['id'] + '>' + p['PermissionName'] + '</a></td>';
-                            permissionTblBody += '<td class="table__content">' + p['PermissionType'] + '</td>';
-                            permissionTblBody += '<td class="table__content">' + (p['Description'] || '') + '</td>';
-                            permissionTblBody += '<td class="table__content">' + (p['LastUpdateDateTime'] || '') + '</td>';
-                            permissionTblBody += '<td class="table__content"><a href=' + '{{ url_for("permission_blueprint.permission_deletion")}}' + '?id=' + p['id'] + '><i class="fa fa-trash"></i></a></td>'
-                            permissionTblBody += '</tr>';
-                        }
-                        
-                    } else {
-                        permissionTblBody = permissionTblBody + '<tr>';
-
-                        permissionTblBody += '<td class="table__content"></td>';
-                        permissionTblBody += '<td class="table__content"></td>';
-                        permissionTblBody += '<td class="table__content"></td>';
-                        permissionTblBody += '<td class="table__content"></td>';
-                        permissionTblBody += '<td class="table__content"></td>';
-                        permissionTblBody = permissionTblBody + '</tr>';
-
-                        
-                    }
-                    document.getElementById("permissionTblBody").innerHTML = permissionTblBody;
-                    if (response['pagination']){
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination");
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination2");
-                    }
-                }
-            }
+            tbodySelector: "#permissionTblBody",
+            rowsKey: "permissions",
+            buildPayload: (page) => ({
+                page,
+                Code: document.getElementById('PermissionName').value || '',
+                PermissionType: document.getElementById('PermissionType').value || '',
+                Description: document.getElementById('Description').value || '',
+                LastUpdateDateTime: document.getElementById('LastUpdateDateTime').value || ''
+            }),
+            rowRenderer: renderPermissionRow,
+            emptyRow: '<tr><td class="table__content" colspan="6">Không có dữ liệu</td></tr>',
+            pagination: ListPage.renderPagination(["pagination","pagination2"])
         });
-    }
+        window.Search = search;
+        window.Delete = function(id){
+            ListPage.confirmDeleteWithPrecheck({
+                precheckUrl: "{{url_for('role_blueprint.getRoleByPermission')}}",
+                deleteUrl: "{{url_for('permission_blueprint.permission_deletion')}}",
+                payload: {'id': id},
+                messageParser: (resp)=> resp || "Xóa permission?"
+            });
+        };
+    });
 </script>
 
 {% endblock %}

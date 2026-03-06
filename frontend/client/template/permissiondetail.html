@@ -101,23 +101,56 @@
       const pageList = [];
       (urlListRaw || []).forEach(u => {
         const type = (u.Type || u.type || 'ROLE').toUpperCase();
+        const urlVal = u.url || u.URL || '';
         const pageVal = u.Page || u.page || '';
-        if (type === 'PAGE' || pageVal) {
+        if (type === 'PAGE') {
           pageList.push({
             ...u,
-            Page: pageVal || u.url || u.URL || u.page || u.Page,
+            Page: pageVal || urlVal,
+            url: pageVal || urlVal,
             Type: 'PAGE'
           });
         } else {
           urlList.push({
             ...u,
-            Type: 'ROLE'
+            url: urlVal || pageVal,
+            Method: u.Method || 'GET',
+            Type: type || 'ROLE'
           });
         }
       });
       const setsList = {{ sets | tojson }};
       renderUrlTable(urlList || []);
       renderPageTable(pageList || []);
+
+      // fallback: nếu không có dữ liệu từ server-side, gọi API getURLbyPermission
+      const permId = "{{permission.get('id','')}}";
+      if ((!urlListRaw || !urlListRaw.length) && permId) {
+        $.ajax({
+          type: "POST",
+          url: "{{ url_for('permission_blueprint.getURLbyPermission') }}",
+          data: JSON.stringify({ PermissionId: permId }),
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          success: function(resp){
+            try{
+              const arr = Array.isArray(resp) ? resp : (resp || []);
+              const urls = [], pages = [];
+              arr.forEach(u=>{
+                const type = (u.Type || u.type || 'ROLE').toUpperCase();
+                const urlVal = u.url || u.URL || '';
+                const pageVal = u.Page || u.page || u.URL || u.url || '';
+                if (type === 'PAGE' || pageVal) {
+                  pages.push({...u, Page: pageVal, url: pageVal, Type:'PAGE'});
+                } else {
+                  urls.push({...u, url: urlVal, Method: u.Method || 'GET', Type:'ROLE'});
+                }
+              });
+              renderUrlTable(urls); renderPageTable(pages);
+            } catch(e){}
+          }
+        });
+      }
 
       // nạp DataSets (unique theo SetId) cho select
       const dataSets = {{ permission.get('DataSets', []) | tojson }};

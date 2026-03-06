@@ -75,16 +75,12 @@
   });
 
   function Search(page = 1) {
-    const SetName = document.getElementById('SetName').value || '';
-    const Services = document.getElementById('Services').value || '';
-    const SetCode = document.getElementById('SetCode').value || '';
-    const params = new URLSearchParams();
-    params.append('page', page);
-    if (SetName) params.append('SetName', SetName);
-    if (Services) params.append('Services', Services);
-    if (SetCode) params.append('SetCode', SetCode);
-    const url = '{{ url_for("dataset_blueprint.datasets") }}' + (params.toString() ? ('?' + params.toString()) : '');
-    window.location.href = url;
+    ListPage.redirectWithParams('{{ url_for("dataset_blueprint.datasets") }}', {
+      page,
+      SetName: document.getElementById('SetName').value || '',
+      Services: document.getElementById('Services').value || '',
+      SetCode: document.getElementById('SetCode').value || ''
+    });
   }
 
   function deleteSet(id, name) {

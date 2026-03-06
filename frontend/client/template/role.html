@@ -56,75 +56,44 @@
     </div>
 </div>
 <script>
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', () => {
         flatpickr("#LastUpdateDateTime", { dateFormat: "d/m/Y" });
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('role_blueprint.Role')}}","pagination");
         pagination("{{pagination.get('page')}}","{{pagination.get('total_pages')}}","{{ url_for('role_blueprint.Role')}}","pagination2");
-    });
-    function Delete(id){
-        $.ajax({
-            type: "POST",
-            url: "{{url_for('role_blueprint.getUserByRole')}}",
-            data: JSON.stringify({'id': id }),
-            contentType: "application/json; charset=utf-8",
-            success: function (response, textStatus, jqXHR) {
-                var result = confirm(response); 
-                if(result)  {
-                    $.post("{{url_for('role_blueprint.role_deletion')}}",{'id':id});
-                    window.location.href = "{{url_for('role_blueprint.Role')}}";
-                } else {
-                    alert("Cancel");
-                }
-            }
-        });
-    }
-    function Search(page = 1) {
-        var RoleName = document.getElementById('RoleName').value || '';
-        var Description = document.getElementById('Description').value || '';
-        var LastUpdateDateTime = document.getElementById('LastUpdateDateTime').value || '';
-        $.ajax({
-            type: "POST",
+
+        const renderRoleRow = (r) => `
+            <tr>
+              <td class="table__content">${r.STT || ''}</td>
+              <td class="table__content"><a href="{{ url_for("role_blueprint.role_detail") }}?id=${r.id || ''}">${r.RoleName || ''}</a></td>
+              <td class="table__content">${r.Description || ''}</td>
+              <td class="table__content">${r.LastUpdateDateTime || ''}</td>
+              <td class="table__content"><a href="#" onclick="Delete(${r.id}); return false;"><i class="fa fa-trash"></i></a></td>
+            </tr>`;
+
+        const search = ListPage.setupAjaxTable({
             url: "{{url_for('role_blueprint.role_searching')}}",
-            data: JSON.stringify({'page':page, 'Code': RoleName, 'Description': Description, 'LastUpdateDateTime': LastUpdateDateTime }),
-            contentType: "application/json; charset=utf-8",
-            success: function (response, textStatus, jqXHR) {
-                if (textStatus == "success") {
-                    var k, v;
-                    var roleTblBody = '';
-                    var id;
-                    if (response['roles']) {
-                        for (const r of response['roles']) {
-                            roleTblBody = roleTblBody + '<tr>';
-
-                            roleTblBody += '<td class="table__content">' + r['STT'] + '</td>';
-                            roleTblBody += '<td class="table__content"><a href=' + '{{ url_for("role_blueprint.role_detail")}}' + '?id=' + r['id'] + '>' + r['RoleName'] + '</a></td>';
-                            roleTblBody += '<td class="table__content">' + (r['Description'] || '') + '</td>';
-                            roleTblBody += '<td class="table__content">' + (r['LastUpdateDateTime'] || '') + '</td>';
-                            roleTblBody += '<td class="table__content"><a href=' + '{{ url_for("role_blueprint.role_deletion")}}' + '?id=' + r['id'] + '><i class="fa fa-trash"></i></a></td>';
-                            roleTblBody += '</tr>';
-                        }
-                        
-                    } else {
-                        roleTblBody = roleTblBody + '<tr>';
-
-                        roleTblBody = roleTblBody + '<td class="table__content" data-heading="STT" scope="col"></td>';
-                        roleTblBody = roleTblBody + '<td class="table__content" data-heading="RoleName" scope="col"></td>';
-                        roleTblBody = roleTblBody + '<td class="table__content" data-heading="Description" scope="col"></td>';
-                        roleTblBody = roleTblBody + '<td class="table__content" data-heading="LastUpdateUserName" scope="col"></td>';
-                        roleTblBody = roleTblBody + '<td class="table__content" data-heading="LastUpdateDateTime" scope="col"></td>';
-                        roleTblBody = roleTblBody + '</tr>';
-
-                        
-                    }
-                    document.getElementById("roleTblBody").innerHTML = roleTblBody;
-                    if (response['pagination']){
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination");
-                        pagination2(response['pagination']['page'],response['pagination']['total_pages'],"pagination2");
-                    }
-                }
-            }
+            tbodySelector: "#roleTblBody",
+            rowsKey: "roles",
+            buildPayload: (page) => ({
+                page,
+                Code: document.getElementById('RoleName').value || '',
+                Description: document.getElementById('Description').value || '',
+                LastUpdateDateTime: document.getElementById('LastUpdateDateTime').value || ''
+            }),
+            rowRenderer: renderRoleRow,
+            emptyRow: '<tr><td class="table__content" colspan="5">Không có dữ liệu</td></tr>',
+            pagination: ListPage.renderPagination(["pagination","pagination2"])
         });
-    }
+        window.Search = search;
+        window.Delete = function(id){
+            ListPage.confirmDeleteWithPrecheck({
+                precheckUrl: "{{url_for('role_blueprint.getUserByRole')}}",
+                deleteUrl: "{{url_for('role_blueprint.role_deletion')}}",
+                payload: {'id': id},
+                messageParser: (resp)=> resp || "Xóa role?"
+            });
+        };
+    });
 </script>
 
 {% endblock %}
