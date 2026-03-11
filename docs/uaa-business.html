@@ -149,6 +149,22 @@
         </li>
         <li><strong>Best practice</strong>: đặt Services và SetCode cụ thể; tránh dùng '*' trừ admin.</li>
       </ul>
+      <h4 style="margin-top:14px;">API cho service khác kiểm tra scope dữ liệu</h4>
+      <ul>
+        <li><code>POST /role_permission_api/getDataSetByUser</code> — body <code>{ "UserId": &lt;id&gt; }</code>; trả về mọi Set/Dataset DATA mà user nhận qua Role ➜ Permission(DATA).</li>
+        <li><code>POST /role_permission_api/getDatasetByPermission</code> — body <code>{ "PermissionId": &lt;pid&gt; }</code>; trả về Set/Dataset gắn với một permission DATA.</li>
+        <li><code>POST /role_permission_api/getPermissionInfo</code> — body <code>{ "ids": [&lt;pid&gt;, ...] }</code>; với permission DATA sẽ có trường <code>DataSets</code>.</li>
+        <li><code>POST /role_permission_api/getDatasetBySet</code> — body <code>{ "SetId": &lt;sid&gt; }</code>; trả về dataset của Set và đã enforce scope theo người gọi.</li>
+      </ul>
+      <div style="margin-top:10px; padding:10px 12px; border:1px solid #e5e7eb; border-radius:8px; background:#f8fafc;">
+        <div style="font-weight:600; margin-bottom:6px;">Chọn API theo mục đích</div>
+        <ul style="margin:0; padding-left:18px;">
+          <li><strong>Audit / hiển thị</strong> phạm vi dữ liệu của user hiện tại → gọi <code>getDataSetByUser</code>.</li>
+          <li><strong>Dựa trên mã permission</strong> (service đã biết permission id) → gọi <code>getDatasetByPermission</code>.</li>
+          <li><strong>Batch resolve</strong> nhiều permission id một lần → gọi <code>getPermissionInfo</code>.</li>
+          <li><strong>Đã có SetId</strong> (từ UI quản trị) cần xem chi tiết dataset → gọi <code>getDatasetBySet</code>.</li>
+        </ul>
+      </div>
     </div>
 
     <div class="card diagram">

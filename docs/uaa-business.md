@@ -47,6 +47,13 @@ UAA (User Authentication & Authorization) cung cấp:
 - DataPermission = Permission(DATA) + Set -> gắn cho user qua `data_permission_id`.
 - Wildcard `*` ở Column/Value cho phép full-access trên table; `*` toàn bộ cho phép full-access mọi dữ liệu.
 
+### API cho dịch vụ khác dùng để kiểm tra scope dữ liệu
+- `POST /role_permission_api/getDataSetByUser` — đầu vào `{ "UserId": <id> }`; trả về tất cả Set/Dataset DATA mà user nhận qua Role ➜ Permission(DATA). Dùng để log/soi phạm vi dữ liệu của user.
+- `POST /role_permission_api/getDatasetByPermission` — đầu vào `{ "PermissionId": <pid> }`; trả về Set/Dataset gắn với một permission DATA cụ thể. Hữu ích khi dịch vụ đang xét quyền dựa trên mã permission.
+- `POST /role_permission_api/getPermissionInfo` — đầu vào `{ "ids": [<pid>, ...] }`; với permission DATA sẽ trả về trường `DataSets` chứa Set/Dataset. Phù hợp khi muốn batch‑resolve nhiều permission.
+- `POST /role_permission_api/getDatasetBySet` — đầu vào `{ "SetId": <sid> }`; trả về tất cả dataset của Set, đã enforce `_data_scope_filters` theo người gọi. Dùng khi dịch vụ chỉ biết set id.
+\n#### Chọn API theo mục đích\n- Audit / hiển thị phạm vi dữ liệu của user hiện tại → `getDataSetByUser`.\n- Dựa trên mã permission (đã biết permission id) → `getDatasetByPermission`.\n- Batch resolve nhiều permission id một lần → `getPermissionInfo`.\n- Đã có SetId (từ UI quản trị) cần xem chi tiết dataset → `getDatasetBySet`.\n*** End Patch});
+
 ## Seed mặc định
 - `scripts/initadmin.sql`: user `admin` với role `Admin`, permission `ALL_ROLE` (ROLE), `FULL_DATA` (DATA) và scope `ALL/*/*/*`.
 - `scripts/inituaa.sql`: user `uaa` (monitor), role `UAA_MONITOR`, quyền URL chỉ `/status|/health|/ping|/static/%`, scope hẹp (`UAA_DATA`) giới hạn vào dữ liệu UAA.
