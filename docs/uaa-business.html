@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UAA – luồng nghiệp vụ</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2d;
+      --panel2: #0f172a;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #a855f7;
+      --accent3: #10b981;
+      --danger: #ef4444;
+      --border: #1f2937;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px 18px 36px;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(56,189,248,0.08), transparent 35%),
+                  radial-gradient(circle at 80% 10%, rgba(168,85,247,0.1), transparent 40%),
+                  radial-gradient(circle at 70% 80%, rgba(16,185,129,0.08), transparent 35%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .doc {
+      max-width: 2048px;
+      margin: 0 auto;
+    }
+    h1 { margin: 0 0 12px; letter-spacing: 0.2px; }
+    p.lead { margin: 0 0 20px; color: var(--muted); max-width: 980px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(31,41,55,0.9), rgba(15,23,42,0.9));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    .card h3 { margin: 0 0 10px; font-size: 17px; }
+    .card ul { margin: 0; padding-left: 18px; color: var(--muted); }
+    .steps { margin: 0; padding-left: 0; list-style: none; color: var(--muted); }
+    .steps li { display: flex; gap: 10px; margin-bottom: 10px; line-height: 1.45; }
+    .badge {
+      min-width: 24px; height: 24px; border-radius: 999px;
+      background: rgba(56,189,248,0.18);
+      color: #e0f2fe; display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px;
+      border: 1px solid var(--accent);
+      flex-shrink: 0;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(56,189,248,0.12);
+      color: #bae6fd;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .pill span.dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); display: inline-block; }
+    .diagram {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(circle at 10% 10%, rgba(56,189,248,0.04), transparent 40%),
+                  radial-gradient(circle at 90% 5%, rgba(168,85,247,0.05), transparent 35%),
+                  #0d1526;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+      padding: 6px;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      aspect-ratio: 920 / 680;
+    }
+    text { fill: var(--text); font-family: "Inter", sans-serif; font-size: 12px; }
+    .node { fill: var(--panel); stroke: var(--border); stroke-width: 1.2; rx: 8; ry: 8; }
+    .node.highlight { fill: #0f1f3a; stroke: var(--accent); }
+    .node2 { fill: #132238; stroke: #2e3a4d; }
+    .label { font-weight: 600; }
+    .muted { fill: var(--muted); font-size: 11px; }
+    .arrow { stroke: var(--accent); stroke-width: 1.6; marker-end: url(#arrow); fill: none; }
+    .arrow2 { stroke: var(--accent3); stroke-width: 1.6; marker-end: url(#arrow2); fill: none; }
+    .arrow3 { stroke: var(--danger); stroke-width: 1.6; marker-end: url(#arrow3); fill: none; }
+    .lane { fill: rgba(255,255,255,0.02); stroke: rgba(255,255,255,0.04); }
+    .callout {
+      fill: #0f1f3a; stroke: var(--accent); stroke-width: 1;
+      rx: 6; ry: 6;
+    }
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: 1fr; }
+      .doc { padding: 0 4px; }
+      svg { aspect-ratio: 920 / 720; }
+    }
+  </style>
+</head>
+<body>
+  <div class="doc">
+    <h1>UAA – luồng nghiệp vụ & phân quyền</h1>
+    <p class="lead">Minh họa hành trình request qua UAA: xác thực, kiểm tra quyền URL (ROLE), cấp menu trang, và áp dụng phạm vi dữ liệu (DATA).</p>
+
+    <div class="grid">
+    <div class="card">
+      <div class="pill"><span class="dot"></span> Tóm tắt</div>
+      <ul>
+        <li>User đăng nhập ➜ nhận JWT (UserId, RoleIds).</li>
+        <li>Middleware `enforce_url_permission` kiểm tra URL dựa trên Role ➜ Permission ➜ URLPermissions.</li>
+        <li>Page menu: PagePermissions quyết định hiển thị mục Home/Role/Permission/User/Datasets/Person.</li>
+        <li>Data scope: User có `data_permission_id` (Permission type DATA) → Set → Dataset → lọc dữ liệu.</li>
+        <li>Admin seed: ALL_ROLE (ROLE) + FULL_DATA (DATA) với scope `*/*/*/*`.</li>
+        <li>Monitor seed: chỉ `/status|/health|/ping|/static/%`, scope hẹp vào UAA.</li>
+      </ul>
+      <h3 style="margin-top:16px;">7 bước chính</h3>
+      <ol class="steps">
+        <li><span class="badge">1</span><span>User gửi request (mang JWT trong cookie/Authorization).</span></li>
+        <li><span class="badge">2</span><span>Frontend gắn CSRF (nếu POST) và forward đến UAA.</span></li>
+        <li><span class="badge">3</span><span>UAA decode JWT, lấy UserId.</span></li>
+        <li><span class="badge">4</span><span>Tra UserRole ➜ RolePermission ➜ URLPermissions để quyết định 200/403.</span></li>
+        <li><span class="badge">5</span><span>Tra PagePermissions ➜ trả menu khả dụng cho UI.</span></li>
+        <li><span class="badge">6</span><span>Tra DataPermission (DATA) ➜ Set ➜ Dataset ➜ sinh scope.</span></li>
+        <li><span class="badge">7</span><span>Scope được áp dụng vào truy vấn (WHERE / lọc client) trước khi UI nhận dữ liệu.</span></li>
+      </ol>
+      <h3 style="margin-top:18px;">Cấu hình phần quyền dữ liệu (Set / Dataset)</h3>
+      <ul>
+        <li><strong>Set</strong>: (Services, SetCode, SetName) – định danh phạm vi dịch vụ/miền dữ liệu.</li>
+        <li><strong>Dataset</strong>: (Table, Column, Value) – điều kiện lọc chi tiết; gắn vào Set.</li>
+        <li><strong>DataPermission</strong> = Permission(type=DATA) + Set → gán vào user (field <code>data_permission_id</code>).</li>
+        <li><strong>Ý nghĩa '*'</strong>:
+          <ul style="margin-top:4px; padding-left:18px;">
+            <li>Table='*' &amp; Column='*' &amp; Value='*' ⇒ full-access toàn bộ bảng/dịch vụ.</li>
+            <li>Column='*' hoặc Value='*' ⇒ wildcard cột/giá trị (ít dùng, nên hạn chế).</li>
+            <li>Không có scope khả dụng ⇒ từ chối (deny all).</li>
+          </ul>
+        </li>
+        <li><strong>Best practice</strong>: đặt Services và SetCode cụ thể; tránh dùng '*' trừ admin.</li>
+      </ul>
+    </div>
+
+    <div class="card diagram">
+      <div class="pill" style="background:rgba(168,85,247,0.12); color:#e9d5ff;"><span class="dot" style="background:var(--accent2);"></span> Luồng kiểm tra</div>
+      <svg viewBox="0 0 920 680" role="img" aria-label="Sơ đồ luồng UAA" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)" />
+          </marker>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent3)" />
+          </marker>
+          <marker id="arrow3" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--danger)" />
+          </marker>
+        </defs>
+
+        <!-- swimlanes -->
+        <rect class="lane" x="20" y="20" width="230" height="620" />
+        <rect class="lane" x="250" y="20" width="220" height="620" />
+        <rect class="lane" x="470" y="20" width="230" height="620" />
+        <rect class="lane" x="700" y="20" width="200" height="620" />
+        <text class="muted" x="115" y="32">User / Browser</text>
+        <text class="muted" x="335" y="32">Frontend server</text>
+        <text class="muted" x="565" y="32">UAA</text>
+        <text class="muted" x="785" y="32">Database</text>
+
+        <!-- User -->
+        <rect class="node highlight" x="45" y="40" width="180" height="70" />
+        <text class="label" x="65" y="78">User (browser)</text>
+        <text class="muted" x="65" y="96">cookie: app_token (JWT)</text>
+
+        <!-- Frontend -->
+        <rect class="node" x="250" y="40" width="180" height="70" />
+        <text class="label" x="270" y="78">Frontend server</text>
+        <text class="muted" x="270" y="96">CSRF + menu/session</text>
+
+        <!-- UAA -->
+        <rect class="node" x="495" y="40" width="180" height="70" />
+        <text class="label" x="515" y="78">UAA API</text>
+        <text class="muted" x="515" y="96">Flask + URL guard</text>
+
+        <!-- DB -->
+        <rect class="node2" x="725" y="30" width="150" height="90" />
+        <text class="label" x="745" y="78">PostgreSQL</text>
+        <text class="muted" x="745" y="96">users, roles, perms…</text>
+
+        <!-- Auth flow -->
+        <path class="arrow" d="M225 75 L270 75" />
+        <text x="225" y="65" fill="var(--muted)">req</text>
+        <path class="arrow" d="M450 75 L495 75" />
+        <text x="450" y="65" fill="var(--muted)">/login → JWT</text>
+        <path class="arrow" d="M675 75 L725 75" />
+        <text x="685" y="65" fill="var(--muted)">verify user/pass</text>
+
+        <!-- URL permission block -->
+        <rect class="node" x="520" y="170" width="220" height="110" />
+        <text class="label" x="540" y="200">enforce_url_permission</text>
+        <text class="muted" x="540" y="218">UserRole ➜ RolePermission ➜ URLPermissions</text>
+        <text class="muted" x="540" y="238">method match + LIKE pattern</text>
+
+        <path class="arrow" d="M340 110 C360 150 400 170 520 180" />
+        <text x="360" y="150" fill="var(--muted)">mỗi request</text>
+
+        <path class="arrow3" d="M520 225 L440 225 L440 260" />
+        <text x="450" y="215" fill="var(--danger)">fail → 403</text>
+
+        <path class="arrow" d="M725 95 C745 140 745 180 705 180" />
+        <text x="735" y="135" fill="var(--muted)">load URL perms</text>
+
+        <!-- Page permissions -->
+        <rect class="node" x="320" y="300" width="200" height="90" />
+        <text class="label" x="338" y="332">PagePermissions</text>
+        <text class="muted" x="338" y="350">quyết định menu UI</text>
+
+        <path class="arrow" d="M520 250 C480 275 470 300 470 300" />
+        <text x="470" y="270" fill="var(--muted)">/getPageByUser</text>
+
+        <!-- Data permission -->
+        <rect class="node" x="560" y="300" width="230" height="140" />
+        <text class="label" x="580" y="332">Data Permission (DATA)</text>
+        <text class="muted" x="580" y="350">user.data_permission_id</text>
+        <text class="muted" x="580" y="368">Set (Services, SetCode, SetName)</text>
+        <text class="muted" x="580" y="386">Dataset (Table, Column, Value)</text>
+
+        <path class="arrow2" d="M470 390 L560 390" />
+        <text x="470" y="378" fill="var(--accent3)">lấy scope</text>
+
+        <path class="arrow2" d="M790 320 C820 260 820 180 800 140" />
+        <text x="800" y="250" fill="var(--accent3)">Set/Dataset</text>
+
+        <!-- Apply scope -->
+        <rect class="node" x="320" y="440" width="220" height="120" />
+        <text class="label" x="338" y="472">Áp dụng scope</text>
+        <text class="muted" x="338" y="490">_data_scope_filters → WHERE</text>
+        <text class="muted" x="338" y="508">Wildcard * cho phép full</text>
+
+        <path class="arrow2" d="M560 420 C520 430 500 440 500 440" />
+        <text x="520" y="430" fill="var(--accent3)">dataset -> predicate</text>
+
+        <path class="arrow" d="M440 560 L440 600" />
+        <text x="452" y="585" fill="var(--muted)">UI nhận data đã lọc</text>
+
+        <!-- Callouts -->
+        <rect class="callout" x="80" y="140" width="190" height="66" />
+        <text class="label" x="95" y="165">Public endpoints</text>
+        <text class="muted" x="95" y="183">/login /register /status /health /ping /static</text>
+        <text class="muted" x="95" y="201">bỏ qua kiểm tra URL</text>
+
+        <rect class="callout" x="720" y="430" width="170" height="90" />
+        <text class="label" x="735" y="455">Data scope rules</text>
+        <text class="muted" x="735" y="473">*/*/* → full</text>
+        <text class="muted" x="735" y="491">Table+Column+Value → allow khi match</text>
+        <text class="muted" x="735" y="509">Không scope → deny</text>
+
+        <!-- Step bubbles -->
+        <circle cx="225" cy="75" r="11" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.6"/><text x="222" y="79" font-size="10" font-weight="700">1</text>
+        <circle cx="462" cy="75" r="11" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.6"/><text x="459" y="79" font-size="10" font-weight="700">2</text>
+        <circle cx="600" cy="75" r="11" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.6"/><text x="597" y="79" font-size="10" font-weight="700">3</text>
+        <circle cx="620" cy="190" r="11" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.6"/><text x="617" y="194" font-size="10" font-weight="700">4</text>
+        <circle cx="430" cy="330" r="11" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.6"/><text x="427" y="334" font-size="10" font-weight="700">5</text>
+        <circle cx="675" cy="330" r="11" fill="var(--panel2)" stroke="var(--accent3)" stroke-width="1.6"/><text x="672" y="334" font-size="10" font-weight="700">6</text>
+        <circle cx="430" cy="470" r="11" fill="var(--panel2)" stroke="var(--accent3)" stroke-width="1.6"/><text x="427" y="474" font-size="10" font-weight="700">7</text>
+
+        <!-- Legend -->
+        <rect class="node2" x="40" y="500" width="210" height="110" />
+        <text class="label" x="60" y="530">Chú thích</text>
+        <text class="muted" x="60" y="548">Xanh dương: kiểm tra URL (ROLE)</text>
+        <text class="muted" x="60" y="566" fill="#10b981">Xanh lá: phạm vi dữ liệu (DATA)</text>
+        <text class="muted" x="60" y="584" fill="#ef4444">Đỏ: từ chối (403)</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

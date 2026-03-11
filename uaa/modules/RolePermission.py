@@ -55,9 +55,9 @@ def _data_scope_filters(user_id, table_name, service_name="uaa"):
             cur.execute(
                 """
                 SELECT s.services AS "Services",
-                       COALESCE(d.tablename, '*') AS "Table",
-                       COALESCE(d.colname, '*')   AS "Column",
-                       COALESCE(d.colval, '*')    AS "Value"
+                       d.tablename AS "Table",
+                       d.colname   AS "Column",
+                       d.colval    AS "Value"
                 FROM data_permissions dp
                 JOIN permissions p ON p.id = dp.permission_id AND p.permission_type = 'DATA'
                 JOIN sets s ON s.id = dp.set_id
@@ -69,6 +69,9 @@ def _data_scope_filters(user_id, table_name, service_name="uaa"):
             scopes = cur.fetchall()
     finally:
         _db.conn_pool.putconn(conn)
+
+    # Ignore sets that have no dataset rows (tablename is NULL) to avoid unintended full access
+    scopes = [sc for sc in scopes if sc.get("Table")]
 
     if not scopes:
         return "1=0", []
