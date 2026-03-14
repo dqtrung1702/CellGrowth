@@ -21,6 +21,20 @@
                 <input type="text" placeholder="NameDisplay" name="namedisplay" value="{{request.form.namedisplay }}">
             </div>
             <div class="input-group">
+                <label for="RoleCodes">Chọn Role</label>
+                <select id="RoleCodes" name="role_codes" multiple style="width:100%"></select>
+            </div>
+            <div class="input-group">
+                <label for="DataPermissionCodes">Chọn Data Permission (TYPE=DATA)</label>
+                <select id="DataPermissionCodes" name="data_permission_codes" multiple style="width:100%"></select>
+            </div>
+            <div class="input-group">
+                <input type="number" placeholder="TTL giờ (tuỳ chọn)" name="ttl_hours" value="{{request.form.ttl_hours }}" min="1">
+            </div>
+            <div class="input-group">
+                <textarea placeholder="Lý do yêu cầu quyền" name="reason" rows="3">{{request.form.reason }}</textarea>
+            </div>
+            <div class="input-group">
                 <input type="submit" value="Register">
             </div>
         </form>
@@ -29,4 +43,46 @@
         {% endif %}
     </div>
 </div>
+<script>
+  $(document).ready(function() {
+    const UAA_BASE = ""; // call via frontend proxy to avoid CORS
+    const preloadRoles = {{ roles|tojson }};
+    const preloadPerms = {{ data_perms|tojson }};
+
+    function buildSelect2(selector, url, placeholder, preload) {
+      $(selector).select2({
+        placeholder,
+        allowClear: true,
+        multiple: true,
+        closeOnSelect: false,
+        data: (preload || []).map(r => ({id: r.Code, text: r.Code + (r.Description ? ' - ' + r.Description : '')})),
+        ajax: {
+          url: url,
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              code: params.term || '',
+              page: params.page || 1,
+              page_size: 20
+            };
+          },
+          processResults: function (data, params) {
+            const items = (data.data || []).map(it => ({
+              id: it.Code,
+              text: it.Code + (it.Description ? ' - ' + it.Description : '')
+            }));
+            return { results: items, pagination: { more: (items.length === 20) }};
+          }
+        }
+      });
+      // preselect from preload
+      const vals = (preload || []).map(r => r.Code);
+      $(selector).val(vals).trigger('change');
+    }
+
+    buildSelect2('#RoleCodes', '/publicRoleList', 'Chọn role', preloadRoles);
+    buildSelect2('#DataPermissionCodes', '/publicPermissionList', 'Chọn data permission', preloadPerms);
+  });
+</script>
 {% endblock %}

@@ -18,11 +18,13 @@ PAGE_MENU_MAP = {
     "user": "Users",
     "datasets": "DataSets",
     "person": "Person",
+    "access_requests": "AccessRequests",
 }
 
 
 def _build_menu_flags(page_items):
-    flags = {"Home": True}  # default show Home
+    # Home luôn hiển thị; AccessRequests hiển thị mặc định để user có thể gửi/xem yêu cầu của chính mình
+    flags = {"Home": True, "AccessRequests": True}
     for item in page_items or []:
         page = (item or {}).get("Page") or (item or {}).get("page") or ""
         norm = page.strip().strip("/").lower()
@@ -48,8 +50,10 @@ def home():
         if res.status_code == 200 and res.json().get('status') == 'OK':
             pages = res.json().get('data', [])
             session['MenuFlags'] = _build_menu_flags(pages)
+        else:
+            session['MenuFlags'] = _build_menu_flags([])
     except Exception:
-        pass
+        session['MenuFlags'] = _build_menu_flags([])
 
     # Refresh DataScopes as well (kept consistent with page refresh)
     try:
@@ -57,7 +61,7 @@ def home():
         if res.status_code == 200 and res.json().get('status') == 'OK':
             session['DataScopes'] = res.json().get('data', [])
     except Exception:
-        pass
+        session['DataScopes'] = []
     return render_template('home.html', title='Home', auth=True)
 
 

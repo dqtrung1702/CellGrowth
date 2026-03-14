@@ -6,6 +6,7 @@ from models.database import db
 from modules.Authentication import authentication
 from modules.User import user_bp
 from modules.RolePermission import rp_bp
+from modules.AccessRequest import ar_bp
 
 app = Flask(__name__)  # khởi tạo app
 app.config.from_object(Config)  # đưa các thông tin từ config vào app
@@ -30,6 +31,7 @@ _ensure_redis_alive()
 app.register_blueprint(authentication)
 app.register_blueprint(user_bp)
 app.register_blueprint(rp_bp)
+app.register_blueprint(ar_bp)
 
 _pool = db()
 
@@ -52,8 +54,20 @@ def enforce_url_permission():
         return "", 204
 
     # Cho phép một số endpoint công khai (login/register/status/health/ping)
-    public_paths = {"/login", "/register", "/status", "/health", "/ping", "/favicon.ico"}
-    public_prefixes = ("/status", "/health", "/static")  # cho phép cả /status/... hoặc /healthz và toàn bộ static
+    public_paths = {
+        "/login",
+        "/register",
+        "/status",
+        "/health",
+        "/ping",
+        "/favicon.ico",
+        "/getPageByUser",
+        "/getDataSetByUser",
+        "/publicRoleList",
+        "/publicPermissionList",
+    }
+    # cho phép cả /status/... hoặc /healthz và toàn bộ static
+    public_prefixes = ("/status", "/health", "/static")
     if not token:
         if path in public_paths or path.startswith(public_prefixes):
             return
@@ -70,6 +84,10 @@ def enforce_url_permission():
         return jsonify({"message": "Unauthorized"}), 401
 
     method = request.method.upper()
+
+    # Cho phép mọi user đã đăng nhập truy cập danh sách access_requests (GET/POST) để tự xem/gửi request
+    if path == "/access_requests":
+        return
 
     conn = _pool.conn_pool.getconn()
     ok = None

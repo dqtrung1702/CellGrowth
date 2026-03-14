@@ -14,18 +14,18 @@ VALUES
 ('UAA', 'UAA'),
 ('PERSON', 'PERSON') 
 ON CONFLICT (code) DO NOTHING;
-INSERT INTO uaa.permissions (code, permission_type, description)
+INSERT INTO uaa.permissions (id,code, permission_type, description)
 VALUES 
-('ALL_ROLE', 'ROLE', 'Full access'),
-('UAA', 'ROLE', 'uaa access'),
-('FULL_DATA', 'DATA', 'Full data access'),
-('UAA_DATA', 'DATA', 'Scope for UAA user')
+(3,'ALL_ROLE', 'ROLE', 'Full access'),
+(4,'UAA', 'ROLE', 'uaa access'),
+(5,'FULL_DATA', 'DATA', 'Full data access'),
+(6,'UAA_DATA', 'DATA', 'Scope for UAA user')
 ON CONFLICT (code, permission_type) DO NOTHING;
 
 -- Data scopes
 INSERT INTO uaa.sets (setname, services, setcode)
 VALUES 
-('ALL', '*', '*'),
+('ALL', '*', 'ALL'),
 ('UAA', 'UAA', 'UAA'),
 ('PERSON', 'PERSON', 'PERSON')
 ON CONFLICT (setname, services, setcode) DO NOTHING;
@@ -142,7 +142,13 @@ BEGIN
             ('/getDatasetBySet', 'POST', 'ROLE'),
             ('/updateDatasetBySet', 'POST', 'ROLE'),
             ('/getPageByUser', 'POST', 'ROLE'),
-            ('/getDatasetByPermission', 'POST', 'ROLE')
+            ('/getDatasetByPermission', 'POST', 'ROLE'),
+            ('/access_requests', 'POST', 'ROLE'),
+            ('/access_requests', 'GET', 'ROLE'),
+            ('/access_requests/%', 'GET', 'ROLE'),
+            ('/access_requests/%/approve', 'POST', 'ROLE'),
+            ('/access_requests/%/reject', 'POST', 'ROLE'),
+            ('/access_requests/%/cancel', 'POST', 'ROLE')
         ) AS urls(url, method, type) ON TRUE
         WHERE perm_id IS NOT NULL
         ON CONFLICT DO NOTHING;
@@ -157,7 +163,8 @@ BEGIN
             ('/Permission'),
             ('/User'),
             ('/datasets'),
-            ('/person')
+            ('/person'),
+            ('/access_requests')
         ) AS pages(page) ON TRUE
         WHERE perm_id IS NOT NULL
         ON CONFLICT DO NOTHING;
@@ -169,7 +176,8 @@ BEGIN
             ('/Role'),
             ('/Permission'),
             ('/User'),
-            ('/datasets')
+            ('/datasets'),
+            ('/access_requests')
         ) AS pages(page) ON TRUE
         WHERE perm_id IS NOT NULL
         ON CONFLICT DO NOTHING;

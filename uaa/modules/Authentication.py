@@ -163,6 +163,13 @@ def register():
     username = (data.get("UserName") or data.get("username") or data.get("Code") or "").strip()
     password = data.get("Password") or data.get("password")
     name_display = data.get("NameDisplay") or data.get("namedisplay") or ""
+    requested_roles = data.get("Roles") or data.get("roles") or []
+    requested_role_codes = data.get("RoleCodes") or data.get("role_codes") or []
+    requested_data_perms = data.get("DataPermissions") or data.get("data_permissions") or []
+    requested_data_perm_codes = data.get("DataPermissionCodes") or data.get("data_permission_codes") or []
+    requested_set_ids = data.get("SetIds") or data.get("set_ids") or []
+    request_reason = data.get("Reason") or data.get("reason")
+    request_ttl = data.get("TtlHours") or data.get("ttl_hours")
 
     if not username or not password:
         res = json.dumps(
@@ -194,6 +201,76 @@ def register():
             row = cur.fetchone()
             conn.commit()
             user_id = row["id"] if row else None
+            # resolve codes -> ids
+            if requested_role_codes:
+                cur.execute("SELECT id FROM roles WHERE code = ANY(%s);", (requested_role_codes,))
+                requested_roles.extend([r["id"] for r in cur.fetchall()])
+            if requested_data_perm_codes:
+                cur.execute(
+                    "SELECT id FROM permissions WHERE permission_type='DATA' AND code = ANY(%s);",
+                    (requested_data_perm_codes,),
+                )
+                requested_data_perms.extend([r["id"] for r in cur.fetchall()])
+
+            # tạo request quyền tự động nếu có chọn
+            has_request = (
+                requested_roles
+                or requested_data_perms
+                or requested_set_ids
+                or requested_role_codes
+                or requested_data_perm_codes
+            )
+            if has_request and user_id:
+
+                cur.execute(
+                    """
+                    INSERT INTO access_requests (requester_id, request_type, status, reason, ttl_hours, created_at, updated_at)
+                    VALUES (%s, %s, 'SUBMITTED', %s, %s, NOW(), NOW())
+                    RETURNING id;
+                    """,
+                    (
+                        user_id,
+                        "DATA" if requested_data_perms or requested_set_ids else "ROLE",
+                        request_reason,
+                        request_ttl,
+                    ),
+                )
+                req_id = cur.fetchone()["id"]
+                for rid in requested_roles:
+                    cur.execute(
+                        """
+                        INSERT INTO access_request_items (request_id, role_id, created_at)
+                        VALUES (%s, %s, NOW())
+                        ON CONFLICT DO NOTHING;
+                        """,
+                        (req_id, rid),
+                    )
+                for dp in requested_data_perms:
+                    cur.execute(
+                        """
+                        INSERT INTO access_request_items (request_id, data_permission_id, created_at)
+                        VALUES (%s, %s, NOW())
+                        ON CONFLICT DO NOTHING;
+                        """,
+                        (req_id, dp),
+                    )
+                for sid in requested_set_ids:
+                    cur.execute(
+                        """
+                        INSERT INTO access_request_items (request_id, set_id, created_at)
+                        VALUES (%s, %s, NOW())
+                        ON CONFLICT DO NOTHING;
+                        """,
+                        (req_id, sid),
+                    )
+                cur.execute(
+                    """
+                    INSERT INTO access_request_logs (request_id, actor_id, action, note, created_at)
+                    VALUES (%s, %s, 'SUBMIT', %s, NOW());
+                    """,
+                    (req_id, user_id, request_reason),
+                )
+                conn.commit()
     except Exception as e:
         conn.rollback()
         res = json.dumps(
@@ -216,7 +293,11 @@ def register():
     session["UserName"] = username
     session["NameDisplay"] = name_display
 
-    res_body = {"token": token_str, "status": "OK"}
+    res_body = {
+        "token": token_str,
+        "status": "OK",
+        "request_status": "SUBMITTED" if (requested_roles or requested_data_perms or requested_set_ids) else None,
+    }
     res = json.dumps(res_body, default=json_util.default)
     return Response(res, mimetype="application/json", status=200)
 

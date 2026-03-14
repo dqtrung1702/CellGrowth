@@ -226,6 +226,44 @@ def get_role_list():
     return _json_response({"data": rows, "total_row": [{"sum": total}], "status": "OK"})
 
 
+@rp_bp.route("/publicRoleList", methods=["GET"])
+def public_role_list():
+    """Public endpoint: return roles for self-service register (no auth)."""
+    page = int(request.args.get("page", 1))
+    page_size = min(int(request.args.get("page_size", 50)), 200)
+    code = request.args.get("code")
+    offset = (page - 1) * page_size
+
+    where = []
+    params = []
+    if code:
+        where.append("code ILIKE %s")
+        params.append(f"%{code}%")
+    where_sql = "WHERE " + " AND ".join(where) if where else ""
+
+    conn = _db.conn_pool.getconn()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(f"SELECT COUNT(*) AS count FROM roles {where_sql};", params)
+            total = cur.fetchone()["count"]
+            cur.execute(
+                f"""
+                SELECT id, code AS "Code", description AS "Description"
+                FROM roles
+                {where_sql}
+                ORDER BY id
+                LIMIT %s OFFSET %s;
+                """,
+                params + [page_size, offset],
+            )
+            rows = cur.fetchall()
+            conn.commit()
+    finally:
+        _db.conn_pool.putconn(conn)
+
+    return _json_response({"data": rows, "total": total, "status": "OK"})
+
+
 @rp_bp.route("/getRoleInfo", methods=["POST"])
 def get_role_info():
     data = request.get_json(silent=True) or {}
@@ -1209,6 +1247,44 @@ def get_data_permission_list():
         _db.conn_pool.putconn(conn)
 
     return _json_response({"data": rows, "total_row": [{"sum": total}], "status": "OK"})
+
+
+@rp_bp.route("/publicPermissionList", methods=["GET"])
+def public_permission_list():
+    """Public endpoint: list DATA permissions for self-service register (no auth)."""
+    page = int(request.args.get("page", 1))
+    page_size = min(int(request.args.get("page_size", 50)), 200)
+    code = request.args.get("code")
+    offset = (page - 1) * page_size
+
+    where = ["permission_type = 'DATA'"]
+    params = []
+    if code:
+        where.append("code ILIKE %s")
+        params.append(f"%{code}%")
+    where_sql = "WHERE " + " AND ".join(where)
+
+    conn = _db.conn_pool.getconn()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(f"SELECT COUNT(*) AS count FROM permissions {where_sql};", params)
+            total = cur.fetchone()["count"]
+            cur.execute(
+                f"""
+                SELECT id, code AS "Code", description AS "Description"
+                FROM permissions
+                {where_sql}
+                ORDER BY id
+                LIMIT %s OFFSET %s;
+                """,
+                params + [page_size, offset],
+            )
+            rows = cur.fetchall()
+            conn.commit()
+    finally:
+        _db.conn_pool.putconn(conn)
+
+    return _json_response({"data": rows, "total": total, "status": "OK"})
 
 
 @rp_bp.route("/getRolePermissionList", methods=["POST"])

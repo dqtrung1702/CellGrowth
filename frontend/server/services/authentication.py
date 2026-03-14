@@ -13,6 +13,7 @@ def login():
       return redirect(url_for('home_blueprint.home'))
     else:
       if request.method == 'POST':
+        session.clear()  # reset menu/data scopes from previous user
         data = request.form
         url = Config.UAA_URL
         payload={'UserName': data.get('username'),'Password': data.get('password')}
@@ -44,14 +45,26 @@ def login():
 def logout():
   resp = redirect(url_for('home_blueprint.home'))
   resp.delete_cookie('app_token')
+  session.clear()
   return resp
 
 @authentication.route('/register',methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+      session.clear()  # clear any old menu/data from previous session
       data = request.form
       url = Config.UAA_URL + '/register'
-      payload={'Code': data.get('username'),'Password': data.get('password'), 'NameDisplay': data.get('namedisplay')}
+      role_codes = [c.strip() for c in (data.getlist('role_codes') or []) if c.strip()]
+      dp_codes = [c.strip() for c in (data.getlist('data_permission_codes') or []) if c.strip()]
+      payload={
+        'Code': data.get('username'),
+        'Password': data.get('password'),
+        'NameDisplay': data.get('namedisplay'),
+        'RoleCodes': role_codes,
+        'DataPermissionCodes': dp_codes,
+        'Reason': data.get('reason'),
+        'TtlHours': data.get('ttl_hours')
+      }
       # Gửi JSON chuẩn để UAA nhận được body
       res = requests.post(url, json=payload, timeout=5)
       if res.status_code == 200:
@@ -65,4 +78,17 @@ def register():
       else:
         return render_template('register.html', title='Error', error=res.text, auth=False)
     else:
-      return render_template('register.html', title='Register', auth=False)
+      # preload options for select boxes
+      roles = []
+      data_perms = []
+      try:
+        rres = requests.get(Config.UAA_URL + '/publicRoleList', timeout=5)
+        roles = (rres.json() or {}).get('data', []) if rres.status_code == 200 else []
+      except Exception:
+        roles = []
+      try:
+        dres = requests.get(Config.UAA_URL + '/publicPermissionList', timeout=5)
+        data_perms = (dres.json() or {}).get('data', []) if dres.status_code == 200 else []
+      except Exception:
+        data_perms = []
+      return render_template('register.html', title='Register', auth=False, roles=roles, data_perms=data_perms)
