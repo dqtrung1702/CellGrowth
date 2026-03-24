@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <h1>Request #{{ req.id }}</h1>
+  <div class="card" style="padding:12px; margin-bottom:12px;">
+    <p><strong>Requester:</strong> {{ req.requester_username or req.requester_id }}</p>
+    <p><strong>Type:</strong> {{ req.request_type }} | <strong>Status:</strong> {{ req.status }}</p>
+    <p><strong>Reason:</strong> {{ req.reason }}</p>
+    <p><strong>TTL (hours):</strong> {{ req.ttl_hours or 'N/A' }}</p>
+    <p><strong>Created:</strong> {{ req.created_at }} | <strong>Updated:</strong> {{ req.updated_at }}</p>
+
+    <h3 style="margin-top:12px;">Items</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Role</th><th>Data Permission</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        {% for it in req.Items %}
+        <tr>
+          <td class="table__content">{{ it.role_code or it.role_id }}</td>
+          <td class="table__content">{{ it.data_permission_code or it.data_permission_id }}</td>
+          <td class="table__content">{{ it.note }}</td>
+        </tr>
+        {% else %}
+        <tr><td class="table__content" colspan="3">No items</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="post" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+      <label class="form-label">Chọn Role</label>
+      <select id="roles-select" name="roles" multiple style="width:100%"></select>
+      <label class="form-label">Chọn Data Permission</label>
+      <select id="data-select" name="data_perms" multiple style="width:100%"></select>
+      <textarea name="note" placeholder="Ghi chú" rows="2" class="form-control" style="max-width:300px;"></textarea>
+      <div class="d-flex gap-2">
+        <button name="action" value="update" class="btn btn-primary" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Update request</button>
+        <button name="action" value="cancel" class="btn btn-secondary" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Cancel request</button>
+      </div>
+      <small class="text-muted">Chỉ cập nhật khi trạng thái SUBMITTED. Để trống select để giữ nguyên.</small>
+    </form>
+  </div>
+
+  <script>
+    $(function() {
+      const preloadRoles = {{ role_items|tojson }};
+      const preloadPerms = {{ data_perm_items|tojson }};
+
+      function buildSelect(sel, url, preload) {
+        $(sel).select2({
+          placeholder: 'Chọn...',
+          multiple: true,
+          allowClear: true,
+          width: '100%',
+          data: preload || [],
+          ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: params => ({
+              page: params.page || 1,
+              page_size: 20,
+              code: params.term || ''
+            }),
+            processResults: (data, params) => {
+              const items = (data.data || []).map(it => {
+                const id = it.id || it.Id || it["id"] || it["RoleId"] || it["role_id"];
+                const code = it.Code || it.code || it.Role || it["role_code"] || it["Permission"] || it["permission_code"] || id;
+                return {id, text: code};
+              });
+              return {results: items, pagination: {more: items.length === 20}};
+            }
+          }
+        });
+        if (preload && preload.length) {
+          preload.forEach(opt => {
+            const option = new Option(opt.text, opt.id, true, true);
+            $(sel).append(option);
+          });
+          $(sel).trigger('change');
+        }
+      }
+      buildSelect('#roles-select', '/publicRoleList', preloadRoles);
+      buildSelect('#data-select', '/publicPermissionList', preloadPerms);
+    });
+  </script>
+
+  <h3 style="margin-top:16px;">Logs</h3>
+  <table class="table">
+    <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Note</th></tr></thead>
+    <tbody>
+      {% for lg in req.Logs %}
+      <tr>
+        <td class="table__content">{{ lg.created_at }}</td>
+        <td class="table__content">{{ lg.actor_username or lg.actor_id }}</td>
+        <td class="table__content">{{ lg.action }}</td>
+        <td class="table__content">{{ lg.note }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="table__content" colspan="4">No logs</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

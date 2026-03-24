@@ -108,8 +108,6 @@
     * CREATE SCHEMA uaa AUTHORIZATION admin;
     * \dn #  list SCHEMA 
     * \dt #  list tables 
-## mongodb
-
 ## Installation of Node.js on Linux
 > Node.js is a JavaScript runtime built on Chrome’s V8 JavaScript engine
 ```
@@ -148,12 +146,8 @@ ng new A-frontend
 # .env (gợi ý)
 REDIS_URL=rediss://:change-me-redis@localhost:6380/0
 UAA_REDIS_DB=0
-DEPT_REDIS_DB=1
-PERSON_REDIS_DB=2
 SESSION_TTL_HOURS=12
 UAA_SESSION_DOMAIN=localhost
-DEPT_SESSION_DOMAIN=localhost
-PERSON_SESSION_DOMAIN=localhost
 ```
 * Khởi chạy Redis TLS nội bộ:
 ```

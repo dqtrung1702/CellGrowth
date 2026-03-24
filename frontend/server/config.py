@@ -4,7 +4,6 @@ class Config(object):
     JWT_ALGORITHM = 'HS256'
     DEFAULT_THEME = None
     UAA_URL = 'http://localhost:8082'
-    PERSON_URL = 'http://localhost:8083'
     PAGE_SIZE = 5
 
 class ProductionConfig(Config):

@@ -1,8 +1,0 @@
-Flask
-Flask-Session
-Flask-Cors
-Flask-PyMongo
-pymongo
-requests
-python-dateutil
-pytz

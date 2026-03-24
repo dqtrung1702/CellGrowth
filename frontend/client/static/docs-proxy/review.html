@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đánh giá SOLID cho dự án</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; line-height: 1.5; color: #222; }
+    h1 { margin-bottom: 0.2em; }
+    h2 { margin-top: 1.4em; }
+    .status { font-weight: bold; }
+    .ok { color: #0b7a0b; }
+    .risk { color: #d17a00; }
+    .fail { color: #c00; }
+    ul { margin-top: 0.4em; }
+    code { background: #f3f3f3; padding: 2px 4px; }
+  </style>
+</head>
+<body>
+  <h2>Review tổng thể (Business logic / Code pattern / Architecture)</h2>
+  <p><strong>Business logic hiện tại</strong></p>
+  <ul>
+    <li>Auth: login/register cấp JWT + lưu session; AccessRequest cho phép user tự gửi yêu cầu xin thêm role/data-permission (duyệt sau), không trực tiếp quản lý.Tạo/cập nhật user, gán role (ROLE-url/page) và data-permission trực tiếp qua API/console (hoặc approve AccessRequest).</li>
+    <li>Authorization: kiểm tra URL theo bảng url_permissions, cache RAM cục bộ.</li>
+    <li>Data scope: mỗi user gắn một <code>data_permission_id</code> → join <code>data_permissions</code> → <code>sets</code>/<code>datasets</code>; build WHERE động (table/col/val) theo dịch vụ, hỗ trợ wildcard “*”; mặc định deny nếu không có scope khớp.</li>
+    <li>AccessRequest: duyệt chỉ áp dụng roles và data_permission; trường <code>set_ids</code> đã loại khỏi luồng duyệt (data scope đi theo data_permission).</li>
+  </ul>
+  <p><strong>Kiến trúc & pattern</strong></p>
+  <ul>
+    <li>Layers: controllers → services → repositories (ORM), utils cho cache/audit/idempotency.</li>
+    <li>ORM: hầu hết repo chuyển sang SQLAlchemy ORM; QueryBuilder dùng expression; không bật FK theo chủ đích.</li>
+    <li>DI: services khởi tạo qua container; engine/session cấu hình qua container; vẫn còn một số cấu hình khác đọc Config trực tiếp.</li>
+    <li>Caching: Redis cho permission list; authz cache nằm trong bộ nhớ process.</li>
+  </ul>
+  <p><strong>Rủi ro / Tech debt</strong></p>
+  <ul>
+    <li>Chưa có FK ở DB (chủ động); toàn vẹn dữ liệu phụ thuộc code và trình tự xoá.</li>
+    <li>AuthZ cache không invalidate khi đổi role/permission; TTL mới xóa.</li>
+    <li>AccessRequest chưa áp dụng <code>set_ids</code>; audit/log mới phần này.</li>
+    <li>Nhiều file xóa (person/department) đang ở trạng thái D trong git; cần dọn commit.</li>
+    <li>Alembic baseline no-op: cần quyết định có bật FK/migration hay giữ hiện trạng.</li>
+  </ul>
+  <p><strong>Hành động khuyến nghị</strong></p>
+  <ul>
+    <li>Dọn nốt <code>text()</code> còn lại, chuẩn hóa scope filter sang expression; bổ sung test cho QueryBuilder mới.</li>
+    <li>Đưa Redis/DB/client vào container/factory để dễ mock; bổ sung test integration.</li>
+    <li>AuthZ cache sang Redis (hoặc cache layer chung) và flush khi cập nhật role/permission.</li>
+    <li>Hoàn thiện logic set_ids trong AccessRequest hoặc bỏ field khỏi API.</li>
+    <li>Chuẩn hóa logging/error code; thêm audit cho create/update/delete role/permission.</li>
+  </ul>
+</body>
+</html>

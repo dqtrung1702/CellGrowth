@@ -2,26 +2,34 @@
 {% block content %}
 <div class="container" style="max-width: 100%;">
   <h1>Access Requests</h1>
-  <div class="table-actions" style="margin: 10px 0; display:flex; gap:8px; align-items:center;">
-    <form method="get" style="display:flex; gap:8px; align-items:center;">
-      <input type="text" name="status" placeholder="Status" value="{{ request.args.get('status','') }}" class="form-control" style="max-width:140px;">
-      <input type="text" name="type" placeholder="Type (ROLE/DATA)" value="{{ request.args.get('type','') }}" class="form-control" style="max-width:140px;">
-      <select name="mine" class="form-control" style="max-width:140px;">
-        <option value="true" {% if request.args.get('mine','true')!='false' %}selected{% endif %}>Only mine</option>
-        <option value="false" {% if request.args.get('mine')=='false' %}selected{% endif %}>All</option>
-      </select>
-      <button class="btn btn-primary" type="submit">Filter</button>
-    </form>
-  </div>
   <table class="table sortable">
     <thead>
       <tr>
         <th class="table__heading">ID</th>
         <th class="table__heading">Requester</th>
-        <th class="table__heading">Type</th>
         <th class="table__heading">Status</th>
-        <th class="table__heading">Reason</th>
         <th class="table__heading">Created</th>
+      </tr>
+      <tr>        
+        <td class="table__searching"></td>
+        <td class="table__searching">
+          <input id="Requester" type="text" style="width: 100%" placeholder="Requester" value="{{ request.args.get('requester','') }}" onchange="Search()" />
+        </td>
+        <td class="table__searching">
+          <select id="Status" class="form-control" onchange="Search()">
+            <option value="">ALL</option>
+            <option value="SUBMITTED" {% if request.args.get('status','')=='SUBMITTED' %}selected{% endif %}>SUBMITTED</option>
+            <option value="APPROVED" {% if request.args.get('status','')=='APPROVED' %}selected{% endif %}>APPROVED</option>
+            <option value="REJECTED" {% if request.args.get('status','')=='REJECTED' %}selected{% endif %}>REJECTED</option>
+            <option value="CANCELLED" {% if request.args.get('status','')=='CANCELLED' %}selected{% endif %}>CANCELLED</option>
+          </select>
+        </td> 
+        <td class="table__searching">
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <input id="CreatedFrom" type="text" class="form-control" style="max-width:130px;" placeholder="From" value="{{ request.args.get('created_from','') }}" onchange="Search()" />
+            <input id="CreatedTo" type="text" class="form-control" style="max-width:130px;" placeholder="To" value="{{ request.args.get('created_to','') }}" onchange="Search()" />
+          </div>
+        </td>       
       </tr>
     </thead>
     <tbody>
@@ -29,15 +37,32 @@
       <tr>
         <td class="table__content"><a href="{{ url_for('access_request_blueprint.access_request_detail', req_id=r.id) }}">{{ r.id }}</a></td>
         <td class="table__content">{{ r.requester_username or r.requester_id }}</td>
-        <td class="table__content">{{ r.request_type }}</td>
         <td class="table__content">{{ r.status }}</td>
-        <td class="table__content">{{ r.reason }}</td>
         <td class="table__content">{{ r.created_at }}</td>
       </tr>
       {% else %}
-      <tr><td class="table__content" colspan="6">No requests</td></tr>
+      <tr><td class="table__content" colspan="4">No requests</td></tr>
       {% endfor %}
     </tbody>
   </table>
+  <div class="pagination" id="pagination"></div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.flatpickr) {
+      flatpickr("#CreatedFrom", { dateFormat: "Y-m-d" });
+      flatpickr("#CreatedTo", { dateFormat: "Y-m-d" });
+    }
+    window.Search = function(page = 1) {
+      ListPage.redirectWithParams("{{ url_for('access_request_blueprint.access_request_list') }}", {
+        requester: document.getElementById('Requester').value || '',
+        status: document.getElementById('Status').value || '',
+        created_from: document.getElementById('CreatedFrom').value || '',
+        created_to: document.getElementById('CreatedTo').value || '',
+        page
+      });
+    }
+  });
+</script>
 {% endblock %}

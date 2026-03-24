@@ -1,12 +1,23 @@
+import os
+
 from flask import Flask
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from flask_session import Session
 from config import Config
 from models.database import db
-from modules.Authentication import authentication
-from modules.User import user_bp
-from modules.RolePermission import rp_bp
-from modules.AccessRequest import ar_bp
+from controllers.Authentication import authentication
+from controllers.User import user_bp
+from controllers.Role import role_bp
+from controllers.URL import url_bp
+from controllers.Data import data_bp
+from controllers.Set import set_bp
+from controllers.AccessRequest import ar_bp
+from services.authorization_service import AuthorizationService
+from utils.token import extract_token
+from utils.http import json_response
+from schemas.response import ResponseEnvelope
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+import time
 
 app = Flask(__name__)  # khởi tạo app
 app.config.from_object(Config)  # đưa các thông tin từ config vào app
@@ -26,52 +37,62 @@ def _ensure_redis_alive():
         raise SystemExit(1)
 
 
-_ensure_redis_alive()
+if not os.getenv("UAA_SKIP_REDIS_HEALTHCHECK"):
+    _ensure_redis_alive()
 
 app.register_blueprint(authentication)
 app.register_blueprint(user_bp)
-app.register_blueprint(rp_bp)
+app.register_blueprint(role_bp)
+app.register_blueprint(url_bp)
+app.register_blueprint(data_bp)
+app.register_blueprint(set_bp)
 app.register_blueprint(ar_bp)
 
-_pool = db()
+START_TIME = time.time()
+
+if os.getenv("UAA_SKIP_DB_INIT"):
+    _pool = None
+    _authz = None
+else:
+    _pool = db()
+    _authz = AuthorizationService()
 
 
-def _extract_token():
-    jwt_token = request.cookies.get("app_token")
-    if not jwt_token:
-        auth_header = request.headers.get("Authorization", "")
-        parts = auth_header.split(None, 1)
-        if len(parts) == 2 and parts[0].lower() == "bearer":
-            jwt_token = parts[1]
-    return jwt_token
+class PrefixMiddleware:
+    """
+    Cho phép truy cập cả /api/v1/... lẫn đường dẫn legacy.
+    Nếu PATH_INFO bắt đầu bằng /api/v1 thì strip prefix và forward.
+    """
+
+    def __init__(self, app, prefix="/api/v1"):
+        self.app = app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+        path = environ.get("PATH_INFO", "")
+        if path.startswith(self.prefix):
+            environ["PATH_INFO"] = path[len(self.prefix):] or "/"
+        return self.app(environ, start_response)
+
+
+app.wsgi_app = PrefixMiddleware(app.wsgi_app)  # type: ignore
 
 
 @app.before_request
 def enforce_url_permission():
-    token = _extract_token()
+    token = extract_token()
     path = request.path
     if request.method.upper() == "OPTIONS":
         return "", 204
 
-    # Cho phép một số endpoint công khai (login/register/status/health/ping)
-    public_paths = {
-        "/login",
-        "/register",
-        "/status",
-        "/health",
-        "/ping",
-        "/favicon.ico",
-        "/getPageByUser",
-        "/getDataSetByUser",
-        "/publicRoleList",
-        "/publicPermissionList",
-    }
-    # cho phép cả /status/... hoặc /healthz và toàn bộ static
-    public_prefixes = ("/status", "/health", "/static")
+    is_public = path in Config.PUBLIC_ENDPOINTS or any(path.startswith(prefix) for prefix in Config.PUBLIC_PREFIXES)
+    if is_public:
+        # Cho phép toàn bộ public endpoint/prefix bỏ qua authz
+        return
+
     if not token:
-        if path in public_paths or path.startswith(public_prefixes):
-            return
         return jsonify({"message": "Unauthorized"}), 401
+
     try:
         import jwt
 
@@ -85,38 +106,46 @@ def enforce_url_permission():
 
     method = request.method.upper()
 
-    # Cho phép mọi user đã đăng nhập truy cập danh sách access_requests (GET/POST) để tự xem/gửi request
+    # Cho phép mọi user đã đăng nhập truy cập/ghi access_requests của chính họ mà không cần PAGE permission.
+    # - list + create: /access_requests (GET/POST)
+    # - view chi tiết: GET /access_requests/<id>
+    # - update/cancel: POST /access_requests/<id>/update hoặc /cancel (service tự kiểm tra owner)
     if path == "/access_requests":
         return
+    if path.startswith("/access_requests/"):
+        parts = path.strip("/").split("/")
+        if len(parts) >= 2 and parts[0] == "access_requests" and parts[1].isdigit():
+            if method == "GET":
+                return
+            if method == "POST" and len(parts) == 3 and parts[2] in ("update", "cancel"):
+                return
 
-    conn = _pool.conn_pool.getconn()
-    ok = None
-    try:
-        with conn.cursor() as cur:
-            # Kiểm tra quyền truy cập URL: khớp chính xác hoặc theo pattern (up.url có thể chứa wildcard %/_).
-            cur.execute(
-                """
-                SELECT 1
-                FROM user_roles ur
-                JOIN role_permissions rp ON rp.role_id = ur.role_id
-                JOIN url_permissions up ON up.permission_id = rp.permission_id
-                WHERE ur.user_id = %s
-                  AND (up.method = '*' OR upper(up.method) = %s)
-                  AND (up.url = %s OR %s LIKE up.url)
-                LIMIT 1;
-                """,
-                (user_id, method, path, path),
-            )
-            ok = cur.fetchone()
-            print("AUTHZ_CHECK", {"user_id": user_id, "path": path, "method": method, "ok": ok})
-    except Exception as e:
-        print("AUTHZ_ERR", e)
-        ok = None
-    finally:
-        _pool.conn_pool.putconn(conn)
-
-    if not ok:
+    if _authz and not _authz.has_url_access(user_id, path, method):
         return jsonify({"message": "Access is denied", "status": "FAIL"}), 403
+
+@app.route("/docs")
+def swagger_ui():
+    return send_from_directory("static/swagger", "index.html")
+
+@app.route("/swagger/<path:filename>")
+def swagger_assets(filename):
+    return send_from_directory("static/swagger", filename)
+
+@app.route("/openapi.yaml")
+def swagger_spec():
+    return send_from_directory("static/swagger", "openapi.yaml")
+
+@app.route("/status", methods=["GET"])
+@app.route("/health", methods=["GET"])
+def health():
+    uptime = int(time.time() - START_TIME)
+    resp = json_response(ResponseEnvelope(status="OK", data={"service": "uaa", "uptime_seconds": uptime}))
+    # CORS cho health check (dùng ở frontend http://localhost:5003)
+    origin = request.headers.get("Origin")
+    if origin:
+        resp.headers["Access-Control-Allow-Origin"] = origin
+        resp.headers["Access-Control-Allow-Credentials"] = "true"
+    return resp
 
 @app.route('/')
 def index():

@@ -1,0 +1,359 @@
+openapi: 3.0.3
+info:
+  title: UAA API
+  version: "1.0.0"
+  description: |
+    Tài liệu tóm tắt các endpoint chính (login, user/role/permission, access request, health).
+servers:
+  - url: http://localhost:8082
+paths:
+  /login:
+    post:
+      summary: Đăng nhập lấy JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: Kết quả đăng nhập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /getUserList:
+    post:
+      summary: Danh sách user (phân trang)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetUserListRequest'
+      responses:
+        "200":
+          description: Danh sách user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+  /getUserInfo:
+    post:
+      summary: Thông tin user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetUserInfoRequest'
+      responses:
+        "200":
+          description: Thông tin user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+  /updateUser:
+    post:
+      summary: Cập nhật user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        "200":
+          description: OK/FAIL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /getRoleList:
+    post:
+      summary: Danh sách role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleListRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleListResponse'
+  /getPermissionList:
+    post:
+      summary: Danh sách permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionListRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionListResponse'
+  /access_requests:
+    get:
+      summary: Liệt kê access request
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string }
+        - in: query
+          name: mine
+          schema: { type: boolean }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 10 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequestListResponse'
+    post:
+      summary: Tạo access request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessRequestCreate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /status:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+components:
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        message:
+          type: string
+    LoginRequest:
+      type: object
+      required: [UserName, Password]
+      properties:
+        UserName:
+          type: string
+          example: admin
+        Password:
+          type: string
+          format: password
+          example: admin
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            token:
+              type: string
+            data:
+              type: object
+              properties:
+                token:
+                  type: string
+    GetUserListRequest:
+      type: object
+      properties:
+        page: { type: integer, default: 1 }
+        page_size: { type: integer, default: 10 }
+        UserName: { type: string, description: "Filter by username (ILIKE)" }
+    UserItem:
+      type: object
+      properties:
+        id: { type: integer }
+        UserName: { type: string }
+        LastSignOnDateTime: { type: string }
+        LastUpdateDateTime: { type: string }
+    UserListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/UserItem' }
+            meta:
+              type: object
+              properties:
+                page: { type: integer }
+                page_size: { type: integer }
+                total: { type: integer }
+                total_row:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sum: { type: integer }
+    GetUserInfoRequest:
+      type: object
+      required: [id]
+      properties:
+        id: { type: integer }
+    UserDetail:
+      type: object
+      properties:
+        id: { type: integer }
+        UserName: { type: string }
+        NameDisplay: { type: string }
+        UserLocked: { type: boolean }
+        LastSignOnDateTime: { type: string }
+        DataPermission: { type: string }
+    UserInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/UserDetail' }
+    UpdateUserRequest:
+      type: object
+      required: [id]
+      properties:
+        id: { type: integer }
+        UserLocked: { type: boolean }
+        Password: { type: string }
+        NameDisplay: { type: string }
+        DataPermission: { type: integer }
+    RoleListRequest:
+      type: object
+      properties:
+        page: { type: integer, default: 1 }
+        page_size: { type: integer, default: 10 }
+        Code: { type: string }
+    RoleItem:
+      type: object
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        description: { type: string }
+    RoleListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/RoleItem' }
+            meta:
+              type: object
+              properties:
+                page: { type: integer }
+                page_size: { type: integer }
+                total: { type: integer }
+                total_row:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sum: { type: integer }
+    PermissionListRequest:
+      type: object
+      properties:
+        page: { type: integer, default: 1 }
+        page_size: { type: integer, default: 10 }
+        Code: { type: string }
+        PermissionType: { type: string, description: "ROLE/DATA/PAGE" }
+    PermissionItem:
+      type: object
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        permission_type: { type: string }
+    PermissionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/PermissionItem' }
+            meta:
+              type: object
+              properties:
+                page: { type: integer }
+                page_size: { type: integer }
+                total: { type: integer }
+                total_row:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sum: { type: integer }
+    AccessRequestCreate:
+      type: object
+      properties:
+        Type: { type: string, enum: [ROLE, DATA], default: ROLE }
+        Roles: { type: array, items: { type: integer } }
+        DataPermissions: { type: array, items: { type: integer } }
+        Reason: { type: string }
+        TtlHours: { type: integer }
+    AccessRequestItem:
+      type: object
+      properties:
+        id: { type: integer }
+        request_type: { type: string }
+        status: { type: string }
+        requester_id: { type: integer }
+        created_at: { type: string }
+    AccessRequestListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/AccessRequestItem' }
+            meta:
+              type: object
+              properties:
+                page: { type: integer }
+                page_size: { type: integer }
+                total: { type: integer }

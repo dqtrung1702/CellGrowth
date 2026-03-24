@@ -17,9 +17,10 @@
         <script src="{{ url_for('static', filename='js/table-sort.js') }}" defer></script>
         <script src="{{ url_for('static', filename='js/base-helpers.js') }}" defer></script>
         <script src="{{ url_for('static', filename='js/list-pages.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='js/health.js') }}" defer></script>
 
         <!-- Image -->
-        <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/ico" />
+        <link rel="icon" href="{{ url_for('static', filename='images/key.png') }}" type="image/ico" />
         {% block head %}        
         {% endblock head %}
         
@@ -75,13 +76,6 @@
                     <input type="radio" name="accordion" id="DataSets" />
                     <section class="box">
         <label class="box-title" for="DataSets"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('Person') %}
-                    <input type="radio" name="accordion" id="Person" />
-                    <section class="box">
-                        <label class="box-title" for="Person"><a href="{{ url_for('person_blueprint.person_list') }}">Person</a></label>
                         <label class="box-close" for="acc-close"></label>
                     </section>
                     {% endif %}

@@ -17,7 +17,6 @@ PAGE_MENU_MAP = {
     "permission": "Permissions",
     "user": "Users",
     "datasets": "DataSets",
-    "person": "Person",
     "access_requests": "AccessRequests",
 }
 
@@ -62,7 +61,7 @@ def home():
             session['DataScopes'] = res.json().get('data', [])
     except Exception:
         session['DataScopes'] = []
-    return render_template('home.html', title='Home', auth=True)
+    return render_template('home.html', title='Home', auth=True, uaa_url=Config.UAA_URL)
 
 
 @home_.route('/Accessisdenied')

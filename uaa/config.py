@@ -39,6 +39,26 @@ class Config(object):
         UAA_PORT = 8082
         UAA_DEBUG_MODE = True
 
+        # Pagination + authz config
+        DEFAULT_PAGE = int(os.getenv('UAA_DEFAULT_PAGE', 1))
+        DEFAULT_PAGE_SIZE = int(os.getenv('UAA_DEFAULT_PAGE_SIZE', 10))
+        MAX_PAGE_SIZE = int(os.getenv('UAA_MAX_PAGE_SIZE', 200))
+        PUBLIC_ENDPOINTS = set(
+                filter(
+                        None,
+                        (os.getenv(
+                                'UAA_PUBLIC_ENDPOINTS',
+                                '/login,/register,/status,/health,/ping,/favicon.ico,/getPageByUser,/getDataSetByUser,/publicRoleList,/publicPermissionList,/docs,/openapi.yaml',
+                        ).split(',')),
+                )
+        )
+        PUBLIC_PREFIXES = tuple(
+                filter(
+                        None,
+                        os.getenv('UAA_PUBLIC_PREFIXES', '/status,/health,/static,/swagger').split(','),
+                )
+        )
+
         POSTGRES_HOST = "127.0.0.1"
         POSTGRES_PORT = "5432"
         POSTGRES_DB = "dev"
@@ -69,6 +89,11 @@ class Config(object):
         JWT_SECRET = os.getenv('UAA_JWT_SECRET', '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW')
         JWT_ALGORITHM = 'HS256'
         JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXP_SECONDS', 6000000))
+
+        # Authorization cache (URL-permission) TTL seconds
+        AUTHZ_CACHE_TTL = int(os.getenv('UAA_AUTHZ_CACHE_TTL', 300))
+        IDEMPOTENCY_TTL_SECONDS = int(os.getenv('UAA_IDEMPOTENCY_TTL', 600))
+        AUDIT_LOG_PATH = os.getenv('UAA_AUDIT_LOG_PATH', os.path.abspath(os.path.join(_ROOT_DIR, "..", "logs", "audit.log")))
 
         SQLALCHEMY_DATABASE_URI = os.getenv(
                 'UAA_DATABASE_URI',

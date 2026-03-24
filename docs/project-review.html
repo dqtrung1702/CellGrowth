@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đánh giá dự án UAA</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 24px; }
+    h1,h2,h3 { color: #1a2f5b; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: left; }
+    th { background: #f1f5fb; }
+    .note { margin-top: 12px; font-size: 0.95em; color: #444; }
+    blockquote { background: #f9faff; border-left: 4px solid #1a75d1; margin: 10px 0; padding: 10px 16px; }
+  </style>
+</head>
+<body>
+  <h1>Đánh giá dịch vụ UAA</h1>
+
+  <h2>Phạm vi</h2>
+  <p>Đã hoàn thành rà soát toàn bộ module service trong <code>uaa/services</code>. Bao gồm business intent, logic chính, pattern kiến trúc và tech stack.</p>
+
+  <h2>1. Tóm tắt</h2>
+  <ul>
+    <li>Tầng service tách biệt với controllers và repository.</li>
+    <li>Repository pattern (User/Role/Permission/Set/AccessRequest).</li>
+    <li>Dependency injection qua <code>uaa/services/container.py</code> với singleton factory.</li>
+    <li>Auth flow: JWT, bcrypt (tùy), session Flask.</li>
+    <li>Workflow access request (submit/approve/reject/cancel/apply).</li>
+  </ul>
+
+  <h2>2. Tổng quan từng service</h2>
+  <table>
+    <thead>
+      <tr><th>Service</th><th>Business</th><th>Logic chính</th><th>Pattern</th><th>Ghi chú</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>AuthService</td><td>Đăng nhập/đăng ký</td><td>login(), register(), tạo JWT, set session</td><td>Auth + RBAC</td><td>Kiểm tra lock, last_signon, tạo access request</td></tr>
+      <tr><td>RegistrationService</td><td>Đăng ký tài khoản</td><td>register(), tạo JWT, set session</td><td>Rút ngắn SRP</td><td>Trùng logic với AuthService</td></tr>
+      <tr><td>UserService</td><td>Quản lý user</td><td>list/get/update user, cập nhật role</td><td>QueryBuilder + data_scope</td><td>Xử lý DataPermission</td></tr>
+      <tr><td>RoleService</td><td>Quản lý role</td><td>list/public/get/add/update/delete + role/permission/user</td><td>QueryBuilder, ResponseEnvelope</td><td>mappings role-permission</td></tr>
+      <tr><td>PermissionService</td><td>Quản lý permission</td><td>list/add/update/delete + cache</td><td>Redis caching, pagination</td><td>Sử dụng data_scope_filters</td></tr>
+      <tr><td>DataService</td><td>Data permission</td><td>dataset_by_user/permission, permission_info</td><td>tương tự PermissionService</td><td>cache và scope</td></tr>
+      <tr><td>SetService</td><td>Quản lý set/dataset</td><td>list/add/update/delete, dataset_by_set</td><td>data_scope + repo</td><td>có kiểm tra quyền truy cập</td></tr>
+      <tr><td>UrlPageService</td><td>URL & page permission</td><td>urls_by_permission, pages_by_user</td><td>wrapper</td><td>hỗ trợ id/code</td></tr>
+      <tr><td>AuthorizationService</td><td>Kiểm tra access URL</td><td>has_url_access + cache in-memory</td><td>cached query</td><td>role-permission-url</td></tr>
+      <tr><td>AccessRequestService</td><td>Luồng yêu cầu cấp quyền</td><td>create/list/get/update</td><td>workflow + filter + paging</td><td>log action</td></tr>
+      <tr><td>AccessRequestApprovalService</td><td>Approve/reject/cancel</td><td>approve(), reject(), cancel()</td><td>delegation apply</td><td>kiểm tra status SUBMITTED</td></tr>
+      <tr><td>AccessRequestApplyService</td><td>Áp dụng request</td><td>apply_items()</td><td>action mapper</td><td>role add + data permission set</td></tr>
+      <tr><td>PasswordService</td><td>Hash/verify password</td><td>hash(), verify()</td><td>bcrypt optional</td><td>fallback plain bytes (rủi ro)</td></tr>
+      <tr><td>session_service</td><td>Session helper</td><td>set/clear/get/is_session_user</td><td>utility</td><td>Flask session</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Tech stack</h2>
+  <ul>
+    <li>Python 3 + Flask</li>
+    <li>SQLAlchemy ORM + raw SQL</li>
+    <li>JWT (pyjwt)</li>
+    <li>bcrypt (nếu có)</li>
+    <li>Redis cache</li>
+    <li>RBAC: role/permission/url</li>
+  </ul>
+
+  <h2>4. Điều cần cải thiện</h2>
+  <ul>
+    <li>Giảm trùng lặp: AuthService/RegistrationService có nhiều code giống nhau.</li>
+    <li>Security: _ids_from_codes dùng f-string table name chưa validate; PasswordService fallback plaintext là nguy cơ.</li>
+    <li>Authorization cache di động: từ bộ nhớ process sang Redis cluster nếu scale.</li>
+    <li>AccessRequest create không dùng requested_set_ids (có trong tham số nhưng chưa xử lý).</li>
+    <li>Không dùng bare except, nên rõ exception và trả lỗi chuẩn.</li>
+  </ul>
+
+  <h2>5. Kết luận</h2>
+  <p>Hệ thống đã hoàn chỉnh logic user+role+permission+access request. Kiến trúc rõ, dễ mở rộng và unit test.
+  Cần củng cố bảo mật, tái cấu trúc để DRY và triển khai cache phân tán.</p>
+
+  <p class="note">File tạo tự động bằng Copilot dựa trên mã nguồn hiện tại.</p>
+</body>
+</html>

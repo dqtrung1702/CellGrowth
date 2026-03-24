@@ -208,6 +208,10 @@
   </div>
 
   <!-- ═══════════════════════════════════════════
+       1B. SERVICE LAYERING (UAA)
+  ════════════════════════════════════════════ -->
+
+  <!-- ═══════════════════════════════════════════
        2. SEQUENCE DIAGRAM
   ════════════════════════════════════════════ -->
   <div class="section">
@@ -568,6 +572,160 @@
         <line x1="670" y1="140" x2="698" y2="140" stroke="#475569" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#za)"/>
         <text x="684" y="132" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono, monospace">TLS/SQL</text>
       </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       6. SERVICE CODE PATTERN
+  ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">06 — Service Code Pattern</div>
+    <div class="card">
+      <div class="card-title">Pattern đang dùng để tổ chức code trong service UAA</div>
+      <svg viewBox="0 0 900 620" style="width:100%;height:auto;font-family:'JetBrains Mono',monospace;">
+        <defs>
+          <marker id="arr-svc" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff" opacity="0.9"/>
+          </marker>
+          <marker id="arr-dep" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#475569" opacity="0.8"/>
+          </marker>
+        </defs>
+
+        <!-- ══════════════════════════════════════════
+             TẦNG 1 — ENTRY LAYER
+        ══════════════════════════════════════════ -->
+        <text x="450" y="18" text-anchor="middle" font-size="9" fill="#334155" letter-spacing="3">ENTRY LAYER</text>
+
+        <!-- main.py -->
+        <rect x="100" y="28" width="155" height="72" rx="10" fill="#0f1a27" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="178" y="54" text-anchor="middle" font-size="13" fill="#00d4ff" font-weight="700">main.py</text>
+        <text x="178" y="72" text-anchor="middle" font-size="10" fill="#e2e8f0">Flask bootstrap</text>
+        <text x="178" y="88" text-anchor="middle" font-size="10" fill="#64748b">auto-discover · middleware</text>
+
+        <!-- arrow main → controllers -->
+        <line x1="255" y1="64" x2="315" y2="64" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr-svc)"/>
+
+        <!-- controllers/* -->
+        <rect x="315" y="28" width="190" height="88" rx="10" fill="#1a1c33" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="410" y="54" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">controllers/*</text>
+        <text x="410" y="72" text-anchor="middle" font-size="10" fill="#e2e8f0">Blueprint endpoints</text>
+        <text x="410" y="88" text-anchor="middle" font-size="10" fill="#64748b">HTTP request/response</text>
+        <text x="410" y="104" text-anchor="middle" font-size="10" fill="#64748b">input mapping</text>
+
+        <!-- ══════════════════════════════════════════
+             DIVIDER 1
+        ══════════════════════════════════════════ -->
+        <line x1="30" y1="138" x2="870" y2="138" stroke="#1e2d45" stroke-width="1" stroke-dasharray="6 4"/>
+        <text x="450" y="154" text-anchor="middle" font-size="9" fill="#334155" letter-spacing="3">FOUNDATION LAYER — services · repos · utils · models</text>
+
+        <!-- ══════════════════════════════════════════
+             TẦNG 2 — FOUNDATION LAYER (Row 1)
+        ══════════════════════════════════════════ -->
+
+        <!-- utils/* -->
+        <rect x="30" y="166" width="185" height="110" rx="10" fill="#11202d" stroke="#22d3ee" stroke-width="1.4"/>
+        <text x="123" y="192" text-anchor="middle" font-size="13" fill="#22d3ee" font-weight="700">utils/*</text>
+        <text x="123" y="210" text-anchor="middle" font-size="10" fill="#e2e8f0">Cross-cutting concerns</text>
+        <text x="123" y="226" text-anchor="middle" font-size="10" fill="#64748b">cache · scope · http</text>
+        <text x="123" y="242" text-anchor="middle" font-size="10" fill="#64748b">idempotency · container (DI)</text>
+        <text x="123" y="258" text-anchor="middle" font-size="10" fill="#64748b">session/cache Redis client</text>
+
+        <!-- services/* -->
+        <rect x="245" y="166" width="200" height="110" rx="10" fill="#251a12" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="345" y="192" text-anchor="middle" font-size="13" fill="#fbbf24" font-weight="700">services/*</text>
+        <text x="345" y="210" text-anchor="middle" font-size="10" fill="#e2e8f0">Business logic</text>
+        <text x="345" y="226" text-anchor="middle" font-size="10" fill="#d97706">validation · ROLE/DATA rules</text>
+        <text x="345" y="242" text-anchor="middle" font-size="10" fill="#64748b">CRUD vs workflow</text>
+        
+        <!-- repositories/* -->
+        <rect x="475" y="166" width="200" height="110" rx="10" fill="#0f1f1a" stroke="#10b981" stroke-width="1.5"/>
+        <text x="575" y="192" text-anchor="middle" font-size="13" fill="#34d399" font-weight="700">repositories/*</text>
+        <text x="575" y="210" text-anchor="middle" font-size="10" fill="#e2e8f0">Persistence layer</text>
+        <text x="575" y="226" text-anchor="middle" font-size="10" fill="#34d399">ORM query / mapping</text>
+        <text x="575" y="242" text-anchor="middle" font-size="10" fill="#64748b">OrmRepo · QueryBuilder</text>
+        <text x="575" y="258" text-anchor="middle" font-size="10" fill="#64748b">session_scope usage</text>
+
+        <!-- models/* -->
+        <rect x="705" y="166" width="185" height="110" rx="10" fill="#1e1c2f" stroke="#7c3aed" stroke-width="1.4"/>
+        <text x="798" y="192" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">models/*</text>
+        <text x="798" y="210" text-anchor="middle" font-size="10" fill="#e2e8f0">orm.py + entities</text>
+        <text x="798" y="226" text-anchor="middle" font-size="10" fill="#94a3b8">engine/session factory</text>
+        <text x="798" y="242" text-anchor="middle" font-size="10" fill="#94a3b8">session_scope helpers</text>
+        <text x="798" y="258" text-anchor="middle" font-size="10" fill="#64748b">SQLAlchemy Base</text>
+
+        <!-- ══════════════════════════════════════════
+             ARROWS — ENTRY → FOUNDATION
+        ══════════════════════════════════════════ -->
+
+        <!-- controllers → services (down) -->
+        <line x1="410" y1="116" x2="410" y2="148" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="410" y1="148" x2="345" y2="148" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="345" y1="148" x2="345" y2="164" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr-svc)"/>
+
+        <!-- utils → controllers (dashed, dependency) -->
+        <line x1="123" y1="166" x2="123" y2="148" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="123" y1="148" x2="314" y2="148" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="314" y1="148" x2="314" y2="116" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-dep)"/>
+
+        <!-- services → repositories -->
+        <line x1="445" y1="221" x2="473" y2="221" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr-svc)"/>
+
+        <!-- repositories → models -->
+        <line x1="675" y1="221" x2="703" y2="221" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr-svc)"/>
+
+        <!-- ══════════════════════════════════════════
+             DIVIDER 2
+        ══════════════════════════════════════════ -->
+        <line x1="30" y1="300" x2="870" y2="300" stroke="#1e2d45" stroke-width="1" stroke-dasharray="6 4"/>
+        <text x="450" y="316" text-anchor="middle" font-size="9" fill="#334155" letter-spacing="3">EXTERNAL STORES</text>
+
+        <!-- ══════════════════════════════════════════
+             TẦNG 3 — EXTERNAL STORES
+        ══════════════════════════════════════════ -->
+
+        <!-- PostgreSQL -->
+        <rect x="270" y="330" width="185" height="72" rx="10" fill="#102316" stroke="#22c55e" stroke-width="1.4"/>
+        <text x="363" y="358" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">PostgreSQL</text>
+        <text x="363" y="376" text-anchor="middle" font-size="10" fill="#64748b">primary store · :5432</text>
+        <text x="363" y="392" text-anchor="middle" font-size="10" fill="#64748b">SQLAlchemy QueuePool</text>
+
+        <!-- Redis TLS -->
+        <rect x="490" y="330" width="185" height="72" rx="10" fill="#2c0f13" stroke="#ef4444" stroke-width="1.4"/>
+        <text x="583" y="358" text-anchor="middle" font-size="13" fill="#ef4444" font-weight="700">Redis TLS</text>
+        <text x="583" y="376" text-anchor="middle" font-size="10" fill="#64748b">session &amp; cache · :6380</text>
+        <text x="583" y="392" text-anchor="middle" font-size="10" fill="#64748b">TTL auto-expire</text>
+
+        <!-- ══════════════════════════════════════════
+             ARROWS — FOUNDATION → STORES
+        ══════════════════════════════════════════ -->
+
+        <!-- repositories → PostgreSQL (down) -->
+        <line x1="575" y1="276" x2="575" y2="310" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="575" y1="310" x2="363" y2="310" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="363" y1="310" x2="363" y2="328" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-dep)"/>
+
+        <!-- utils → Redis (down) -->
+        <line x1="123" y1="276" x2="123" y2="310" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="123" y1="310" x2="583" y2="310" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3"/>
+        <line x1="583" y1="310" x2="583" y2="328" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-dep)"/>
+
+        <!-- ══════════════════════════════════════════
+             LEGEND
+        ══════════════════════════════════════════ -->
+        <line x1="30" y1="430" x2="870" y2="430" stroke="#1e2d45" stroke-width="1"/>
+
+        <line x1="50" y1="452" x2="88" y2="452" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr-svc)"/>
+        <text x="96" y="456" font-size="10" fill="#94a3b8">Request / data flow</text>
+
+        <line x1="260" y1="452" x2="298" y2="452" stroke="#475569" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-dep)"/>
+        <text x="306" y="456" font-size="10" fill="#94a3b8">Dependency / uses</text>
+
+        <text x="530" y="456" font-size="10" fill="#475569">No FK at DB · integrity via code &amp; delete order</text>
+      </svg>
+      <p style="color:#94a3b8; font-size:12px; margin-top:16px; line-height:1.4;">
+        Controller → Service → Repository → Models theo hợp đồng Protocol; core/* cung cấp middleware/scope; container tiêm engine/session &amp; Redis; không bật FK ở DB, kiểm soát toàn vẹn bằng code + thứ tự xoá.
+      </p>
     </div>
   </div>
 
