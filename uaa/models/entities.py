@@ -21,6 +21,7 @@ class User(Base):
 
     roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
     data_permission = relationship("Permission", back_populates="users", foreign_keys=[data_permission_id])
+    identities = relationship("UserIdentity", back_populates="user", cascade="all, delete-orphan")
 
 
 class Role(Base):
