@@ -212,7 +212,7 @@ class ZaloClient(IdentityProviderClient):
         )
 
 
-def build_default_provider_map(config, db_configs: List[Dict] | None = None) -> Dict[str, IdentityProviderClient]:
+def build_default_provider_map(db_configs: List[Dict] | None = None) -> Dict[str, IdentityProviderClient]:
     """
     Build provider map ưu tiên cấu hình lấy từ DB (db_configs).
     db_configs: list dict {provider, client_id, client_secret, redirect_uri, scopes}

@@ -104,7 +104,7 @@ def social_auth_service() -> SocialAuthService:
             role_repo=RoleRepository(),
             perm_repo=PermissionRepository(),
             identity_repo=UserIdentityRepository(),
-            providers=build_default_provider_map(Config, social_provider_config_service().list_enabled()),
+            providers=build_default_provider_map(social_provider_config_service().list_enabled()),
         ),
     )
 
