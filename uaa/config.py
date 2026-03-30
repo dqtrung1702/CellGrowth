@@ -86,7 +86,7 @@ class Config(object):
                 **_redis_ssl_kwargs(),
         )
 
-        JWT_SECRET = os.getenv('UAA_JWT_SECRET', '$2a$12$hUXgiU2qN/ELnVASgsti1ujEZVbGtpeyPEkddJR4vbrnfSyzdaJaW')
+        JWT_SECRET = os.getenv('UAA_JWT_SECRET', '')
         JWT_ALGORITHM = 'HS256'
         JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXP_SECONDS', 6000000))
 
