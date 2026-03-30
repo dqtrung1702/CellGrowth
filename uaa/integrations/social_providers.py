@@ -214,27 +214,13 @@ class ZaloClient(IdentityProviderClient):
 
 def build_default_provider_map(config, db_configs: List[Dict] | None = None) -> Dict[str, IdentityProviderClient]:
     """
-    Build provider map ưu tiên cấu hình lấy từ DB (db_configs), fallback env Config.
+    Build provider map ưu tiên cấu hình lấy từ DB (db_configs).
     db_configs: list dict {provider, client_id, client_secret, redirect_uri, scopes}
+    Nếu DB không có provider, map sẽ rỗng và SocialAuthService sẽ báo thiếu cấu hình.
     """
     providers: Dict[str, IdentityProviderClient] = {}
-    db_configs = db_configs or []
-
-    def make_google(cfg):
-        client = GoogleClient(cfg["client_id"], cfg["client_secret"], cfg["redirect_uri"])
-        return client
-
-    # From DB
-    if db_configs:
-        for cfg in db_configs:
-            if cfg.get("provider") == "google":
-                providers["google"] = make_google(cfg)
-
-    # Fallback env
-    if "google" not in providers:
-        providers["google"] = GoogleClient(
-            config.GOOGLE_CLIENT_ID,
-            config.GOOGLE_CLIENT_SECRET,
-            config.GOOGLE_REDIRECT_URI,
-        )
+    for cfg in db_configs or []:
+        provider = (cfg.get("provider") or "").lower()
+        if provider == "google":
+            providers["google"] = GoogleClient(cfg["client_id"], cfg["client_secret"], cfg["redirect_uri"])
     return providers

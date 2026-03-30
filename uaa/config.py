@@ -94,15 +94,15 @@ class Config(object):
         SOCIAL_CALLBACK_BASE = os.getenv('UAA_SOCIAL_CALLBACK_BASE', UAA_URL.rstrip('/'))
         SOCIAL_DEFAULT_ROLE_CODES = [c for c in os.getenv('UAA_SOCIAL_DEFAULT_ROLES', '').split(',') if c]
         SOCIAL_DEFAULT_DATA_PERM_CODES = [c for c in os.getenv('UAA_SOCIAL_DEFAULT_DATA_PERMS', '').split(',') if c]
-        # Social login defaults: rỗng để tránh lộ secret trong repo; dùng DB hoặc env.
-        GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
-        GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
+        # Provider credentials được lưu trong DB bảng social_providers; không đặt default ở code.
+        GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')  # optional fallback
+        GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
         GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', f"{SOCIAL_CALLBACK_BASE}/auth/google/callback")
-        FACEBOOK_CLIENT_ID = os.getenv('FACEBOOK_CLIENT_ID', '')
-        FACEBOOK_CLIENT_SECRET = os.getenv('FACEBOOK_CLIENT_SECRET', '')
+        FACEBOOK_CLIENT_ID = os.getenv('FACEBOOK_CLIENT_ID')
+        FACEBOOK_CLIENT_SECRET = os.getenv('FACEBOOK_CLIENT_SECRET')
         FACEBOOK_REDIRECT_URI = os.getenv('FACEBOOK_REDIRECT_URI', f"{SOCIAL_CALLBACK_BASE}/auth/facebook/callback")
-        ZALO_CLIENT_ID = os.getenv('ZALO_CLIENT_ID', '')
-        ZALO_CLIENT_SECRET = os.getenv('ZALO_CLIENT_SECRET', '')
+        ZALO_CLIENT_ID = os.getenv('ZALO_CLIENT_ID')
+        ZALO_CLIENT_SECRET = os.getenv('ZALO_CLIENT_SECRET')
         ZALO_REDIRECT_URI = os.getenv('ZALO_REDIRECT_URI', f"{SOCIAL_CALLBACK_BASE}/auth/zalo/callback")
         # Authorization cache (URL-permission) TTL seconds
         AUTHZ_CACHE_TTL = int(os.getenv('UAA_AUTHZ_CACHE_TTL', 300))
