@@ -50,6 +50,9 @@ def login():
           status = res_body.get('status','')
           if status == 'OK':
             jwt_token = res_body.get('token','')
+            if not isinstance(jwt_token, str) or not jwt_token:
+              error_detail = res_body or res.text or 'Login OK but token missing'
+              return render_template('login.html', title='Error', error=error_detail, auth=False)
             resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
             return resp
           if status == 'OTP_REQUIRED':
