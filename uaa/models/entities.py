@@ -204,8 +204,6 @@ class AccessRequestLog(Base):
 
     request = relationship("AccessRequest", back_populates="logs")
     actor = relationship("User")
-<<<<<<< HEAD
-=======
 
 
 class UserIdentity(Base):
