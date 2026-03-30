@@ -25,6 +25,7 @@ from services.access_request_approval_service import AccessRequestApprovalServic
 from services.social_auth_service import SocialAuthService
 from services.social_provider_config_service import SocialProviderConfigService
 from integrations.social_providers import build_default_provider_map
+from services.totp_service import TOTPService
 
 T = TypeVar("T")
 
@@ -113,6 +114,10 @@ def social_provider_config_service() -> SocialProviderConfigService:
         "social_provider_config_service",
         lambda: SocialProviderConfigService(cache=RedisCache(client=redis_client())),
     )
+
+
+def totp_service() -> TOTPService:
+    return Container.get("totp_service", lambda: TOTPService())
 
 
 # ---- Infra clients ----

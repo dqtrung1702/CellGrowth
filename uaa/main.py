@@ -12,6 +12,7 @@ from controllers.URL import url_bp
 from controllers.Data import data_bp
 from controllers.Set import set_bp
 from controllers.AccessRequest import ar_bp
+from controllers.Mfa import mfa_bp
 from services.authorization_service import AuthorizationService
 from utils.token import extract_token
 from utils.http import json_response
@@ -47,6 +48,7 @@ app.register_blueprint(url_bp)
 app.register_blueprint(data_bp)
 app.register_blueprint(set_bp)
 app.register_blueprint(ar_bp)
+app.register_blueprint(mfa_bp)
 
 START_TIME = time.time()
 
