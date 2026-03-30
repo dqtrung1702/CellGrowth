@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<div class="container auth-grid">
+  <div class="auth-form">
+    <img src="/static/images/free.png" alt="OTP" height="160">
+    <h2>Nhập mã OTP</h2>
+    <p>Nhập mã 6 số trong Google Authenticator.</p>
+    <form method="post">
+      <input type="hidden" name="mfa_token" value="{{ mfa_token }}">
+      <div class="input-group">
+        <input type="text" placeholder="123456" name="otp" autocomplete="one-time-code">
+      </div>
+      <div class="input-group">
+        <input type="submit" value="Xác nhận">
+      </div>
+    </form>
+    {% if error %}
+      <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

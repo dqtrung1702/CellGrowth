@@ -16,11 +16,27 @@ def login():
         session.clear()  # reset menu/data scopes from previous user
         data = request.form
         url = Config.UAA_URL
+
+        # Branch 1: submit OTP after receiving mfa_token
+        if data.get('mfa_token') and data.get('otp'):
+          payload = {'Code': data.get('otp'), 'mfa_token': data.get('mfa_token')}
+          try:
+            res = requests.post(url + '/mfa/totp/verify_login', json=payload, timeout=5)
+            res_body = res.json() if res.content else {}
+          except Exception as exc:
+            return render_template('login_totp.html', title='Error', error=f'OTP verify failed: {exc}', auth=False, mfa_token=data.get('mfa_token'))
+          if res.status_code == 200 and res_body.get('status') == 'OK':
+            jwt_token = res_body.get('token') or (res_body.get('data') or {}).get('token','')
+            resp = redirect(url_for('home_blueprint.home'))
+            resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
+            return resp
+          error_detail = res_body or res.text or f'Unexpected status code {res.status_code}'
+          return render_template('login_totp.html', title='Error', error=error_detail, auth=False, mfa_token=data.get('mfa_token'))
+
+        # Branch 2: username/password
         payload={'UserName': data.get('username'),'Password': data.get('password')}
         resp = redirect(url_for('home_blueprint.home'))
-        print(payload)
         try:
-          # Send JSON with proper headers; requests sets Content-Type automatically when using json=.
           res = requests.post(url + '/login', json=payload, timeout=5)
         except requests.RequestException as exc:
           return render_template('login.html', title='Error', error=f'Authentication service unreachable: {exc}', auth=False)
@@ -30,10 +46,15 @@ def login():
         except ValueError:
           res_body = {}
 
-        if res.status_code == 200 and res_body.get('status','') == 'OK':
-          jwt_token = res_body.get('token','')
-          resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
-          return resp
+        if res.status_code == 200:
+          status = res_body.get('status','')
+          if status == 'OK':
+            jwt_token = res_body.get('token','')
+            resp.set_cookie('app_token', jwt_token, path='/', httponly=True, samesite="Lax")
+            return resp
+          if status == 'OTP_REQUIRED':
+            mfa_token = res_body.get('mfa_token','')
+            return render_template('login_totp.html', title='Login - OTP', auth=False, mfa_token=mfa_token)
 
         # Build a user-friendly error when the upstream response is not JSON or status is unexpected.
         error_detail = res_body or res.text or f'Unexpected status code {res.status_code}'
