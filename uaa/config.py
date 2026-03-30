@@ -94,6 +94,7 @@ class Config(object):
         SOCIAL_CALLBACK_BASE = os.getenv('UAA_SOCIAL_CALLBACK_BASE', UAA_URL.rstrip('/'))
         SOCIAL_DEFAULT_ROLE_CODES = [c for c in os.getenv('UAA_SOCIAL_DEFAULT_ROLES', '').split(',') if c]
         SOCIAL_DEFAULT_DATA_PERM_CODES = [c for c in os.getenv('UAA_SOCIAL_DEFAULT_DATA_PERMS', '').split(',') if c]
+        # Social login defaults: rỗng để tránh lộ secret trong repo; dùng DB hoặc env.
         GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
         GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
         GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', f"{SOCIAL_CALLBACK_BASE}/auth/google/callback")

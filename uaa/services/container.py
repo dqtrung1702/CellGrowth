@@ -22,6 +22,9 @@ from services.permission_service import PermissionService
 from services.url_page_service import UrlPageService
 from services.set_service import SetService
 from services.access_request_approval_service import AccessRequestApprovalService
+from services.social_auth_service import SocialAuthService
+from services.social_provider_config_service import SocialProviderConfigService
+from integrations.social_providers import build_default_provider_map
 
 T = TypeVar("T")
 
@@ -91,6 +94,24 @@ def access_request_approval_service() -> AccessRequestApprovalService:
     return Container.get(
         "access_request_approval_service",
         lambda: AccessRequestApprovalService(AccessRequestRepository(), UserRepository()),
+    )
+
+def social_auth_service() -> SocialAuthService:
+    return Container.get(
+        "social_auth_service",
+        lambda: SocialAuthService(
+            user_repo=UserRepository(),
+            role_repo=RoleRepository(),
+            perm_repo=PermissionRepository(),
+            identity_repo=UserIdentityRepository(),
+            providers=build_default_provider_map(Config, social_provider_config_service().list_enabled()),
+        ),
+    )
+
+def social_provider_config_service() -> SocialProviderConfigService:
+    return Container.get(
+        "social_provider_config_service",
+        lambda: SocialProviderConfigService(cache=RedisCache(client=redis_client())),
     )
 
 

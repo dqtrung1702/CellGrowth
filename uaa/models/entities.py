@@ -204,3 +204,51 @@ class AccessRequestLog(Base):
 
     request = relationship("AccessRequest", back_populates="logs")
     actor = relationship("User")
+<<<<<<< HEAD
+=======
+
+
+class UserIdentity(Base):
+    __tablename__ = "user_identities"
+    __table_args__ = {"schema": "uaa"}
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("uaa.users.id"), nullable=False)
+    provider = Column(String(30), nullable=False)
+    external_id = Column(String(255), nullable=False)
+    email = Column(String(255))
+    display_name = Column(String(255))
+    avatar_url = Column(String)
+    tokens_json = Column(JSON)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User", back_populates="identities")
+
+
+class UserTOTP(Base):
+    __tablename__ = "user_totp"
+    __table_args__ = {"schema": "uaa"}
+
+    user_id = Column(Integer, ForeignKey("uaa.users.id"), primary_key=True)
+    secret_base32 = Column(String(64), nullable=False)
+    confirmed = Column(Boolean, default=False, nullable=False)
+    backup_codes_json = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User")
+
+
+class SocialProvider(Base):
+    __tablename__ = "social_providers"
+    __table_args__ = {"schema": "uaa"}
+
+    id = Column(Integer, primary_key=True)
+    provider = Column(String(32), unique=True, nullable=False)
+    client_id = Column(String, nullable=False)
+    client_secret_enc = Column(String, nullable=False)
+    redirect_uri = Column(String, nullable=False)
+    scopes = Column(String)  # space-separated
+    enabled = Column(Boolean, default=True, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_by = Column(String(64))
