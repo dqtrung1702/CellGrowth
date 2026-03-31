@@ -38,7 +38,7 @@
         <td class="table__content"><a href="{{ url_for('access_request_blueprint.access_request_detail', req_id=r.id) }}">{{ r.id }}</a></td>
         <td class="table__content">{{ r.requester_username or r.requester_id }}</td>
         <td class="table__content">{{ r.status }}</td>
-        <td class="table__content">{{ r.created_at }}</td>
+        <td class="table__content">{{ r.created_at|default('') }}</td>
       </tr>
       {% else %}
       <tr><td class="table__content" colspan="4">No requests</td></tr>

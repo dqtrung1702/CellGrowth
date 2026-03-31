@@ -13,6 +13,7 @@ from repositories.interfaces import UserRepoProtocol, RoleRepoProtocol, Permissi
 from services.password_service import PasswordService
 from services.access_request_service import AccessRequestService
 from services.session_service import set_user_session
+from services.totp_service import TOTPService
 
 
 class AuthService:
@@ -30,6 +31,7 @@ class AuthService:
         self.role_repo: RoleRepoProtocol = role_repo or RoleRepository()
         self.perm_repo: PermissionRepoProtocol = perm_repo or PermissionRepository()
         self.access_request_service = access_request_service or AccessRequestService(user_repo=self.user_repo)
+        self.totp_service = TOTPService()
 
     # ---------- helpers ----------
     def _token_payload(self, user_id: int, username: str):
@@ -64,7 +66,20 @@ class AuthService:
             return False, {"message": "Password is incorrect", "status": "FAIL"}, 200
 
         self.user_repo.update_last_signon(user["id"])
+        if self.totp_service.is_enabled(user["id"]):
+            # yêu cầu TOTP: trả mfa_token ngắn hạn
+            mfa_payload = {
+                "exp": datetime.utcnow() + timedelta(minutes=5),
+                "UserId": user["id"],
+                "UserName": username,
+                "mfa": True,
+            }
+            mfa_token = jwt.encode(mfa_payload, Config.JWT_SECRET, algorithm=Config.JWT_ALGORITHM)
+            return True, {"status": "OTP_REQUIRED", "mfa_token": mfa_token, "UserId": user["id"], "UserName": username}, 200
+
         token_str, _ = self._token_payload(user["id"], username)
+        if not token_str:
+            return False, {"message": "Token generation failed", "status": "FAIL"}, 500
         set_user_session(user["id"], username)
         return True, {"token": token_str, "status": "OK", "UserId": user["id"]}, 200
 

@@ -17,6 +17,15 @@ class UserRepository(OrmRepo):
             )
             return dict(row._mapping) if row else None
 
+    def get_by_id(self, user_id: int):
+        with self.session() as session:
+            row = (
+                session.query(User.id, User.username, User.userlocked)
+                .filter(User.id == user_id)
+                .first()
+            )
+            return dict(row._mapping) if row else None
+
     def insert_user(self, username: str, password_hash, name_display: str):
         with self.session() as session:
             user = User(

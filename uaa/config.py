@@ -48,7 +48,7 @@ class Config(object):
                         None,
                         (os.getenv(
                                 'UAA_PUBLIC_ENDPOINTS',
-                                '/login,/register,/status,/health,/ping,/favicon.ico,/getPageByUser,/getDataSetByUser,/publicRoleList,/publicPermissionList,/docs,/openapi.yaml',
+                                '/login,/register,/status,/health,/ping,/favicon.ico,/getPageByUser,/getDataSetByUser,/publicRoleList,/publicPermissionList,/docs,/openapi.yaml,/mfa/totp/verify_login',
                         ).split(',')),
                 )
         )

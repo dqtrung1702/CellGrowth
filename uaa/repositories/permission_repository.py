@@ -176,6 +176,7 @@ class PermissionRepository(OrmRepo):
                     Dataset.colname.label("Column"),
                     Dataset.colval.label("Value"),
                 )
+                .select_from(UserRole)
                 .join(RolePermission, RolePermission.role_id == UserRole.role_id)
                 .join(Permission, Permission.id == RolePermission.permission_id)
                 .join(DataPermission, DataPermission.permission_id == Permission.id)
@@ -301,12 +302,20 @@ class PermissionRepository(OrmRepo):
                 perm.permission_type = ptype
             perm.last_update_datetime = datetime.utcnow()
 
+            # Capture current scopes to preserve when client sends empty lists
+            existing_urls = self.list_url_by_permission(pid) if perm.permission_type != "DATA" else []
+            existing_sets = []
+            if perm.permission_type == "DATA":
+                existing_sets = self.list_dataset_by_permission(pid)
+
             session.query(UrlPermission).filter(UrlPermission.permission_id == pid).delete(synchronize_session=False)
             session.query(PagePermission).filter(PagePermission.permission_id == pid).delete(synchronize_session=False)
             session.query(DataPermission).filter(DataPermission.permission_id == pid).delete(synchronize_session=False)
 
             if perm.permission_type == "DATA":
-                for ds in data_sets:
+                # If client didn't send datasets, keep old ones
+                target_sets = data_sets or existing_sets
+                for ds in target_sets:
                     set_id = self.set_repo.resolve_set_id(session, ds if isinstance(ds, dict) else {})
                     session.add(
                         DataPermission(
@@ -316,7 +325,8 @@ class PermissionRepository(OrmRepo):
                         )
                     )
             else:
-                self._insert_url_or_page(session, pid, url_list)
+                target_urls = url_list or existing_urls
+                self._insert_url_or_page(session, pid, target_urls)
 
     def delete_permission(self, pid: int):
         with self.session() as session:

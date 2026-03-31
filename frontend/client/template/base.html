@@ -86,6 +86,13 @@
                         <label class="box-close" for="acc-close"></label>
                     </section>
                     {% endif %}
+                    {% if menu.get('TOTP') %}
+                    <input type="radio" name="accordion" id="TOTP" />
+                    <section class="box">
+                        <label class="box-title" for="TOTP"><a href="/mfa/totp/setup">TOTP</a></label>
+                        <label class="box-close" for="acc-close"></label>
+                    </section>
+                    {% endif %}
                     <input type="radio" name="accordion" id="Logout" />
                     <section class="box">
                         <label class="box-title" for="Logout"><a href="{{ url_for('auth_blueprint.logout') }}">Logout</a></label>

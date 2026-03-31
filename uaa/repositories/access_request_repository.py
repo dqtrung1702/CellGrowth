@@ -110,7 +110,21 @@ class AccessRequestRepository(OrmRepo):
                 .order_by(AccessRequestLog.created_at.asc())
                 .all()
             )
-            return dict(requester_username=req_row.requester_username, **req_obj.__dict__), [dict(r._mapping) for r in items], [dict(r._mapping) for r in logs]
+            # sanitize ORM objects to plain dict
+            def _clean(obj: dict):
+                return {k: v for k, v in obj.items() if not k.startswith("_sa_instance_state")}
+
+            def _normalize_dt(val):
+                if hasattr(val, "strftime"):
+                    # Format with offset and milliseconds: 2026-03-13T23:23:13.685+0700
+                    return val.strftime("%Y-%m-%dT%H:%M:%S.%f%z")[:-3]
+                return val
+
+            req_dict = {k: _normalize_dt(v) for k, v in _clean(req_obj.__dict__).items()}
+            req_dict["requester_username"] = req_row.requester_username
+            item_dicts = [{k: _normalize_dt(v) for k, v in dict(r._mapping).items()} for r in items]
+            log_dicts = [{k: _normalize_dt(v) for k, v in dict(r._mapping).items()} for r in logs]
+            return req_dict, item_dicts, log_dicts
 
     def approve_request(self, req_id: int, approver_id: int, actions: List[dict], note: Optional[str]):
         with self.session() as session:

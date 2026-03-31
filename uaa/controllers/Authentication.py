@@ -29,12 +29,24 @@ _registration_service = registration_service()
 def login():
     payload: LoginRequest = request.parsed_obj
     success, body, status = _auth_service.login(payload.UserName.strip(), payload.Password)
+    # Giữ token ở cấp cao nhất để frontend cũ đọc được, nhưng cũng trả về đầy đủ thông tin
     token = body.get("token")
+    mfa_token = body.get("mfa_token")
+    envelope_status = body.get("status") if success else "FAIL"
+
+    # data cần chứa cả mfa_token để client biết chuyển sang bước OTP
+    data = {
+        "token": token,
+        "mfa_token": mfa_token,
+        "UserId": body.get("UserId"),
+        "UserName": body.get("UserName"),
+    }
     envelope = ResponseEnvelope(
-        status="OK" if success else "FAIL",
+        status=envelope_status,
         message=body.get("message"),
-        data={"token": token},
+        data=data,
         token=token,  # duy trì tương thích cho frontend cũ đọc trực tiếp
+        mfa_token=mfa_token,  # giúp frontend biết hiển thị form OTP
     )
     return json_response(envelope, status=status)
 

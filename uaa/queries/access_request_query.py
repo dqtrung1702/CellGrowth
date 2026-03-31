@@ -62,7 +62,15 @@ class AccessRequestQuery:
         return "".join(rebuilt), bound
 
     @staticmethod
-    def _to_dict(row: AccessRequest):
+    def _fmt_dt(val):
+        if hasattr(val, "strftime"):
+            offset = val.strftime("%z") or "+0000"
+            millis = int(getattr(val, "microsecond", 0) / 1000)
+            return f"{val.strftime('%Y-%m-%dT%H:%M:%S')}.{millis:03d}{offset}"
+        return val
+
+    @classmethod
+    def _to_dict(cls, row: AccessRequest):
         return {
             "id": row.id,
             "requester_id": row.requester_id,
@@ -71,17 +79,21 @@ class AccessRequestQuery:
             "status": row.status,
             "reason": row.reason,
             "ttl_hours": row.ttl_hours,
-            "created_at": row.created_at,
-            "updated_at": row.updated_at,
+            "created_at": cls._fmt_dt(row.created_at),
+            "updated_at": cls._fmt_dt(row.updated_at),
             "approved_by": row.approved_by,
-            "approved_at": row.approved_at,
+            "approved_at": cls._fmt_dt(row.approved_at),
         }
 
     def list_requests(self, flt: AccessRequestFilter, limit: int, offset: int) -> Tuple[int, List[dict]]:
         with self.session_factory() as session:
+            # Count with explicit FROM to avoid losing table when using with_entities
+            count_q = session.query(func.count()).select_from(AccessRequest)
+            count_q = self._apply_filters(count_q, flt)
+            total = count_q.scalar()
+
             base_q = session.query(AccessRequest)
             base_q = self._apply_filters(base_q, flt)
-            total = base_q.with_entities(func.count()).scalar()
             rows = (
                 base_q.order_by(AccessRequest.created_at.desc())
                 .offset(offset)

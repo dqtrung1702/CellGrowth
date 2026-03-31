@@ -25,14 +25,33 @@ class AuthorizationService:
             return None
         return allowed
 
-    def _cache_set(self, key, value: bool):
-        self._cache[key] = (value, time.time() + self.cache_ttl)
+    def _cache_set_positive(self, key):
+        """Cache only positive grants to avoid stale denials after role changes."""
+        self._cache[key] = (True, time.time() + self.cache_ttl)
+
+    def _has_page_access(self, session, user_id: int, path: str) -> bool:
+        """Check page_permissions (menu/page access) for GET/HEAD routes."""
+        row = session.execute(
+            text(
+                """
+                SELECT 1
+                FROM user_roles ur
+                JOIN role_permissions rp ON rp.role_id = ur.role_id
+                JOIN page_permissions pp ON pp.permission_id = rp.permission_id
+                WHERE ur.user_id = :uid
+                  AND pp.page = :path
+                LIMIT 1;
+                """
+            ),
+            {"uid": user_id, "path": path},
+        ).first()
+        return bool(row)
 
     def has_url_access(self, user_id: int, path: str, method: str) -> bool:
         key = (user_id, method.upper(), path)
         cached = self._cache_get(key)
-        if cached is not None:
-            return cached
+        if cached is True:
+            return True
 
         try:
             with self.perm_repo.session() as session:
@@ -52,7 +71,13 @@ class AuthorizationService:
                     {"uid": user_id, "method": method.upper(), "path": path},
                 ).first()
                 allowed_bool = bool(allowed)
-                self._cache_set(key, allowed_bool)
+
+                # For page routes (GET/HEAD), also honor page_permissions mapping
+                if not allowed_bool and method.upper() in ("GET", "HEAD"):
+                    allowed_bool = self._has_page_access(session, user_id, path)
+
+                if allowed_bool:
+                    self._cache_set_positive(key)
                 return allowed_bool
         except Exception:
             return False

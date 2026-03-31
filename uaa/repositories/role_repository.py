@@ -10,10 +10,12 @@ from models.entities import Role, Permission, RolePermission, UserRole
 class RoleRepository(OrmRepo):
     def list_roles_orm(self, filters: List, limit: int, offset: int):
         with self.session() as session:
+            count_q = session.query(func.count()).select_from(Role)
             base = session.query(Role)
             for f in filters:
+                count_q = count_q.filter(f)
                 base = base.filter(f)
-            total = base.with_entities(func.count()).scalar() or 0
+            total = count_q.scalar() or 0
             rows = (
                 base.with_entities(
                     Role.id,
@@ -31,10 +33,12 @@ class RoleRepository(OrmRepo):
 
     def list_public_roles_orm(self, filters: List, limit: int, offset: int):
         with self.session() as session:
+            count_q = session.query(func.count()).select_from(Role)
             base = session.query(Role)
             for f in filters:
+                count_q = count_q.filter(f)
                 base = base.filter(f)
-            total = base.with_entities(func.count()).scalar() or 0
+            total = count_q.scalar() or 0
             rows = (
                 base.with_entities(Role.id, Role.code.label("Code"), Role.description.label("Description"))
                 .order_by(Role.id)

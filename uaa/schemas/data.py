@@ -23,8 +23,8 @@ class AddPermissionRequest(BaseModel):
     Code: str
     PermissionType: str = "ROLE"
     Description: Optional[str] = None
-    UrlList: List[int | str] = Field(default_factory=list)
-    DataSets: List[int | str] = Field(default_factory=list)
+    UrlList: List[dict | int | str] = Field(default_factory=list)
+    DataSets: List[dict | int | str] = Field(default_factory=list)
 
     model_config = ConfigDict(extra="allow")
 
@@ -33,8 +33,8 @@ class UpdatePermissionRequest(BaseModel):
     PermissionId: int
     Description: Optional[str] = None
     PermissionType: Optional[str] = None
-    UrlList: List[int | str] = Field(default_factory=list)
-    DataSets: List[int | str] = Field(default_factory=list)
+    UrlList: List[dict | int | str] = Field(default_factory=list)
+    DataSets: List[dict | int | str] = Field(default_factory=list)
 
     model_config = ConfigDict(extra="allow")
 

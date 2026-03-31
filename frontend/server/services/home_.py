@@ -18,6 +18,7 @@ PAGE_MENU_MAP = {
     "user": "Users",
     "datasets": "DataSets",
     "access_requests": "AccessRequests",
+    "mfa/totp/setup": "TOTP",
 }
 
 

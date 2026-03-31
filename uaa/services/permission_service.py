@@ -30,9 +30,34 @@ class PermissionService:
         scope_sql, scope_params = data_scope_filters(SessionLocal, requester_id, table_name="permissions")
         extra = (" AND " + scope_sql) if scope_sql else ""
         rows = self.perm_repo.get_permission_info(ids, extra, scope_params or [])
-        return ResponseEnvelope(status="OK", data=rows)
+        # Normalize datetimes to isoformat strings to avoid JSON serialization errors
+        norm_rows = []
+        for row in rows:
+            norm_row = {}
+            for k, v in row.items():
+                if hasattr(v, "isoformat"):
+                    try:
+                        norm_row[k] = v.isoformat()
+                        continue
+                    except Exception:
+                        pass
+                norm_row[k] = v
+            norm_rows.append(norm_row)
+        return ResponseEnvelope(status="OK", data=norm_rows)
+
+    @staticmethod
+    def _normalize_datasets(data_sets: List) -> List[dict]:
+        """Accept SetId as int/str/dict and normalize to dict with SetId key."""
+        norm = []
+        for item in data_sets or []:
+            if isinstance(item, dict):
+                norm.append(item)
+            else:
+                norm.append({"SetId": item})
+        return norm
 
     def add_permission(self, code: str, ptype: str, description: Optional[str], url_list: List, data_sets: List):
+        data_sets = self._normalize_datasets(data_sets)
         try:
             pid = self.perm_repo.insert_permission(code, ptype, description, url_list, data_sets)
             return ResponseEnvelope(status="OK", data={"id": pid})
@@ -44,6 +69,7 @@ class PermissionService:
             return ResponseEnvelope(status="FAIL", message=str(e))
 
     def update_permission(self, pid: int, description: Optional[str], ptype: str, url_list: List, data_sets: List):
+        data_sets = self._normalize_datasets(data_sets)
         try:
             self.perm_repo.update_permission(pid, description, ptype, url_list, data_sets)
             return ResponseEnvelope(status="OK")

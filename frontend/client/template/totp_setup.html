@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<div class="container auth-grid">
+  <div class="auth-form">
+    <h2>Kích hoạt xác thực OTP</h2>
+    <p>Quét mã QR bằng Google Authenticator (hoặc nhập secret thủ công), sau đó nhập mã 6 số để kích hoạt.</p>
+    {% if provisioning_uri %}
+      <div style="margin:16px 0;text-align:center;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ provisioning_uri | urlencode }}" alt="QR for OTP">
+      </div>
+    {% endif %}
+    {% if secret %}
+      <div class="input-group">
+        <label>Secret</label>
+        <input type="text" readonly value="{{ secret }}">
+      </div>
+    {% endif %}
+    <form method="post">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="input-group">
+        <input type="text" placeholder="123456" name="otp" autocomplete="one-time-code" required>
+      </div>
+      <div class="input-group">
+        <input type="submit" value="Xác nhận">
+      </div>
+    </form>
+    <form method="post" style="margin-top:8px;">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="disable">
+      <div class="input-group">
+        <input type="submit" value="Tắt OTP">
+      </div>
+    </form>
+    {% if success %}
+      <p class="auth-success">{{ success }}</p>
+    {% endif %}
+    {% if error %}
+      <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

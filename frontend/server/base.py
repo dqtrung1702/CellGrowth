@@ -4,7 +4,17 @@ import secrets
 from flask import request, redirect, session, abort
 from config import Config
 import jwt
+import requests
 
+PAGE_MENU_MAP = {
+    "home": "Home",
+    "role": "Roles",
+    "permission": "Permissions",
+    "user": "Users",
+    "datasets": "DataSets",
+    "access_requests": "AccessRequests",
+    "mfa/totp/setup": "TOTP",
+}
 
 def _menu_flags_from_session():
     """Normalize menu flag storage into a dict of {MenuId: bool}."""
@@ -16,6 +26,54 @@ def _menu_flags_from_session():
     for item in raw or []:
         flags[str(item)] = True
     return flags
+
+
+def _build_menu_flags(page_items):
+    # Home luôn hiển thị; AccessRequests hiển thị mặc định để user có thể gửi/xem yêu cầu của chính mình
+    flags = {"Home": True, "AccessRequests": True}
+    for item in page_items or []:
+        page = (item or {}).get("Page") or (item or {}).get("page") or ""
+        norm = page.strip().strip("/").lower()
+        menu_id = PAGE_MENU_MAP.get(norm)
+        if menu_id:
+            flags[menu_id] = True
+    return flags
+
+
+def _ensure_menu_flags(cookies, user_id: int):
+    flags = _menu_flags_from_session()
+    if flags:
+        return flags
+    # fetch from UAA if missing
+    try:
+        res = requests.post(Config.UAA_URL + "/getPageByUser", json={"UserId": user_id}, cookies=cookies, timeout=5)
+        if res.status_code == 200 and (res.json() or {}).get("status") == "OK":
+            pages = res.json().get("data", [])
+            flags = _build_menu_flags(pages)
+            session["MenuFlags"] = flags
+            return flags
+    except Exception:
+        pass
+    return flags or {}
+
+
+def _path_to_menu_id(path: str):
+    norm = (path or "").strip().strip("/").lower()
+    if not norm:
+        return "Home"
+    if norm.startswith("role"):
+        return PAGE_MENU_MAP.get("role")
+    if norm.startswith("permission"):
+        return PAGE_MENU_MAP.get("permission")
+    if norm.startswith("user"):
+        return PAGE_MENU_MAP.get("user")
+    if norm.startswith("datasets") or norm.startswith("dataset"):
+        return PAGE_MENU_MAP.get("datasets")
+    if norm.startswith("access_requests"):
+        return PAGE_MENU_MAP.get("access_requests")
+    if norm.startswith("mfa/totp/setup"):
+        return PAGE_MENU_MAP.get("mfa/totp/setup")
+    return None
 
 
 def inject_menu_flags():
@@ -49,6 +107,11 @@ def require_page_access(view_func):
     def wrapper(*args, **kwargs):
         jwt_token = request.cookies.get("app_token", "")
         if not auth(jwt_token):
+            return redirect("Accessisdenied")
+        _, info = auth_info(jwt_token)
+        flags = _ensure_menu_flags(request.cookies, (info or {}).get("UserId"))
+        menu_id = _path_to_menu_id(request.path)
+        if menu_id and not flags.get(menu_id):
             return redirect("Accessisdenied")
         return view_func(*args, **kwargs)
 
