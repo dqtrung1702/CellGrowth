@@ -1,51 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width: 100%;">
-  <h1>Access Requests</h1>
-  <table class="table sortable">
-    <thead>
-      <tr>
-        <th class="table__heading">ID</th>
-        <th class="table__heading">Requester</th>
-        <th class="table__heading">Status</th>
-        <th class="table__heading">Created</th>
-      </tr>
-      <tr>        
-        <td class="table__searching"></td>
-        <td class="table__searching">
-          <input id="Requester" type="text" style="width: 100%" placeholder="Requester" value="{{ request.args.get('requester','') }}" onchange="Search()" />
-        </td>
-        <td class="table__searching">
-          <select id="Status" class="form-control" onchange="Search()">
-            <option value="">ALL</option>
-            <option value="SUBMITTED" {% if request.args.get('status','')=='SUBMITTED' %}selected{% endif %}>SUBMITTED</option>
-            <option value="APPROVED" {% if request.args.get('status','')=='APPROVED' %}selected{% endif %}>APPROVED</option>
-            <option value="REJECTED" {% if request.args.get('status','')=='REJECTED' %}selected{% endif %}>REJECTED</option>
-            <option value="CANCELLED" {% if request.args.get('status','')=='CANCELLED' %}selected{% endif %}>CANCELLED</option>
-          </select>
-        </td> 
-        <td class="table__searching">
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-            <input id="CreatedFrom" type="text" class="form-control" style="max-width:130px;" placeholder="From" value="{{ request.args.get('created_from','') }}" onchange="Search()" />
-            <input id="CreatedTo" type="text" class="form-control" style="max-width:130px;" placeholder="To" value="{{ request.args.get('created_to','') }}" onchange="Search()" />
-          </div>
-        </td>       
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in requests %}
-      <tr>
-        <td class="table__content"><a href="{{ url_for('access_request_blueprint.access_request_detail', req_id=r.id) }}">{{ r.id }}</a></td>
-        <td class="table__content">{{ r.requester_username or r.requester_id }}</td>
-        <td class="table__content">{{ r.status }}</td>
-        <td class="table__content">{{ r.created_at|default('') }}</td>
-      </tr>
-      {% else %}
-      <tr><td class="table__content" colspan="4">No requests</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="pagination" id="pagination"></div>
+<div class="container page-shell">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Approval workflow</p>
+      <h2 class="page-title">Access requests</h2>
+      <p class="page-subtitle">Lọc yêu cầu theo người gửi, trạng thái và khoảng thời gian tạo.</p>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table sortable">
+      <thead>
+        <tr>
+          <th class="table__heading">ID</th>
+          <th class="table__heading">Requester</th>
+          <th class="table__heading">Status</th>
+          <th class="table__heading">Created</th>
+        </tr>
+        <tr>
+          <td class="table__searching"></td>
+          <td class="table__searching">
+            <input id="Requester" type="text" placeholder="Requester" value="{{ request.args.get('requester','') }}" onchange="Search()" />
+          </td>
+          <td class="table__searching">
+            <select id="Status" class="form-control" onchange="Search()">
+              <option value="">ALL</option>
+              <option value="SUBMITTED" {% if request.args.get('status','')=='SUBMITTED' %}selected{% endif %}>SUBMITTED</option>
+              <option value="APPROVED" {% if request.args.get('status','')=='APPROVED' %}selected{% endif %}>APPROVED</option>
+              <option value="REJECTED" {% if request.args.get('status','')=='REJECTED' %}selected{% endif %}>REJECTED</option>
+              <option value="CANCELLED" {% if request.args.get('status','')=='CANCELLED' %}selected{% endif %}>CANCELLED</option>
+            </select>
+          </td>
+          <td class="table__searching">
+            <div class="inline-actions">
+              <input id="CreatedFrom" type="text" class="form-control" placeholder="From" value="{{ request.args.get('created_from','') }}" onchange="Search()" />
+              <input id="CreatedTo" type="text" class="form-control" placeholder="To" value="{{ request.args.get('created_to','') }}" onchange="Search()" />
+            </div>
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td class="table__content"><a href="{{ url_for('access_request_blueprint.access_request_detail', req_id=r.id) }}">{{ r.id }}</a></td>
+          <td class="table__content">{{ r.requester_username or r.requester_id }}</td>
+          <td class="table__content">
+            <span class="status-pill status-pill--{{ (r.status or 'submitted')|lower }}">{{ r.status }}</span>
+          </td>
+          <td class="table__content">{{ r.created_at|default('') }}</td>
+        </tr>
+        {% else %}
+        <tr><td class="table__content" colspan="4">No requests</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="table-toolbar table-toolbar--bottom">
+    <div class="pagination" id="pagination"></div>
+  </div>
 </div>
 
 <script>

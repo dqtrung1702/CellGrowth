@@ -1,27 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width: 50em;">
-  <div>
-    <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('dataset_blueprint.datasets') }}'"> Back to Data Sets</i>
+<div class="container panel-container--wide page-shell">
+  <a class="back-link" href="{{ url_for('dataset_blueprint.datasets') }}">
+    <i class="fa fa-arrow-left"></i> Back to data sets
+  </a>
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Governed resources</p>
+      <h2 class="page-title">Dataset detail</h2>
+      <p class="page-subtitle">Chỉnh sửa từng data row trong set với bộ lọc nội tuyến và bảng có cấu trúc rõ hơn.</p>
+    </div>
   </div>
-  <h2>Dataset Detail</h2>
-  <form id="DatasetDetailForm" method="POST" action="{{ url_for('dataset_blueprint.dataset_detail') }}">
+  <form id="DatasetDetailForm" method="POST" action="{{ url_for('dataset_blueprint.dataset_detail') }}" class="form-card">
     <input type="hidden" name="SetId" value="{{ SetId }}">
     <div class="input-group">
-      <label><i class="fa fa-tag"> SetName</i></label>
+      <label><i class="fa fa-tag"></i> Set name</label>
       <input type="text" value="{{ set_info.get('SetName','') }}" disabled>
     </div>
     <div class="input-group">
-      <label><i class="fa fa-cogs"> Services</i></label>
+      <label><i class="fa fa-cogs"></i> Services</label>
       <input type="text" value="{{ set_info.get('Services','') }}" disabled>
     </div>
     <div class="input-group">
-      <label><i class="fa fa-key"> SetCode</i></label>
+      <label><i class="fa fa-key"></i> Set code</label>
       <input type="text" value="{{ set_info.get('SetCode','') }}" disabled>
     </div>
 
     <div class="input-group data-rows-block">
-      <label><i class="fa fa-table"> Data rows</i></label>
+      <label><i class="fa fa-table"></i> Data rows</label>
       <div class="table-wrapper">
         <table id="DataTable" class="table sortable">
           <thead>
@@ -34,20 +40,20 @@
             </tr>
             <tr>
               <td class="table__searching"></td>
-              <td class="table__searching"><input id="filterTable" type="text" placeholder="Filter table.." oninput="filterDataRows()" /></td>
-              <td class="table__searching"><input id="filterColumn" type="text" placeholder="Filter column.." oninput="filterDataRows()" /></td>
-              <td class="table__searching"><input id="filterValue" type="text" placeholder="Filter value.." oninput="filterDataRows()" /></td>
+              <td class="table__searching"><input id="filterTable" type="text" placeholder="Filter table" oninput="filterDataRows()" /></td>
+              <td class="table__searching"><input id="filterColumn" type="text" placeholder="Filter column" oninput="filterDataRows()" /></td>
+              <td class="table__searching"><input id="filterValue" type="text" placeholder="Filter value" oninput="filterDataRows()" /></td>
               <td class="table__searching"></td>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
-        <button type="button" class="btn" onclick="addDataRow()"><i class="fa fa-plus"></i> Add</button>
+        <button type="button" class="btn" onclick="addDataRow()"><i class="fa fa-plus"></i> Add row</button>
       </div>
     </div>
 
     <input type="hidden" id="DataJSON" name="DataJSON" />
-    <div class="input-group">
+    <div class="action-row">
       <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>

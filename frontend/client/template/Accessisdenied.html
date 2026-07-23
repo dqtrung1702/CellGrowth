@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-  <h2>Access is denied</h2>
-  <p>Bạn không có quyền truy cập trang này.</p>
-  <p><a href="{{ url_for('home_blueprint.home') }}">Về trang Home</a></p>
+<div class="container panel-container page-shell">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Restricted</p>
+      <h2 class="page-title">Access is denied</h2>
+      <p class="page-subtitle">Bạn không có quyền truy cập trang này.</p>
+    </div>
+  </div>
+  <div class="empty-state">
+    <p><a href="{{ url_for('home_blueprint.home') }}">Về trang Home</a></p>
+  </div>
 </div>
 {% endblock %}

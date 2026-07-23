@@ -1,54 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container"  style="max-width: 40em;">
-    <div >              
-      <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('role_blueprint.Role') }}'"> Back to Roles screen</i>
-    </div>
-    <form method="POST">        
+  <div class="container panel-container page-shell">
+    <a class="back-link" href="{{ url_for('role_blueprint.Role') }}">
+      <i class="fa fa-arrow-left"></i> Back to roles
+    </a>
+    <form method="POST" class="form-card">
         <input type="hidden" name="id" value="{{ role.get('id','New') }}">
-        <div class="">
-          <h4>Role Info</h4>
+        <div class="section-block">
+          <div>
+            <p class="page-eyebrow">Access bundles</p>
+            <h2 class="page-title">Role info</h2>
+          </div>
           <div class="input-group">
-              <label for="RoleName"><i class="fa fa-tag"> Role Name</i></label>
-              {% if role.get('RoleName') %} 
-                <input id="RoleName" type="text" disabled value="{{role.get('RoleName')}}"  placeholder="Role Name" name="RoleName"/>
+              <label for="RoleName"><i class="fa fa-tag"></i> Role name</label>
+              {% if role.get('RoleName') %}
+                <input id="RoleName" type="text" disabled value="{{role.get('RoleName')}}" placeholder="Role Name" name="RoleName"/>
               {% else %}
-                <input id="RoleName" type="text"  placeholder="Role Name" name="RoleName"/>
+                <input id="RoleName" type="text" placeholder="Role Name" name="RoleName"/>
               {%endif%}
           </div>
-          
+
           <div class="input-group">
-            <label for="Description"><i class="fa fa-align-center"> Description</i></label>
-            <input id ="Description" type="text" value="{{role.get('Description','')}}"  placeholder="Description" name="Description" />
+            <label for="Description"><i class="fa fa-align-center"></i> Description</label>
+            <input id="Description" type="text" value="{{role.get('Description','')}}" placeholder="Description" name="Description" />
           </div>
-          
-          <div class="input-group">
-            
-            <div class="input-group col-half">
-              <label for="LastUpdateDateTime"><i class="fa fa-history"> Last Update</i></label>
-              <input id = "LastUpdateDateTime" type="text" disabled value="{{role.get('LastUpdateDateTime','')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
+
+          <div class="form-row">
+            <div class="input-group">
+              <label for="LastUpdateDateTime"><i class="fa fa-history"></i> Last update</label>
+              <input id="LastUpdateDateTime" type="text" disabled value="{{role.get('LastUpdateDateTime','')}}" placeholder="Last Update DateTime" name="LastUpdateDateTime" />
             </div>
-            <div class="input-group col-half">
-              <label for="LastUpdateUserName"><i class="fa fa-user"> by</i></label>
-              <input id = "LastUpdateUserName" type="text" disabled value="{{role.get('LastUpdateUserName','')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
+            <div class="input-group">
+              <label for="LastUpdateUserName"><i class="fa fa-user"></i> Updated by</label>
+              <input id="LastUpdateUserName" type="text" disabled value="{{role.get('LastUpdateUserName','')}}" placeholder="Last Update User Name" name="LastUpdateUserName" />
             </div>
           </div>
           <div class="input-group">
-            <label for="xpermission"><i class="fa fa-check-circle"> Permissions</i></label>            
-            <select id="xpermission" name="Permission">
-              
-            </select>            
+            <label for="xpermission"><i class="fa fa-check-circle"></i> Permissions</label>
+            <select id="xpermission" name="Permission"></select>
           </div>
         </div>
-        <div class="input-group">            
-          <div class="col-half">
-            <button type="submit"><i class="fa fa-save"> Save</i></button>
-          </div>
-          <div class="col-half">              
-            <button type="button" onclick="window.location.href='{{ url_for('role_blueprint.role_detail', id = role.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
-          </div>
+        <div class="action-row">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+          <button type="button" onclick="window.location.href='{{ url_for('role_blueprint.role_detail', id = role.get('id')) }}'"><i class="fa fa-undo"></i> Undo</button>
         </div>
-        
     </form>
   </div>
   <script>

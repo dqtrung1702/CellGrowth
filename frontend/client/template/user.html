@@ -1,31 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" id="pageUser">
-    <div style="text-align: center;">
-        <h1>List Users</h1>
+<div class="container page-shell" id="pageUser">
+    <div class="page-header">
+        <div>
+            <p class="page-eyebrow">Identity directory</p>
+            <h2 class="page-title">Users</h2>
+            <p class="page-subtitle">Tìm người dùng theo tên và theo dõi thời điểm đăng nhập, cập nhật gần nhất.</p>
+        </div>
     </div>
-    <div class="pagination">
-        <div id = "pagination"></div>
+    <div class="table-toolbar">
+        <div class="pagination">
+            <div id="pagination"></div>
+        </div>
     </div>
-    <div>
+    <div class="table-wrapper">
         <table class="table sortable">
-            {% if users %}
             <thead>
                 <th class="table__heading">STT</th>
-                <th class="table__heading">UserName</th>
-                <th class="table__heading">LastSignOnDateTime</th>
-                <th class="table__heading">LastUpdateDateTime</th>
+                <th class="table__heading">User name</th>
+                <th class="table__heading">Last sign-on</th>
+                <th class="table__heading">Last update</th>
                 <tr>
                     <td class="table__searching"></td>
                     <td class="table__searching">
-                        <input id="UserName" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" />
+                        <input id="UserName" type="text" placeholder="Filter by user name" onchange="Search()" />
                     </td>
                     <td class="table__searching">
-                        <input id="LastSignOnDateTime" type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
+                        <input id="LastSignOnDateTime" type="text" placeholder="Pick date" onchange="Search()" />
                     </td>
                     <td class="table__searching">
-                        <input id="LastUpdateDateTime" type="text" style="width: 100%" placeholder="Picker.." onchange="Search()" />
+                        <input id="LastUpdateDateTime" type="text" placeholder="Pick date" onchange="Search()" />
                     </td>
                 </tr>
             </thead>
@@ -40,14 +45,19 @@
                     <td class="table__content">{{ line.get('LastSignOnDateTime') }}</td>
                     <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td class="table__content" colspan="4">Không có dữ liệu</td>
+                </tr>
                 {% endfor %}
             </tbody>
-            {% endif %}
         </table>
     </div>
 
-    <div class="pagination">
-        <div id = "pagination2"></div>
+    <div class="table-toolbar table-toolbar--bottom">
+        <div class="pagination">
+            <div id="pagination2"></div>
+        </div>
     </div>
 </div>
 

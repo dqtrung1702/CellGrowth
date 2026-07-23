@@ -1,64 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container"  style="max-width: 40em;">
-    <div >              
-      <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('user_blueprint.User') }}'"> Back to Users screen</i>
-    </div>
-    <form method="POST">        
-        <div class="">
-          <h4>User Info</h4>
+  <div class="container panel-container page-shell">
+    <a class="back-link" href="{{ url_for('user_blueprint.User') }}">
+      <i class="fa fa-arrow-left"></i> Back to users
+    </a>
+    <form method="POST" class="form-card">
+        <div class="section-block">
           <div>
+            <p class="page-eyebrow">Identity directory</p>
+            <h2 class="page-title">User info</h2>
+          </div>
+          <div class="input-group">
+            <label for="UserName"><i class="fa fa-user"></i> User name</label>
+            <input id="UserName" type="text" disabled value="{{user.get('UserName')}}" placeholder="User Name" name="UserName"/>
+          </div>
+          <div class="input-group">
+            {% if user.get('UserLocked')== True %}
+              <input id="UserLocked" checked type="checkbox" name="UserLocked" />
+            {% else %}
+              <input id="UserLocked" type="checkbox" name="UserLocked" />
+            {% endif %}
+            <label for="UserLocked"><i class="fa fa-lock"></i> User locked</label>
+          </div>
+          <div class="input-group">
+            <input id="PasswordChanging" onclick="chg_pass()" type="checkbox" class=""/>
+            <label for="PasswordChanging" class=""><i class="fa fa-key"></i> Need to change password?</label>
+            <input style="display: none;" disabled type="password" id="inputPassword" placeholder="New Password" name="Password"/>
+          </div>
+          <div class="input-group">
+            <label for="NameDisplay"><i class="fa fa-tag"></i> Name display</label>
+            <input id="NameDisplay" type="text" value="{{user.get('NameDisplay')}}" placeholder="Name Display" name="NameDisplay" />
+          </div>
+          <div class="input-group">
+            <label for="DataPermission"><i class="fa fa-table"></i> Data permission</label>
+            <select id="DataPermission" name="DataPermission"></select>
+          </div>
+          <div class="input-group">
+            <label for="LastSignOnDateTime"><i class="fa fa-history"></i> Last sign-on</label>
+            <input id="LastSignOnDateTime" type="text" disabled value="{{user.get('LastSignOnDateTime')}}" placeholder="Last SignOn DateTime" name="LastSignOnDateTime" />
+          </div>
+          <div class="form-row">
             <div class="input-group">
-              <label for="UserName"><i class="fa fa-user"> User Name</i></label>                
-              <input id="UserName" type="text" disabled value="{{user.get('UserName')}}"  placeholder="User Name" name="UserName"/>              
+              <label for="LastUpdateDateTime"><i class="fa fa-clock-o"></i> Last update</label>
+              <input id="LastUpdateDateTime" type="text" disabled value="{{user.get('LastUpdateDateTime')}}" placeholder="Last Update DateTime" name="LastUpdateDateTime" />
             </div>
             <div class="input-group">
-              {% if user.get('UserLocked')== True %}
-                <input id="UserLocked" checked type="checkbox" name="UserLocked" />
-              {% else %}
-                <input id="UserLocked" type="checkbox" name="UserLocked" />
-              {% endif %}
-              <label for="UserLocked"><i class="fa fa-lock"> User Locked</i></label>
+              <label for="LastUpdateUserName"><i class="fa fa-user"></i> Updated by</label>
+              <input id="LastUpdateUserName" type="text" disabled value="{{user.get('LastUpdateUserName')}}" placeholder="Last Update User Name" name="LastUpdateUserName" />
             </div>
           </div>
           <div class="input-group">
-            <input id="PasswordChanging"  onclick="chg_pass()" type="checkbox" class=""/>
-            <label for="PasswordChanging" class=""><i class="fa fa-key"> Need to change password?</i></label>
-            <input style="display: none;" disabled type="password" id="inputPassword" placeholder="New Password" name="Password"/>                          
-        </div>
-          <div class="input-group">
-            <label for="NameDisplay"><i class="fa fa-tag"> Name Display</i></label>
-            <input id ="NameDisplay" type="text" value="{{user.get('NameDisplay')}}"  placeholder="Name Display" name="NameDisplay" />
-          </div>
-          <div class="input-group">
-            <label for="DataPermission"><i class="fa fa-table"> Data-Permission</i></label>            
-            <select id="DataPermission" name="DataPermission"></select>            
-          </div>
-          <div class="input-group">
-            <label for="LastSignOnDateTime"><i class="fa fa-history"> Last SignOn</i></label>
-            <input id = "LastSignOnDateTime" type="text" disabled value="{{user.get('LastSignOnDateTime')}}"  placeholder="Last SignOn DateTime" name="LastSignOnDateTime" />
-            
-            <div class="input-group col-half">
-              <label for="LastUpdateDateTime"><i class="fa fa-clock-o"> Last Update</i></label>
-              <input id = "LastUpdateDateTime" type="text" disabled value="{{user.get('LastUpdateDateTime')}}"  placeholder="Last Update DateTime" name="LastUpdateDateTime" />
-            </div>
-            <div class="input-group col-half">
-              <label for="LastUpdateUserName"><i class="fa fa-user"> by</i></label>
-              <input id = "LastUpdateUserName" type="text" disabled value="{{user.get('LastUpdateUserName')}}"  placeholder="Last Update User Name" name="LastUpdateUserName" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label for="xrole"><i class="fa fa-list"> Roles</i></label>            
-            <select id="xrole" name="xrole"></select>            
+            <label for="xrole"><i class="fa fa-list"></i> Roles</label>
+            <select id="xrole" name="xrole"></select>
           </div>
         </div>
-        <div class="input-group">            
-          <div class="col-half ">
-            <button type="submit"><i class="fa fa-save"> Save</i></button>
-          </div>
-          <div class="col-half">
-            <button type="button" onclick="window.location.href='{{ url_for('user_blueprint.user_detail', id = user.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
-          </div>
+        <div class="action-row">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+          <button type="button" onclick="window.location.href='{{ url_for('user_blueprint.user_detail', id = user.get('id')) }}'"><i class="fa fa-undo"></i> Undo</button>
         </div>
     </form>
   </div>

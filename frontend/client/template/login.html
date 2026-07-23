@@ -2,25 +2,53 @@
 {% block content %}
 <!-- CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-<div class="container auth-grid">
-    <div class="auth-form">
-        <img src="/static/images/free.png" alt="Login" height="200">
-        <h2>Đăng nhập</h2>
-        <p>Chào mừng bạn quay lại.</p>
-        <form method="post">
-            <div class="input-group">
-                <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
+<div class="container panel-container--wide">
+    <div class="auth-layout">
+        <section class="auth-visual">
+            <div class="auth-stack">
+                <span class="auth-kicker">Cell Growth</span>
+                <div>
+                    <h2>Truy cập workspace quản trị với cấu trúc rõ ràng hơn.</h2>
+                    <p>
+                        Đăng nhập để tiếp tục quản lý user, role, permission và các data scope trong cùng một luồng làm việc.
+                    </p>
+                </div>
+                <div class="auth-points">
+                    <div class="auth-point">
+                        <strong>Audit-friendly</strong>
+                        <p>Điều hướng và trạng thái được tách bạch để rà soát nhanh hơn.</p>
+                    </div>
+                    <div class="auth-point">
+                        <strong>Security-first</strong>
+                        <p>Hỗ trợ OTP và luồng cấp quyền mà không thay đổi nghiệp vụ hiện có.</p>
+                    </div>
+                </div>
             </div>
-            <div class="input-group">
-                <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
+            <div class="auth-media">
+                <img src="/static/images/free.png" alt="Cell Growth access portal illustration">
             </div>
-            <div class="input-group">
-                <input type="submit" value="Login">
+        </section>
+
+        <section class="auth-form">
+            <div>
+                <h2>Đăng nhập</h2>
+                <p>Chào mừng bạn quay lại. Nhập thông tin tài khoản để tiếp tục.</p>
             </div>
-        </form>
-        {% if error %}
-            <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
-        {% endif %}
+            <form method="post">
+                <div class="input-group">
+                    <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
+                </div>
+                <div class="input-group">
+                    <input type="submit" value="Login">
+                </div>
+            </form>
+            {% if error %}
+                <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
+            {% endif %}
+        </section>
     </div>
 </div>
 

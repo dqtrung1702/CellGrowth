@@ -1,58 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="max-width: 100%;">
-    <div class="">
-        <div class="">
-            <h1>List Roles</h1>
+<div class="container page-shell">
+    <div class="page-header">
+        <div>
+            <p class="page-eyebrow">Access bundles</p>
+            <h2 class="page-title">Roles</h2>
+            <p class="page-subtitle">Quản lý nhóm quyền dùng lại được, kèm mô tả và lịch sử cập nhật.</p>
+        </div>
+        <div class="page-actions">
+            <a class="btn btn-primary" href="{{ url_for('role_blueprint.role_detail', id = 'New') }}">
+                <i class="fa fa-plus"></i> Add role
+            </a>
         </div>
     </div>
-    <div class="pagination">
-        <div id = "pagination"></div>
-    </div>
-    <div class="">
-        
-        <div class="">
-            
-            <table id="roleTable" class="table sortable">
-                {% if roles %}
-                <thead>
-                    <th class="table__heading">STT</th>
-                    <th class="table__heading">RoleName</th>
-                    <th class="table__heading">Description</th>
-                    <th class="table__heading">LastUpdateDateTime</th>
-                    <th class="table__heading"></th>
-                    <tr>
-                        <td class="table__searching"></td>
-                        <td class="table__searching"><input id="RoleName" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
-                        <td class="table__searching"><input id="Description" type="text" style="width:100%" placeholder="Filter.." onchange="Search()" /></td>
-                        <td class="table__searching"><input id="LastUpdateDateTime" type="text" style="width:100%" placeholder="Picker.." onchange="Search()" /></td>
-                        <td class="table__searching"></td>
-                    </tr>
-                </thead>
-                <tbody id="roleTblBody">
-                    {% for line in roles %}
-                    <tr id="{{ 'roleLine' ~ line.get('id') }}">
-                        <td class="table__content">{{ line.get('STT') }}</td>
-                        <td class="table__content"><a href="{{ url_for('role_blueprint.role_detail', id = line.get('id')) }}">{{ line.get('RoleName') }} <i class="fa fa-edit"></i></a></td>
-                        <td class="table__content">{{ line.get('Description') }}</td>
-                        <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
-                        <td class="table__content"><a href="#"><i class="fa fa-trash" onclick="Delete({{line.get('id')}})"></i></a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                {% endif %}
-            </table>
-            <div style="text-align: left;">
-                <h4>
-                    <a href="{{ url_for('role_blueprint.role_detail', id = 'New') }}"><i class="fa fa-plus"> Add</i></a>                    
-                </h4>            
-            </div>
-            
+    <div class="table-toolbar">
+        <div class="pagination">
+            <div id="pagination"></div>
         </div>
     </div>
-    <div class="pagination">
-        <div id = "pagination2"></div>
+    <div class="table-wrapper">
+        <table id="roleTable" class="table sortable">
+            <thead>
+                <th class="table__heading">STT</th>
+                <th class="table__heading">Role name</th>
+                <th class="table__heading">Description</th>
+                <th class="table__heading">Last update</th>
+                <th class="table__heading">Action</th>
+                <tr>
+                    <td class="table__searching"></td>
+                    <td class="table__searching"><input id="RoleName" type="text" placeholder="Filter by role name" onchange="Search()" /></td>
+                    <td class="table__searching"><input id="Description" type="text" placeholder="Filter by description" onchange="Search()" /></td>
+                    <td class="table__searching"><input id="LastUpdateDateTime" type="text" placeholder="Pick date" onchange="Search()" /></td>
+                    <td class="table__searching"></td>
+                </tr>
+            </thead>
+            <tbody id="roleTblBody">
+                {% for line in roles %}
+                <tr id="{{ 'roleLine' ~ line.get('id') }}">
+                    <td class="table__content">{{ line.get('STT') }}</td>
+                    <td class="table__content"><a href="{{ url_for('role_blueprint.role_detail', id = line.get('id')) }}">{{ line.get('RoleName') }} <i class="fa fa-edit"></i></a></td>
+                    <td class="table__content">{{ line.get('Description') }}</td>
+                    <td class="table__content">{{ line.get('LastUpdateDateTime') }}</td>
+                    <td class="table__content"><a href="#" onclick="Delete({{line.get('id')}}); return false;"><i class="fa fa-trash"></i></a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td class="table__content" colspan="5">Không có dữ liệu</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-toolbar table-toolbar--bottom">
+        <div class="pagination">
+            <div id="pagination2"></div>
+        </div>
     </div>
 </div>
 <script>

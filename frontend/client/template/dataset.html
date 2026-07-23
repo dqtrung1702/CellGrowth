@@ -1,32 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" id="pageDataset">
-  <div style="text-align: center;">
-    <h1>Data Sets</h1>
+<div class="container page-shell" id="pageDataset">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Governed resources</p>
+      <h2 class="page-title">Data sets</h2>
+      <p class="page-subtitle">Quản lý danh mục data set, service liên quan và mã định danh dùng trong permission.</p>
+    </div>
+    <div class="page-actions">
+      <a class="btn btn-primary" href="{{ url_for('dataset_blueprint.set_detail', SetId='New') }}">
+        <i class="fa fa-plus"></i> Add data set
+      </a>
+    </div>
   </div>
 
-  <div class="pagination">
-    <div id="pagination"></div>
+  <div class="table-toolbar">
+    <div class="pagination">
+      <div id="pagination"></div>
+    </div>
   </div>
 
   <div class="table-wrapper">
     <table class="table sortable">
       <thead>
         <th class="table__heading">STT</th>
-        <th class="table__heading">SetName</th>
+        <th class="table__heading">Set name</th>
         <th class="table__heading">Services</th>
-        <th class="table__heading">SetCode</th>
-        <th class="table__heading"></th>
+        <th class="table__heading">Set code</th>
+        <th class="table__heading">Action</th>
         <tr>
           <td class="table__searching"></td>
           <td class="table__searching">
-            <input id="SetName" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('SetName','') }}" />
+            <input id="SetName" type="text" placeholder="Filter by set name" onchange="Search()" value="{{ request.args.get('SetName','') }}" />
           </td>
           <td class="table__searching">
-            <input id="Services" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('Services','') }}" />
+            <input id="Services" type="text" placeholder="Filter by service" onchange="Search()" value="{{ request.args.get('Services','') }}" />
           </td>
           <td class="table__searching">
-            <input id="SetCode" type="text" style="width: 100%" placeholder="Filter.." onchange="Search()" value="{{ request.args.get('SetCode','') }}" />
+            <input id="SetCode" type="text" placeholder="Filter by set code" onchange="Search()" value="{{ request.args.get('SetCode','') }}" />
           </td>
           <td class="table__searching"></td>
         </tr>
@@ -42,27 +53,24 @@
           <td class="table__content">{{ s.get('Services') }}</td>
           <td class="table__content">{{ s.get('SetCode') }}</td>
           <td class="table__content">
-            <a href="{{ url_for('dataset_blueprint.set_detail', SetId=s.get('SetId')) }}">Edit info</a> |
-            <a href="{{ url_for('dataset_blueprint.dataset_detail', SetId=s.get('SetId')) }}">Datasets</a> |
-            <a href="#" onclick="return deleteSet('{{ s.get('SetId') }}','{{ s.get('SetName') }}')">Delete</a>
+            <div class="inline-actions">
+              <a href="{{ url_for('dataset_blueprint.set_detail', SetId=s.get('SetId')) }}">Edit info</a>
+              <a href="{{ url_for('dataset_blueprint.dataset_detail', SetId=s.get('SetId')) }}">Datasets</a>
+              <a href="#" onclick="return deleteSet('{{ s.get('SetId') }}','{{ s.get('SetName') }}')">Delete</a>
+            </div>
           </td>
         </tr>
-        {% endfor %}
-        {% if not sets %}
+        {% else %}
         <tr><td class="table__content" colspan="5">No sets found.</td></tr>
-        {% endif %}
+        {% endfor %}
       </tbody>
     </table>
   </div>
 
-  <div class="pagination">
-    <div id="pagination2"></div>
-  </div>
-
-  <div style="text-align: left;">
-    <h4>
-      <a href="{{ url_for('dataset_blueprint.set_detail', SetId='New') }}"><i class="fa fa-plus"> Add</i></a>
-    </h4>
+  <div class="table-toolbar table-toolbar--bottom">
+    <div class="pagination">
+      <div id="pagination2"></div>
+    </div>
   </div>
 </div>
 

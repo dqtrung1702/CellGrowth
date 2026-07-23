@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CellGrowth Internal IAM + Data Access Approval Platform</title>
+  <meta
+    name="description"
+    content="Tài liệu định hướng thiết kế và phát triển CellGrowth theo hướng Internal IAM + Data Access Approval Platform trên nền ứng dụng hiện tại."
+  >
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap");
+
+    :root {
+      --bg: #edf1f4;
+      --bg-deep: #dde4ea;
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-strong: #ffffff;
+      --surface-soft: #f6f8fa;
+      --line: rgba(15, 23, 42, 0.12);
+      --line-strong: rgba(15, 23, 42, 0.2);
+      --ink: #17202a;
+      --muted: #566475;
+      --accent: #b42318;
+      --accent-soft: rgba(180, 35, 24, 0.1);
+      --accent-strong: #8f1c14;
+      --success: #126b4d;
+      --warning: #8a5b0d;
+      --shadow: 0 24px 60px rgba(17, 24, 39, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --content-width: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(180, 35, 24, 0.08), transparent 22rem),
+        radial-gradient(circle at top right, rgba(15, 23, 42, 0.05), transparent 28rem),
+        linear-gradient(180deg, #f5f7f9 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(23, 32, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 32, 42, 0.025) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 78%);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content-width);
+      margin: 0 auto;
+      padding: 28px 18px 72px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .surface {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 24px;
+      padding: 30px;
+      overflow: hidden;
+      position: relative;
+      min-height: 320px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(180, 35, 24, 0.14), rgba(180, 35, 24, 0));
+      pointer-events: none;
+    }
+
+    .eyebrow,
+    .section-id,
+    .chip,
+    .mini-label {
+      font-family: "JetBrains Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 11px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2.3rem, 5vw, 4.5rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 10.5ch;
+      text-wrap: balance;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+      line-height: 1.08;
+      padding-bottom: 2px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 60ch;
+      line-height: 1.72;
+      font-size: 1rem;
+    }
+
+    .hero-aside {
+      display: grid;
+      align-content: space-between;
+      gap: 16px;
+    }
+
+    .hero-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(23, 32, 42, 0.08);
+      background: rgba(255, 255, 255, 0.8);
+      padding: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .metric strong {
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .metric span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.96rem;
+    }
+
+    .hero-note {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(180, 35, 24, 0.08), rgba(180, 35, 24, 0.03));
+      border: 1px solid rgba(180, 35, 24, 0.12);
+      padding: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-note p {
+      max-width: none;
+      font-size: 0.95rem;
+    }
+
+    .toc {
+      padding: 20px 24px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .toc a {
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(23, 32, 42, 0.09);
+      background: rgba(255, 255, 255, 0.74);
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .toc a:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180, 35, 24, 0.24);
+      background: var(--surface-strong);
+    }
+
+    .toc strong {
+      font-size: 0.98rem;
+      letter-spacing: -0.02em;
+    }
+
+    .toc span {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .section {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-id {
+      color: var(--accent);
+    }
+
+    .section-head h2 {
+      margin: 6px 0 0;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 58ch;
+      line-height: 1.6;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(180, 35, 24, 0.14);
+    }
+
+    .two-column-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .list-panel {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      display: grid;
+      gap: 12px;
+    }
+
+    .list-panel.good {
+      box-shadow: inset 0 1px 0 rgba(18, 107, 77, 0.08);
+    }
+
+    .list-panel.bad {
+      box-shadow: inset 0 1px 0 rgba(180, 35, 24, 0.08);
+    }
+
+    .list-panel h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    ul.flat {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .diagram-card {
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .diagram-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .diagram-header h3 {
+      margin: 0;
+      font-size: 1.18rem;
+      letter-spacing: -0.03em;
+    }
+
+    .diagram-header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 54ch;
+    }
+
+    .diagram-shell {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(23, 32, 42, 0.09);
+      background:
+        linear-gradient(180deg, rgba(246, 248, 250, 0.8), rgba(255, 255, 255, 0.96));
+      padding: 12px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      min-width: 860px;
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .caption-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .caption {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .map-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .map-card h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .map-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .map-card ul {
+      margin: 0;
+      padding-left: 16px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .roadmap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .phase {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .phase strong {
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .phase small {
+      display: block;
+      margin-top: 6px;
+      color: var(--accent);
+      font-family: "JetBrains Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+    }
+
+    .phase ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .footer-note {
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .footer-note strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 1080px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .toc-grid,
+      .grid-3,
+      .map-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 18px 12px 54px;
+      }
+
+      .hero,
+      .toc,
+      .card,
+      .diagram-card {
+        padding: 18px;
+      }
+
+      .toc-grid,
+      .grid-2,
+      .grid-3,
+      .two-column-list,
+      .map-grid,
+      .phase {
+        grid-template-columns: 1fr;
+      }
+
+      .phase {
+        gap: 10px;
+      }
+
+      svg {
+        min-width: 720px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero surface">
+      <div>
+        <div class="eyebrow">Design Read</div>
+        <h1>CellGrowth nên đi theo hướng <em>Internal IAM</em> + Data Access Approval Platform</h1>
+        <p>
+          Đọc brief này như một bài toán sản phẩm trust-first cho môi trường nội bộ doanh nghiệp:
+          hệ thống hiện tại đã mạnh ở xác thực, RBAC, page and URL permission, dataset permission,
+          request and approval workflow. Hướng đúng là làm sâu phần quản trị danh tính và cấp quyền dữ liệu,
+          không ép hệ thống thành LDAP server.
+        </p>
+      </div>
+      <aside class="hero-aside">
+        <div class="hero-stack">
+          <div class="metric">
+            <div class="mini-label">Nền hiện tại</div>
+            <strong>Flask UAA + Frontend + Redis + DB</strong>
+            <span>Đã có session, JWT, MFA/TOTP, RBAC, page permission, dataset permission và access request workflow.</span>
+          </div>
+          <div class="metric">
+            <div class="mini-label">Định vị đúng</div>
+            <strong>Policy + Workflow Brain</strong>
+            <span>Giữ quyền nội bộ và logic xét duyệt làm trung tâm, còn LDAP or IdP ngoài chỉ là nguồn xác thực nếu cần.</span>
+          </div>
+        </div>
+        <div class="hero-note">
+          <div class="mini-label">Kết luận</div>
+          <p>
+            Sản phẩm nên trở thành cổng quản trị danh tính nội bộ, trung tâm phân quyền cho ứng dụng
+            và nền tảng xin cấp quyền dữ liệu có audit trail.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <nav class="toc surface" aria-label="Mục lục tài liệu">
+      <div class="toc-grid">
+        <a href="#positioning">
+          <strong>Định vị</strong>
+          <span>Nên làm gì và không nên làm gì với codebase hiện tại.</span>
+        </a>
+        <a href="#physical-architecture">
+          <strong>Kiến trúc vật lý</strong>
+          <span>Sơ đồ triển khai và boundary kỹ thuật dựa trên ứng dụng đang có.</span>
+        </a>
+        <a href="#logical-architecture">
+          <strong>Kiến trúc logic</strong>
+          <span>Các miền chức năng cốt lõi để phát triển thành platform.</span>
+        </a>
+        <a href="#roadmap">
+          <strong>Roadmap</strong>
+          <span>Các pha nâng cấp hợp lý trong 12 tháng tới.</span>
+        </a>
+      </div>
+    </nav>
+
+    <section class="section" id="positioning">
+      <div class="section-head">
+        <div>
+          <div class="section-id">01 / Positioning</div>
+          <h2>Định vị sản phẩm bám theo những gì hệ thống đã làm tốt</h2>
+        </div>
+        <p>
+          Hiện trạng code thể hiện rất rõ một UAA nội bộ có chiều sâu về phân quyền và workflow.
+          Giá trị lớn nhất không nằm ở giao thức xác thực, mà nằm ở mô hình quyền và quy trình cấp quyền dữ liệu.
+        </p>
+      </div>
+
+      <div class="two-column-list">
+        <article class="list-panel good surface">
+          <h3>Nên phát triển theo hướng này</h3>
+          <div class="chip-row">
+            <span class="chip">Internal IAM</span>
+            <span class="chip">RBAC + Data Entitlement</span>
+            <span class="chip">Approval Workflow</span>
+          </div>
+          <ul class="flat">
+            <li>Quản lý user nội bộ, MFA, session, token và external identity mapping.</li>
+            <li>Quản lý role, permission, URL access, page access và data access như một lõi policy.</li>
+            <li>Biến `AccessRequest`, `AccessRequestItem`, `AccessRequestLog` thành workflow cấp quyền dữ liệu có audit đầy đủ.</li>
+            <li>Dùng hệ thống làm policy and approval brain cho các ứng dụng nội bộ khác.</li>
+          </ul>
+        </article>
+
+        <article class="list-panel bad surface">
+          <h3>Không nên đẩy hệ thống theo hướng này</h3>
+          <div class="chip-row">
+            <span class="chip">Không phải LDAP Server</span>
+            <span class="chip">Không phải AD thay thế</span>
+          </div>
+          <ul class="flat">
+            <li>Không xây LDAP protocol server, DN tree, objectClass, replication hay schema management.</li>
+            <li>Không xem LDAP or Active Directory là đích phát triển chính của sản phẩm.</li>
+            <li>Không trộn generic directory service với business-level access workflow trong cùng một mục tiêu.</li>
+            <li>Không để token hoặc policy của IdP ngoài trở thành nguồn quyết định cuối cho quyền dữ liệu nội bộ.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="physical-architecture">
+      <div class="section-head">
+        <div>
+          <div class="section-id">02 / Physical Architecture</div>
+          <h2>Kiến trúc vật lý khuyến nghị trên nền ứng dụng hiện tại</h2>
+        </div>
+        <p>
+          Sơ đồ dưới đây giữ nguyên lõi triển khai hiện có: frontend Flask làm giao diện và cookie boundary,
+          UAA Flask làm auth and policy service, Redis cho session and cache, database làm source of truth.
+          Tích hợp ngoài là lớp mở rộng, không phải lõi vận hành.
+        </p>
+      </div>
+
+      <article class="diagram-card surface">
+        <div class="diagram-header">
+          <div>
+            <h3>Sơ đồ kiến trúc vật lý</h3>
+            <p>Kiến trúc triển khai được định vị theo mô hình trust-first nội bộ, với integration edge ở phía ngoài.</p>
+          </div>
+        </div>
+        <div class="diagram-shell">
+          <svg viewBox="0 0 1180 700" role="img" aria-label="Sơ đồ kiến trúc vật lý cho CellGrowth Internal IAM và Data Access Approval Platform">
+            <defs>
+              <marker id="arrow-red" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+                <path d="M0 0 L12 6 L0 12 Z" fill="#b42318"></path>
+              </marker>
+              <marker id="arrow-gray" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+                <path d="M0 0 L12 6 L0 12 Z" fill="#4b5563"></path>
+              </marker>
+              <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+                <path d="M0 0 L12 6 L0 12 Z" fill="#126b4d"></path>
+              </marker>
+              <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#17202a" flood-opacity="0.08"></feDropShadow>
+              </filter>
+            </defs>
+
+            <rect x="24" y="24" width="1132" height="652" rx="24" fill="#ffffff" stroke="rgba(23,32,42,0.08)"></rect>
+
+            <rect x="60" y="72" width="1060" height="170" rx="22" fill="#f7f9fb" stroke="rgba(23,32,42,0.08)" stroke-dasharray="8 6"></rect>
+            <text x="84" y="104" font-size="15" font-weight="700" fill="#17202a">Người dùng và ứng dụng sử dụng platform</text>
+            <text x="84" y="126" font-size="12" fill="#566475">Tất cả đi qua frontend hoặc UAA API thay vì truy cập trực tiếp database hoặc policy table.</text>
+
+            <g filter="url(#softShadow)">
+              <rect x="84" y="148" width="210" height="64" rx="16" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <text x="104" y="177" font-size="14" font-weight="700" fill="#17202a">Người dùng nội bộ</text>
+              <text x="104" y="197" font-size="11" fill="#566475">admin, approver, requester, auditor</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="318" y="148" width="220" height="64" rx="16" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <text x="338" y="177" font-size="14" font-weight="700" fill="#17202a">Trình duyệt hoặc portal nội bộ</text>
+              <text x="338" y="197" font-size="11" fill="#566475">UI để login, quản trị quyền, gửi yêu cầu cấp quyền</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="562" y="148" width="234" height="64" rx="16" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <text x="582" y="177" font-size="14" font-weight="700" fill="#17202a">Ứng dụng nội bộ khác</text>
+              <text x="582" y="197" font-size="11" fill="#566475">data portal, admin tools, reporting apps</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="820" y="148" width="264" height="64" rx="16" fill="#ffffff" stroke="rgba(23,32,42,0.12)" stroke-dasharray="5 4"></rect>
+              <text x="840" y="177" font-size="14" font-weight="700" fill="#17202a">Optional integration edge</text>
+              <text x="840" y="197" font-size="11" fill="#566475">LDAP, AD, OIDC IdP, HR source, directory sync</text>
+            </g>
+
+            <rect x="60" y="274" width="1060" height="274" rx="22" fill="#fffdfd" stroke="rgba(180,35,24,0.12)"></rect>
+            <text x="84" y="308" font-size="15" font-weight="700" fill="#17202a">Lõi CellGrowth nên giữ vai trò policy and workflow brain</text>
+            <text x="84" y="330" font-size="12" fill="#566475">Đây là phần nên đầu tư sâu nhất vì đã có nền sẵn trong codebase.</text>
+
+            <g filter="url(#softShadow)">
+              <rect x="84" y="358" width="280" height="152" rx="20" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <rect x="84" y="358" width="280" height="40" rx="20" fill="rgba(180,35,24,0.08)"></rect>
+              <text x="106" y="383" font-size="13" font-weight="700" fill="#b42318">Frontend Flask</text>
+              <text x="106" y="414" font-size="12" fill="#17202a">Web UI, cookie boundary, page rendering</text>
+              <text x="106" y="438" font-size="11" fill="#566475">login, register, role pages, dataset pages, access request pages</text>
+              <text x="106" y="462" font-size="11" fill="#566475">đọc menu theo page permission, giữ app_token và csrf cookie</text>
+              <text x="106" y="486" font-size="11" fill="#566475">giao tiếp UAA qua HTTP/JSON</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="398" y="358" width="384" height="152" rx="20" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <rect x="398" y="358" width="384" height="40" rx="20" fill="rgba(180,35,24,0.08)"></rect>
+              <text x="420" y="383" font-size="13" font-weight="700" fill="#b42318">UAA Flask Service</text>
+              <text x="420" y="414" font-size="12" fill="#17202a">Auth, policy, access workflow, approval engine</text>
+              <text x="420" y="438" font-size="11" fill="#566475">Authentication, Mfa, User, Role, URL, Data, Set, AccessRequest controllers</text>
+              <text x="420" y="462" font-size="11" fill="#566475">JWT nội bộ, URL authz middleware, dataset permission, access request lifecycle</text>
+              <text x="420" y="486" font-size="11" fill="#566475">lõi thích hợp nhất để mở rộng thành Internal IAM + Data Access Approval Platform</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="816" y="358" width="268" height="152" rx="20" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <rect x="816" y="358" width="268" height="40" rx="20" fill="rgba(180,35,24,0.08)"></rect>
+              <text x="838" y="383" font-size="13" font-weight="700" fill="#b42318">Audit and future connectors</text>
+              <text x="838" y="414" font-size="12" fill="#17202a">Báo cáo, log, integration adapters</text>
+              <text x="838" y="438" font-size="11" fill="#566475">không phải lõi đầu tiên nhưng cần để scale governance</text>
+              <text x="838" y="462" font-size="11" fill="#566475">LDAP or OIDC chỉ nên cắm ở cạnh này như auth source</text>
+              <text x="838" y="486" font-size="11" fill="#566475">không thay vai trò quyết định quyền nội bộ</text>
+            </g>
+
+            <rect x="60" y="574" width="1060" height="72" rx="18" fill="#f7f9fb" stroke="rgba(23,32,42,0.08)"></rect>
+            <text x="84" y="605" font-size="15" font-weight="700" fill="#17202a">Persistence layer giữ source of truth</text>
+            <text x="84" y="627" font-size="12" fill="#566475">Database giữ identity, permission, dataset, access request; Redis giữ session, cache và state ngắn hạn.</text>
+
+            <g filter="url(#softShadow)">
+              <rect x="656" y="588" width="200" height="42" rx="14" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <text x="676" y="614" font-size="12" font-weight="700" fill="#17202a">Redis</text>
+              <text x="728" y="614" font-size="11" fill="#566475">session, csrf, cache, login state</text>
+            </g>
+
+            <g filter="url(#softShadow)">
+              <rect x="874" y="588" width="210" height="42" rx="14" fill="#ffffff" stroke="rgba(23,32,42,0.12)"></rect>
+              <text x="894" y="614" font-size="12" font-weight="700" fill="#17202a">Database</text>
+              <text x="964" y="614" font-size="11" fill="#566475">users, roles, permissions, datasets, requests</text>
+            </g>
+
+            <line x1="538" y1="212" x2="210" y2="358" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow-gray)"></line>
+            <line x1="678" y1="212" x2="590" y2="358" stroke="#b42318" stroke-width="2.2" marker-end="url(#arrow-red)"></line>
+            <line x1="916" y1="212" x2="950" y2="358" stroke="#4b5563" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrow-gray)"></line>
+            <line x1="950" y1="212" x2="590" y2="358" stroke="#4b5563" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrow-gray)"></line>
+
+            <line x1="364" y1="434" x2="396" y2="434" stroke="#b42318" stroke-width="2.2" marker-end="url(#arrow-red)"></line>
+            <line x1="590" y1="510" x2="756" y2="588" stroke="#126b4d" stroke-width="2" marker-end="url(#arrow-green)"></line>
+            <line x1="688" y1="510" x2="930" y2="588" stroke="#126b4d" stroke-width="2" marker-end="url(#arrow-green)"></line>
+            <line x1="918" y1="510" x2="930" y2="588" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow-gray)"></line>
+
+            <text x="444" y="420" font-size="10" fill="#b42318">HTTP + JWT + policy calls</text>
+            <text x="770" y="566" font-size="10" fill="#126b4d">session and cache</text>
+            <text x="920" y="566" font-size="10" fill="#126b4d">source of truth</text>
+            <text x="940" y="274" font-size="10" fill="#566475">future integration, not core control plane</text>
+          </svg>
+        </div>
+        <div class="caption-row">
+          <span class="caption"><span class="dot" style="background:#b42318;"></span>Đường đậm: luồng chính nên đầu tư</span>
+          <span class="caption"><span class="dot" style="background:#4b5563;"></span>Đường nét đứt: tích hợp ngoài tùy chọn</span>
+          <span class="caption"><span class="dot" style="background:#126b4d;"></span>Đường xanh: persistence và runtime state</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="logical-architecture">
+      <div class="section-head">
+        <div>
+          <div class="section-id">03 / Logical Architecture</div>
+          <h2>Kiến trúc logic mục tiêu để hệ thống phát triển thành platform</h2>
+        </div>
+        <p>
+          Phần logic nên được tách thành các miền có trách nhiệm rõ. Điểm quan trọng là
+          `Authentication`, `Authorization`, `Access Workflow` và `Audit` phải tách được với nhau,
+          nhưng vẫn cùng vận hành trên source of truth hiện có.
+        </p>
+      </div>
+
+      <article class="diagram-card surface">
+        <div class="diagram-header">
+          <div>
+            <h3>Sơ đồ kiến trúc logic</h3>
+            <p>Các module hiện có trong UAA map khá tự nhiên vào 5 miền này, vì vậy đây là hướng refactor an toàn và thực dụng.</p>
+          </div>
+        </div>
+        <div class="diagram-shell">
+          <svg viewBox="0 0 1180 780" role="img" aria-label="Sơ đồ kiến trúc logic cho Internal IAM và Data Access Approval Platform">
+            <defs>
+              <marker id="logic-arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+                <path d="M0 0 L12 6 L0 12 Z" fill="#b42318"></path>
+              </marker>
+              <filter id="logicShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#17202a" flood-opacity="0.08"></feDropShadow>
+              </filter>
+            </defs>
+
+            <rect x="24" y="24" width="1132" height="732" rx="24" fill="#ffffff" stroke="rgba(23,32,42,0.08)"></rect>
+
+            <g filter="url(#logicShadow)">
+              <rect x="80" y="72" width="250" height="178" rx="22" fill="#fdf7f6" stroke="rgba(180,35,24,0.16)"></rect>
+              <text x="104" y="104" font-size="14" font-weight="700" fill="#b42318">1. Identity Core</text>
+              <text x="104" y="132" font-size="12" fill="#17202a">Quản lý danh tính và hồ sơ người dùng</text>
+              <text x="104" y="158" font-size="11" fill="#566475">User</text>
+              <text x="104" y="180" font-size="11" fill="#566475">UserIdentity</text>
+              <text x="104" y="202" font-size="11" fill="#566475">trạng thái user, source identity, profile</text>
+              <text x="104" y="224" font-size="11" fill="#566475">future: department, email, lifecycle metadata</text>
+            </g>
+
+            <g filter="url(#logicShadow)">
+              <rect x="362" y="72" width="250" height="178" rx="22" fill="#fdf7f6" stroke="rgba(180,35,24,0.16)"></rect>
+              <text x="386" y="104" font-size="14" font-weight="700" fill="#b42318">2. Authentication and Session</text>
+              <text x="386" y="132" font-size="12" fill="#17202a">Đăng nhập, MFA, token, session state</text>
+              <text x="386" y="158" font-size="11" fill="#566475">AuthService</text>
+              <text x="386" y="180" font-size="11" fill="#566475">UserTOTP</text>
+              <text x="386" y="202" font-size="11" fill="#566475">JWT nội bộ, Flask session, CSRF</text>
+              <text x="386" y="224" font-size="11" fill="#566475">future: login source adapters, recovery flows</text>
+            </g>
+
+            <g filter="url(#logicShadow)">
+              <rect x="644" y="72" width="250" height="178" rx="22" fill="#fdf7f6" stroke="rgba(180,35,24,0.16)"></rect>
+              <text x="668" y="104" font-size="14" font-weight="700" fill="#b42318">3. Authorization Core</text>
+              <text x="668" y="132" font-size="12" fill="#17202a">Policy cho app, page, API và data</text>
+              <text x="668" y="158" font-size="11" fill="#566475">Role, Permission, RolePermission, UserRole</text>
+              <text x="668" y="180" font-size="11" fill="#566475">UrlPermission, PagePermission, DataPermission</text>
+              <text x="668" y="202" font-size="11" fill="#566475">AuthorizationService, menu flags, URL guard</text>
+              <text x="668" y="224" font-size="11" fill="#566475">future: entitlement model, validity window</text>
+            </g>
+
+            <g filter="url(#logicShadow)">
+              <rect x="926" y="72" width="170" height="178" rx="22" fill="#f8fafb" stroke="rgba(23,32,42,0.1)" stroke-dasharray="6 5"></rect>
+              <text x="948" y="104" font-size="14" font-weight="700" fill="#17202a">Integration edge</text>
+              <text x="948" y="132" font-size="11" fill="#566475">LDAP</text>
+              <text x="948" y="154" font-size="11" fill="#566475">Active Directory</text>
+              <text x="948" y="176" font-size="11" fill="#566475">OIDC IdP</text>
+              <text x="948" y="198" font-size="11" fill="#566475">HR or directory sync</text>
+              <text x="948" y="220" font-size="11" fill="#566475">nguồn xác thực hoặc nguồn user ngoài</text>
+            </g>
+
+            <g filter="url(#logicShadow)">
+              <rect x="168" y="326" width="396" height="208" rx="24" fill="#fffdfd" stroke="rgba(180,35,24,0.16)"></rect>
+              <text x="196" y="362" font-size="15" font-weight="700" fill="#b42318">4. Data Access Workflow</text>
+              <text x="196" y="390" font-size="12" fill="#17202a">Lõi khác biệt nhất của sản phẩm</text>
+              <text x="196" y="420" font-size="11" fill="#566475">AccessRequest</text>
+              <text x="196" y="442" font-size="11" fill="#566475">AccessRequestItem</text>
+              <text x="196" y="464" font-size="11" fill="#566475">AccessRequestLog</text>
+              <text x="196" y="486" font-size="11" fill="#566475">dataset request, approve, reject, cancel, apply</text>
+              <text x="196" y="508" font-size="11" fill="#566475">future: owner chain, expiry, recertification, revoke flow</text>
+            </g>
+
+            <g filter="url(#logicShadow)">
+              <rect x="616" y="326" width="396" height="208" rx="24" fill="#fffdfd" stroke="rgba(180,35,24,0.16)"></rect>
+              <text x="644" y="362" font-size="15" font-weight="700" fill="#b42318">5. Audit and Governance</text>
+              <text x="644" y="390" font-size="12" fill="#17202a">Báo cáo, kiểm soát, truy vết, vận hành</text>
+              <text x="644" y="420" font-size="11" fill="#566475">ai có quyền gì</text>
+              <text x="644" y="442" font-size="11" fill="#566475">quyền được cấp từ đâu và trong bao lâu</text>
+              <text x="644" y="464" font-size="11" fill="#566475">log login, mfa, role change, data access approval</text>
+              <text x="644" y="486" font-size="11" fill="#566475">future: compliance reports, periodic review, exception tracking</text>
+            </g>
+
+            <rect x="124" y="588" width="932" height="112" rx="24" fill="#f7f9fb" stroke="rgba(23,32,42,0.08)"></rect>
+            <text x="152" y="626" font-size="15" font-weight="700" fill="#17202a">Shared source of truth and execution runtime</text>
+            <text x="152" y="650" font-size="12" fill="#566475">Database giữ entity và quyết định chính sách. Redis giữ session, state ngắn hạn và cache. Frontend và UAA cùng đọc cùng một mô hình quyền nội bộ.</text>
+            <text x="152" y="676" font-size="11" fill="#566475">Mọi tích hợp ngoài chỉ được ảnh hưởng đến login source hoặc identity sync, không được vượt qua lõi authorization và approval workflow.</text>
+
+            <line x1="330" y1="160" x2="360" y2="160" stroke="#b42318" stroke-width="2.3" marker-end="url(#logic-arrow)"></line>
+            <line x1="612" y1="160" x2="642" y2="160" stroke="#b42318" stroke-width="2.3" marker-end="url(#logic-arrow)"></line>
+            <line x1="768" y1="250" x2="768" y2="324" stroke="#b42318" stroke-width="2.3" marker-end="url(#logic-arrow)"></line>
+            <line x1="366" y1="250" x2="366" y2="324" stroke="#b42318" stroke-width="2.3" marker-end="url(#logic-arrow)"></line>
+            <line x1="564" y1="430" x2="614" y2="430" stroke="#b42318" stroke-width="2.3" marker-end="url(#logic-arrow)"></line>
+            <line x1="1012" y1="250" x2="894" y2="250" stroke="#4b5563" stroke-width="2" stroke-dasharray="7 6"></line>
+            <line x1="972" y1="250" x2="872" y2="326" stroke="#4b5563" stroke-width="2" stroke-dasharray="7 6"></line>
+
+            <text x="340" y="148" font-size="10" fill="#b42318">user resolved</text>
+            <text x="620" y="148" font-size="10" fill="#b42318">issue token and policy context</text>
+            <text x="778" y="286" font-size="10" fill="#b42318">enforce by policy</text>
+            <text x="374" y="286" font-size="10" fill="#b42318">request access</text>
+            <text x="574" y="418" font-size="10" fill="#b42318">feed audit trail</text>
+            <text x="922" y="276" font-size="10" fill="#566475">optional auth source only</text>
+          </svg>
+        </div>
+      </article>
+
+      <div class="map-grid">
+        <article class="map-card surface">
+          <h3>Identity Core</h3>
+          <div>
+            <strong>Hiện có</strong>
+            <ul>
+              <li>`User`</li>
+              <li>`UserIdentity`</li>
+              <li>quan hệ user and identity trong model</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Nên thêm</strong>
+            <ul>
+              <li>status, auth_source, email, lifecycle metadata</li>
+              <li>quy tắc link local and external identity</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="map-card surface">
+          <h3>Authentication</h3>
+          <div>
+            <strong>Hiện có</strong>
+            <ul>
+              <li>local login</li>
+              <li>MFA TOTP</li>
+              <li>JWT and session</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Nên thêm</strong>
+            <ul>
+              <li>đăng nhập ngoài như LDAP or OIDC tại login boundary</li>
+              <li>recovery and stronger audit</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="map-card surface">
+          <h3>Authorization</h3>
+          <div>
+            <strong>Hiện có</strong>
+            <ul>
+              <li>role and permission</li>
+              <li>URL, page, data permission</li>
+              <li>menu gating and URL middleware</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Nên thêm</strong>
+            <ul>
+              <li>entitlement model rõ hơn cho data access</li>
+              <li>effective date, expiry, revoke logic</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="map-card surface">
+          <h3>Workflow</h3>
+          <div>
+            <strong>Hiện có</strong>
+            <ul>
+              <li>request, approve, reject, cancel</li>
+              <li>item and log model</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Nên thêm</strong>
+            <ul>
+              <li>multi-step approve</li>
+              <li>owner based routing</li>
+              <li>recertification</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="map-card surface">
+          <h3>Governance</h3>
+          <div>
+            <strong>Hiện có</strong>
+            <ul>
+              <li>có log ở access request</li>
+              <li>có dữ liệu để build audit reports</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Nên thêm</strong>
+            <ul>
+              <li>role change audit</li>
+              <li>login and MFA audit</li>
+              <li>who has access report</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="section-head">
+        <div>
+          <div class="section-id">04 / Roadmap</div>
+          <h2>Lộ trình phát triển thực tế trên nền code hiện tại</h2>
+        </div>
+        <p>
+          Nên đi theo các pha nhỏ, mỗi pha tăng dần chất lượng của identity, policy và approval workflow.
+          Đây là cách nâng sản phẩm mà không phá logic JS hay flow nghiệp vụ đang chạy.
+        </p>
+      </div>
+
+      <div class="roadmap">
+        <article class="phase surface">
+          <div>
+            <strong>Pha 1</strong>
+            <small>0-3 tháng</small>
+          </div>
+          <ul>
+            <li>Củng cố user lifecycle, login audit, MFA audit và quản trị trạng thái tài khoản.</li>
+            <li>Chuẩn hóa model `User`, `UserIdentity`, `UserTOTP` và cách ghi session or JWT metadata.</li>
+            <li>Dọn policy model để phân biệt rõ role, page permission, URL permission và data permission.</li>
+          </ul>
+        </article>
+
+        <article class="phase surface">
+          <div>
+            <strong>Pha 2</strong>
+            <small>3-6 tháng</small>
+          </div>
+          <ul>
+            <li>Làm sâu `Data Access Approval`: owner route, expiry, revoke, comment trail, request SLA.</li>
+            <li>Tạo report ai có quyền gì, vì sao có, quyền đó tới từ role hay từ access request.</li>
+            <li>Chuẩn hóa dashboard cho approver, admin và auditor.</li>
+          </ul>
+        </article>
+
+        <article class="phase surface">
+          <div>
+            <strong>Pha 3</strong>
+            <small>6-12 tháng</small>
+          </div>
+          <ul>
+            <li>Mở integration edge: LDAP or AD bind cho login nếu cần, hoặc OIDC federation cho enterprise SSO.</li>
+            <li>Đồng bộ group ngoài thành role nội bộ nhưng vẫn giữ quyền dữ liệu do hệ thống này quyết định.</li>
+            <li>Bổ sung reporting and governance layer cho compliance nội bộ.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="card surface">
+        <div class="section-id">05 / Success Criteria</div>
+        <h3>Khi nào định hướng này được xem là thành công</h3>
+        <ul class="flat">
+          <li>Người dùng nội bộ đăng nhập an toàn và có MFA.</li>
+          <li>Quản trị viên trả lời được chính xác ai đang có quyền gì.</li>
+          <li>Quyền truy cập dữ liệu đi qua workflow có audit trail.</li>
+          <li>Quyền được thu hồi, hết hạn hoặc review định kỳ.</li>
+          <li>Hệ thống tích hợp được auth source ngoài mà không làm loãng lõi policy nội bộ.</li>
+        </ul>
+      </article>
+
+      <article class="card surface">
+        <div class="section-id">06 / Design Principles</div>
+        <h3>Nguyên tắc thiết kế nên giữ trong các thay đổi tiếp theo</h3>
+        <ul class="flat">
+          <li>Tách `authentication` khỏi `authorization` và khỏi `approval workflow`.</li>
+          <li>Giữ `dataset access` như một miền riêng, không nhét hết vào role chung.</li>
+          <li>Xem LDAP or IdP ngoài như nguồn xác thực, không phải nguồn quyết định quyền cuối.</li>
+          <li>Ưu tiên auditability và clarity hơn là thêm nhiều kiểu quyền mới quá sớm.</li>
+          <li>Refactor theo lớp service and repository hiện có, không rewrite từ đầu.</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer class="footer-note surface">
+      <span><strong>File:</strong> `docs/internal-iam-data-access-platform.html`</span>
+      <span>Tài liệu này thay cho bản SSO design cũ và bỏ hoàn toàn bản `.md` trung gian.</span>
+    </footer>
+  </main>
+</body>
+</html>

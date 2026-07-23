@@ -1,10 +1,8 @@
 -- Seed superuser admin, base roles/permissions, URL permissions, and data scopes
 
--- Admin user
 INSERT INTO uaa.users (username, password, userlocked)
 VALUES ('admin', crypt('admin', gen_salt('bf', 12))::bytea, FALSE),
-('uaa', crypt('uaa', gen_salt('bf', 12))::bytea, FALSE),
-('trung', crypt('trung', gen_salt('bf', 12))::bytea, FALSE)
+('uaa', crypt('uaa', gen_salt('bf', 12))::bytea, FALSE)
 ON CONFLICT (username) DO NOTHING;
 
 -- Core roles/permissions

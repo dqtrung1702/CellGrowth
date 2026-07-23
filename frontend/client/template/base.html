@@ -1,113 +1,219 @@
 {% block base %}
-    
-    <head>
-        <!-- CSS -->   
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/select2.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
-        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet" />
-        
-        <!-- jQuery -->
-        <!-- Core libs must load immediately so inline scripts can call $/select2/flatpickr -->
-        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/pagination.js') }}" defer></script>
-        <script src="{{ url_for('static', filename='js/table-sort.js') }}" defer></script>
-        <script src="{{ url_for('static', filename='js/base-helpers.js') }}" defer></script>
-        <script src="{{ url_for('static', filename='js/list-pages.js') }}" defer></script>
-        <script src="{{ url_for('static', filename='js/health.js') }}" defer></script>
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Cell Growth Access Portal{% endblock %}</title>
+    <meta
+      name="description"
+      content="Internal workspace for managing users, roles, permissions, datasets, and access requests."
+    >
 
-        <!-- Image -->
-        <link rel="icon" href="{{ url_for('static', filename='images/key.png') }}" type="image/ico" />
-        {% block head %}        
-        {% endblock head %}
-        
-    </head>
-    <body>
-            <div class="col-fifth">
-                <nav class="accordion" >
-                    <header class="box">            
-                        <label for="acc-close" class="box-title"></label>
-                    </header>
-                    {% if not auth %}
-                    <input type="radio" name="accordion" id="login" />
-                    <section class="box">
-                        <label class="box-title" for="login"><a href="{{ url_for('auth_blueprint.login') }}">Login</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    <input type="radio" name="accordion" id="Register" />
-                    <section class="box">
-                        <label class="box-title" for="Register"><a href="{{ url_for('auth_blueprint.register') }}">Register</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% else %}
-                    {% set menu = menu_flags or {} %}
-                    {% if menu.get('Home', True) %}
-                    <input type="radio" name="accordion" id="Home" />
-                    <section class="box">
-                        <label class="box-title" for="Home"><a href="{{ url_for('home_blueprint.home') }}">Home</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('Users') %}
-                    <input type="radio" name="accordion" id="Users" />
-                    <section class="box">
-                        <label class="box-title" for="Users"><a href="{{ url_for('user_blueprint.User') }}">Users</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('Roles') %}
-                    <input type="radio" name="accordion" id="Roles" />
-                    <section class="box">
-                        <label class="box-title" for="Roles"><a href="{{ url_for('role_blueprint.Role') }}">Roles</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('Permissions') %}
-                    <input type="radio" name="accordion" id="Permissions" />
-                    <section class="box">
-                        <label class="box-title" for="Permissions"><a href="{{ url_for('permission_blueprint.Permission') }}">Permissions</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('DataSets') %}
-                    <input type="radio" name="accordion" id="DataSets" />
-                    <section class="box">
-        <label class="box-title" for="DataSets"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('AccessRequests') %}
-                    <input type="radio" name="accordion" id="AccessRequests" />
-                    <section class="box">
-                        <label class="box-title" for="AccessRequests"><a href="{{ url_for('access_request_blueprint.access_request_list') }}">Access Requests</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    {% if menu.get('TOTP') %}
-                    <input type="radio" name="accordion" id="TOTP" />
-                    <section class="box">
-                        <label class="box-title" for="TOTP"><a href="/mfa/totp/setup">TOTP</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                    </section>
-                    {% endif %}
-                    <input type="radio" name="accordion" id="Logout" />
-                    <section class="box">
-                        <label class="box-title" for="Logout"><a href="{{ url_for('auth_blueprint.logout') }}">Logout</a></label>
-                        <label class="box-close" for="acc-close"></label>
-                        <div class="box-content">Bye!</div>
-                    </section>
-                    {% endif %}
-                    <input type="radio" name="accordion" id="acc-close" />
-                </nav>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    >
+
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pagination.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/table-sort.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/base-helpers.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/list-pages.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/health.js') }}" defer></script>
+
+    <link rel="icon" href="{{ url_for('static', filename='images/key.png') }}" type="image/ico">
+    {% block head %}
+    {% endblock head %}
+  </head>
+  <body class="{{ 'is-authenticated' if auth else 'is-guest' }}">
+    <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+    <input class="nav-toggle-input" type="checkbox" id="nav-toggle" aria-hidden="true">
+    <label class="nav-overlay" for="nav-toggle" aria-hidden="true"></label>
+
+    {% set menu = menu_flags or {} %}
+
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark">CG</div>
+          <div class="brand-copy">
+            <p class="brand-kicker">Cell Growth</p>
+            <h1 class="brand-title">Access portal</h1>
+            <p class="brand-subtitle">
+              {% if auth %}
+              Users, roles, permissions and data scopes in one workspace.
+              {% else %}
+              Secure sign-in and registration for the access workspace.
+              {% endif %}
+            </p>
+          </div>
+          <label class="sidebar-close" for="nav-toggle" aria-label="Đóng điều hướng">
+            <i class="fa fa-times"></i>
+          </label>
+        </div>
+
+        <nav class="app-nav" aria-label="Primary">
+          <p class="nav-group-label">{% if auth %}Workspace{% else %}Account{% endif %}</p>
+          <ul class="nav-list">
+            {% if not auth %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint == 'auth_blueprint.login' %}is-active{% endif %}"
+                href="{{ url_for('auth_blueprint.login') }}"
+              >
+                <span class="nav-link-title">Login</span>
+                <span class="nav-link-meta">Sign in to continue</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="nav-link {% if request.endpoint == 'auth_blueprint.register' %}is-active{% endif %}"
+                href="{{ url_for('auth_blueprint.register') }}"
+              >
+                <span class="nav-link-title">Register</span>
+                <span class="nav-link-meta">Request a new account</span>
+              </a>
+            </li>
+            {% else %}
+            {% if menu.get('Home', True) %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('home_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('home_blueprint.home') }}"
+              >
+                <span class="nav-link-title">Home</span>
+                <span class="nav-link-meta">System overview and docs</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('Users') %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('user_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('user_blueprint.User') }}"
+              >
+                <span class="nav-link-title">Users</span>
+                <span class="nav-link-meta">Identity directory</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('Roles') %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('role_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('role_blueprint.Role') }}"
+              >
+                <span class="nav-link-title">Roles</span>
+                <span class="nav-link-meta">Access bundles</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('Permissions') %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('permission_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('permission_blueprint.Permission') }}"
+              >
+                <span class="nav-link-title">Permissions</span>
+                <span class="nav-link-meta">Route and data scopes</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('DataSets') %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('dataset_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('dataset_blueprint.datasets') }}"
+              >
+                <span class="nav-link-title">Data Sets</span>
+                <span class="nav-link-meta">Governed resources</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('AccessRequests') %}
+            <li>
+              <a
+                class="nav-link {% if request.endpoint and request.endpoint.startswith('access_request_blueprint.') %}is-active{% endif %}"
+                href="{{ url_for('access_request_blueprint.access_request_list') }}"
+              >
+                <span class="nav-link-title">Access requests</span>
+                <span class="nav-link-meta">Approval workflow</span>
+              </a>
+            </li>
+            {% endif %}
+            {% if menu.get('TOTP') %}
+            <li>
+              <a
+                class="nav-link {% if request.path and request.path.startswith('/mfa/totp') %}is-active{% endif %}"
+                href="/mfa/totp/setup"
+              >
+                <span class="nav-link-title">TOTP</span>
+                <span class="nav-link-meta">Multi-factor security</span>
+              </a>
+            </li>
+            {% endif %}
+            <li>
+              <a class="nav-link nav-link--danger" href="{{ url_for('auth_blueprint.logout') }}">
+                <span class="nav-link-title">Logout</span>
+                <span class="nav-link-meta">End current session</span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+          <p class="sidebar-footer-label">Operational note</p>
+          <p class="sidebar-footer-text">
+            Keep permissions explicit, reversible, and easy to audit.
+          </p>
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="app-topbar">
+          <div class="app-topbar-main">
+            <label class="nav-trigger" for="nav-toggle" aria-label="Mở điều hướng">
+              <span></span>
+              <span></span>
+              <span></span>
+            </label>
+            <div class="topbar-copy">
+              <p class="topbar-kicker">{% if auth %}Access control workspace{% else %}Secure account access{% endif %}</p>
+              <p class="topbar-subtitle">
+                {% if auth %}
+                Manage access with clearer hierarchy, calmer surfaces, and stronger state cues.
+                {% else %}
+                Sign in, register, and manage one-time password settings.
+                {% endif %}
+              </p>
             </div>
-            
-            <div class="col-xfifth">
-                {% block content %}
-                {% endblock %}
-            </div>
-        
-    </body>
+          </div>
+          <div class="topbar-badge">
+            {% if auth %}Trusted session{% else %}Public entry{% endif %}
+          </div>
+        </header>
+
+        <main id="main-content" class="app-content">
+          {% block content %}
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
 {% endblock %}

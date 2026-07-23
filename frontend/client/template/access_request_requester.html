@@ -1,15 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width: 900px;">
-  <h1>Request #{{ req.id }}</h1>
-  <div class="card" style="padding:12px; margin-bottom:12px;">
-    <p><strong>Requester:</strong> {{ req.requester_username or req.requester_id }}</p>
-    <p><strong>Type:</strong> {{ req.request_type }} | <strong>Status:</strong> {{ req.status }}</p>
-    <p><strong>Reason:</strong> {{ req.reason }}</p>
-    <p><strong>TTL (hours):</strong> {{ req.ttl_hours or 'N/A' }}</p>
-    <p><strong>Created:</strong> {{ req.created_at }} | <strong>Updated:</strong> {{ req.updated_at }}</p>
+<div class="container panel-container--wide page-shell">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Approval workflow</p>
+      <h2 class="page-title">Request #{{ req.id }}</h2>
+      <p class="page-subtitle">Xem lại nội dung yêu cầu, cập nhật item khi còn ở trạng thái submitted và theo dõi log xử lý.</p>
+    </div>
+  </div>
+  <div class="surface-card">
+    <div class="summary-grid">
+      <div class="summary-item">
+        <strong>Requester</strong>
+        <span>{{ req.requester_username or req.requester_id }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Status</strong>
+        <span class="status-pill status-pill--{{ (req.status or 'submitted')|lower }}">{{ req.status }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Type</strong>
+        <span>{{ req.request_type }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>TTL (hours)</strong>
+        <span>{{ req.ttl_hours or 'N/A' }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Created</strong>
+        <span>{{ req.created_at }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Updated</strong>
+        <span>{{ req.updated_at }}</span>
+      </div>
+    </div>
+    <div class="auth-note">
+      <strong>Reason</strong>
+      <p>{{ req.reason }}</p>
+    </div>
 
-    <h3 style="margin-top:12px;">Items</h3>
+    <h3>Items</h3>
+    <div class="table-wrapper">
     <table class="table">
       <thead>
         <tr><th>Role</th><th>Data Permission</th><th>Note</th></tr>
@@ -26,14 +58,15 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
-    <form method="post" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+    <form method="post" class="form-card">
       <label class="form-label">Chọn Role</label>
-      <select id="roles-select" name="roles" multiple style="width:100%"></select>
+      <select id="roles-select" name="roles" multiple></select>
       <label class="form-label">Chọn Data Permission</label>
-      <select id="data-select" name="data_perms" multiple style="width:100%"></select>
-      <textarea name="note" placeholder="Ghi chú" rows="2" class="form-control" style="max-width:300px;"></textarea>
-      <div class="d-flex gap-2">
+      <select id="data-select" name="data_perms" multiple></select>
+      <textarea name="note" placeholder="Ghi chú" rows="2" class="form-control"></textarea>
+      <div class="action-row">
         <button name="action" value="update" class="btn btn-primary" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Update request</button>
         <button name="action" value="cancel" class="btn btn-secondary" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Cancel request</button>
       </div>
@@ -85,7 +118,8 @@
     });
   </script>
 
-  <h3 style="margin-top:16px;">Logs</h3>
+  <h3>Logs</h3>
+  <div class="table-wrapper">
   <table class="table">
     <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Note</th></tr></thead>
     <tbody>
@@ -101,5 +135,6 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% endblock %}

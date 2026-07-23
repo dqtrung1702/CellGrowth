@@ -141,3 +141,41 @@ CREATE TABLE IF NOT EXISTS uaa.access_request_logs (
 );
 
 CREATE INDEX IF NOT EXISTS idx_access_request_logs_req ON uaa.access_request_logs(request_id);
+
+-- Federated identity bindings (SSO) per user
+CREATE TABLE IF NOT EXISTS uaa.user_identities (
+    id            BIGSERIAL PRIMARY KEY,
+    user_id       BIGINT NOT NULL,
+    provider      VARCHAR(30) NOT NULL,
+    external_id   VARCHAR(255) NOT NULL,
+    email         VARCHAR(255),
+    display_name  VARCHAR(255),
+    avatar_url    TEXT,
+    tokens_json   JSONB,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(provider, external_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_identities_user ON uaa.user_identities(user_id);
+
+-- TOTP secret and recovery codes per user
+CREATE TABLE IF NOT EXISTS uaa.user_totp (
+    user_id          BIGINT PRIMARY KEY,
+    secret_base32    VARCHAR(64) NOT NULL,
+    confirmed        BOOLEAN NOT NULL DEFAULT FALSE,
+    backup_codes_json TEXT,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- OAuth/social provider client configs
+CREATE TABLE IF NOT EXISTS uaa.social_providers (
+    id               BIGSERIAL PRIMARY KEY,
+    provider         VARCHAR(32) UNIQUE NOT NULL,
+    client_id        TEXT NOT NULL,
+    client_secret_enc TEXT NOT NULL,
+    redirect_uri     TEXT NOT NULL,
+    scopes           TEXT,
+    enabled          BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_by       VARCHAR(64)
+);

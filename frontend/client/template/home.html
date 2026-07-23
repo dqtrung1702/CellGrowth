@@ -1,23 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container-fluid" style="max-width: 1400px;" data-uaa-url="{{ uaa_url|default('') }}">
-    <div class="alert alert-light d-flex justify-content-between align-items-center" id="health-card" style="border:1px solid #eee;border-radius:8px;">
+  <div class="container-fluid page-shell" data-uaa-url="{{ uaa_url|default('') }}">
+    <div class="page-header">
       <div>
-        <strong>Status:</strong> <span id="health-status">...</span> |
-        <strong>Uptime:</strong> <span id="health-uptime">...</span>
+        <p class="page-eyebrow">Overview</p>
+        <h2 class="page-title">Workspace home</h2>
+        <p class="page-subtitle">
+          Theo dõi nhanh trạng thái hệ thống và mở các tài liệu vận hành quan trọng.
+        </p>
       </div>
-      <button class="btn btn-sm btn-outline-primary" id="health-refresh">Refresh</button>
     </div>
-    <h2>Tài liệu</h2>
-    <p style="margin: 0.3em 0 1em; color:#666;">Chọn tài liệu để xem:</p>
-    <div class="list-group" style="margin-bottom:16px;">
-      <a class="list-group-item list-group-item-action" target="_blank"
-         href="{{ url_for('static', filename='docs-proxy/uaa-business.html') }}">UAA Business Flow</a>
-      <a class="list-group-item list-group-item-action" target="_blank"
-         href="{{ url_for('static', filename='docs-proxy/architecture-diagrams.html') }}">Architecture Diagrams</a>
-      <a class="list-group-item list-group-item-action" target="_blank"
-         href="{{ url_for('static', filename='docs-proxy/review.html') }}">Project Review</a>
+
+    <div class="overview-grid">
+      <section class="surface-card status-card" id="health-card">
+        <div class="status-card-meta">
+          <div class="status-label">
+            <strong>Status</strong>
+            <span class="status-value" id="health-status">...</span>
+          </div>
+          <div class="status-label">
+            <strong>Uptime</strong>
+            <span class="status-value" id="health-uptime">...</span>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-primary" id="health-refresh">Refresh</button>
+      </section>
+
+      <section class="surface-card">
+        <div>
+          <p class="page-eyebrow">Documentation</p>
+          <h3 class="section-title">Operational references</h3>
+          <p class="page-subtitle">Chọn tài liệu để mở trong tab mới.</p>
+        </div>
+        <div class="doc-list">
+          <a class="doc-link" target="_blank" href="{{ url_for('static', filename='docs-proxy/uaa-business.html') }}">
+            <span>
+              <span class="doc-link-title">UAA business flow</span>
+              <span class="doc-link-note">Business sequence and decision path</span>
+            </span>
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a class="doc-link" target="_blank" href="{{ url_for('static', filename='docs-proxy/architecture-diagrams.html') }}">
+            <span>
+              <span class="doc-link-title">Architecture diagrams</span>
+              <span class="doc-link-note">System structure and dependencies</span>
+            </span>
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a class="doc-link" target="_blank" href="{{ url_for('static', filename='docs-proxy/review.html') }}">
+            <span>
+              <span class="doc-link-title">Project review</span>
+              <span class="doc-link-note">Review notes and implementation summary</span>
+            </span>
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </section>
     </div>
   </div>
 {% endblock %}

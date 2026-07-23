@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container"  style="max-width: 100%;">
-    <div class="">
-        <div class="">
-            <h1>Url Access Rights</h1>
+<div class="container page-shell">
+    <div class="page-header">
+        <div>
+            <p class="page-eyebrow">Legacy routing</p>
+            <h2 class="page-title">URL access rights</h2>
+            <p class="page-subtitle">Rà soát permission theo từng URL với bảng chỉnh sửa nội tuyến.</p>
         </div>
     </div>
     <div id="PermissionRole"></div>
-    <div class=" table-wrapper">
+    <div class="table-wrapper">
         <div class="table-scroll">
             <table id="UrlTable" class="table">
                 <thead>
@@ -36,17 +38,18 @@
                                                                                                                
                                 {% endif %}
                             {% endfor %}
-                            <td style="width: 10em;">
+                            <td class="table__content">
+                                <div class="inline-actions">
                                     <a onclick="save({{line}})">
-                                        <i class="fa fa-save" style="color: #F4D03F;"></i>
+                                        <i class="fa fa-save"></i>
                                     </a>
                                     <a href="{{ url_for('uaa_blueprint.URLPermission') }}">
-                                        <i class="fa fa-undo" style="color: rgb(216, 195, 255);"></i>
+                                        <i class="fa fa-undo"></i>
                                     </a>
                                     <a href="{{ url_for('uaa_blueprint.URLPermission', id = line.get('id')) }}">
-                                        <i class="fa fa-remove" style="color: rgb(153, 153, 153);"></i>
+                                        <i class="fa fa-remove"></i>
                                     </a>
-                                
+                                </div>
                             </td>
                         </tr>                            
                     {% endfor %}

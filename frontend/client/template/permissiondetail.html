@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container col-full">
-    <div>              
-      <i class="fa fa-arrow-circle-left" onclick="window.location.href='{{ url_for('permission_blueprint.Permission') }}'"> Back to Permissions screen</i>
-    </div>
-    <form id="PermissionForm" method="POST">
+  <div class="container panel-container--wide page-shell">
+    <a class="back-link" href="{{ url_for('permission_blueprint.Permission') }}">
+      <i class="fa fa-arrow-left"></i> Back to permissions
+    </a>
+    <form id="PermissionForm" method="POST" class="form-card">
       <input type="hidden" name="id" value="{{ permission.get('id','New') }}">
-      <div class="col-full">
-        <h4>Permission Info</h4>
+      <div class="section-block">
+        <div>
+          <p class="page-eyebrow">Scopes</p>
+          <h2 class="page-title">Permission info</h2>
+        </div>
         <div class="input-group">
-          <label for="PermissionName"><i class="fa fa-tag"> Permission Name</i></label>
+          <label for="PermissionName"><i class="fa fa-tag"></i> Permission name</label>
           {% if permission.get('PermissionName') %} 
             <input id="PermissionName" type="text" disabled value="{{permission.get('PermissionName')}}"  placeholder="Permission Name" name="PermissionName"/>
           {% else %}
@@ -17,14 +20,14 @@
           {%endif%}
         </div>
         <div class="input-group">
-          <label for="PermissionType"><i class="fa fa-flag"> Type</i></label>
+          <label for="PermissionType"><i class="fa fa-flag"></i> Type</label>
           <select name="PermissionType" id="PermissionType">
             <option value="ROLE">ROLE</option>
             <option value="DATA">DATA</option>
           </select>
         </div>
         <div class="input-group">
-          <label for="Description"><i class="fa fa-align-center"> Description</i></label>
+          <label for="Description"><i class="fa fa-align-center"></i> Description</label>
           <input id="Description" type="text" value="{{permission.get('Description','')}}" placeholder="Description" name="Description" />
         </div>
         <div class="input-group scope-block">
@@ -58,33 +61,29 @@
               </thead>
               <tbody></tbody>
             </table>
-            <button type="button" class="btn" onclick="addPageRow()"><i class="fa fa-plus"></i> Add Page</button>
+            <button type="button" class="btn" onclick="addPageRow()"><i class="fa fa-plus"></i> Add page</button>
           </div>
 
           <div class="table-wrapper" id="data-wrapper" style="display:none;">
-            <select id="DataSetSelect" class="set-select" name="DataSets" multiple style="width:100%"></select>
-            <p style="margin: 6px 0;"><a href="{{ url_for('dataset_blueprint.datasets') }}">Data Sets</a></p>
+            <select id="DataSetSelect" class="set-select" name="DataSets" multiple></select>
+            <p><a href="{{ url_for('dataset_blueprint.datasets') }}">Open data sets</a></p>
           </div>
         </div>
-        <div class="input-group">
-          <div class="col-half">
-            <label><i class="fa fa-user"> Last Update</i></label>
+        <div class="form-row">
+          <div class="input-group">
+            <label><i class="fa fa-user"></i> Last update</label>
             <input type="text" disabled value="{{permission.get('LastUpdateDateTime','')}}" />
           </div>
-          <div class="col-half">
-            <label><i class="fa fa-user"> by</i></label>
+          <div class="input-group">
+            <label><i class="fa fa-user"></i> Updated by</label>
             <input type="text" disabled value="{{permission.get('LastUpdateUserName','')}}" />
           </div>
         </div>
-      </div>        
-      <div class="col-half input-group">          
-        <div class="col-half">
-          <button type="submit"><i class="fa fa-save"> Save</i></button>
-        </div>
-        <div class="col-half">              
-          <button type="button" onclick="window.location.href='{{ url_for('permission_blueprint.permission_detail', id = permission.get('id')) }}'"><i class="fa fa-undo"> Undo</i></button>
-        </div>
-      </div>        
+      </div>
+      <div class="action-row">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+        <button type="button" onclick="window.location.href='{{ url_for('permission_blueprint.permission_detail', id = permission.get('id')) }}'"><i class="fa fa-undo"></i> Undo</button>
+      </div>
       <input type="hidden" id="UrlListJSON" name="UrlListJSON" />
       <input type="hidden" id="DataSetsJSON" name="DataSetsJSON" />
     </form>

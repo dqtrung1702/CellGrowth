@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAA Data Models Atlas</title>
+  <meta
+    name="description"
+    content="Bản đồ business và technical cho các ORM models, Pydantic schemas và endpoint crosswalk của UAA trong CellGrowth."
+  >
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap");
+
+    :root {
+      --bg: #f4f1ea;
+      --bg-deep: #e8e0d2;
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-strong: #ffffff;
+      --surface-soft: #fbf7f1;
+      --line: rgba(31, 41, 55, 0.12);
+      --line-strong: rgba(31, 41, 55, 0.22);
+      --ink: #1b2430;
+      --muted: #667085;
+      --accent: #9f3a10;
+      --accent-soft: rgba(159, 58, 16, 0.1);
+      --accent-2: #0f766e;
+      --accent-3: #1d4ed8;
+      --accent-4: #7c2d12;
+      --shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --content-width: 1240px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(159, 58, 16, 0.12), transparent 26rem),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.1), transparent 24rem),
+        linear-gradient(180deg, #faf8f3 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(27, 36, 48, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27, 36, 48, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.38), transparent 82%);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    code,
+    .mono {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content-width);
+      margin: 0 auto;
+      padding: 30px 18px 80px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .surface {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(310px, 0.8fr);
+      gap: 26px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -48px;
+      top: -40px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(15, 118, 110, 0.14), rgba(15, 118, 110, 0));
+      pointer-events: none;
+    }
+
+    .eyebrow,
+    .section-id,
+    .chip,
+    .mini-label,
+    .diagram-label {
+      font-family: "JetBrains Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 11px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2.4rem, 5vw, 4.7rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      max-width: 10.8ch;
+      text-wrap: balance;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.72;
+      max-width: 62ch;
+      font-size: 1rem;
+    }
+
+    .hero-stack {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .metric,
+    .note,
+    .toc a,
+    .mini-card,
+    .domain-card,
+    details {
+      border: 1px solid rgba(27, 36, 48, 0.09);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .metric {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .metric strong {
+      font-size: 1.7rem;
+      letter-spacing: -0.04em;
+    }
+
+    .metric span,
+    .note p,
+    .mini-card p,
+    .domain-card p,
+    .section-copy,
+    li {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    .note {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(159, 58, 16, 0.08), rgba(159, 58, 16, 0.03));
+    }
+
+    .toc {
+      padding: 20px 24px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .toc a {
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .toc a:hover {
+      transform: translateY(-2px);
+      border-color: rgba(159, 58, 16, 0.24);
+      background: var(--surface-strong);
+    }
+
+    .toc strong {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .toc span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .section {
+      padding: 26px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      display: grid;
+      gap: 8px;
+    }
+
+    .section-id {
+      color: var(--accent);
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2vw, 2.4rem);
+      letter-spacing: -0.04em;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(159, 58, 16, 0.12);
+    }
+
+    .two-col,
+    .three-col,
+    .four-col {
+      display: grid;
+      gap: 14px;
+    }
+
+    .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .four-col {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .mini-card,
+    .domain-card {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-card strong,
+    .domain-card strong {
+      font-size: 1.04rem;
+      letter-spacing: -0.02em;
+    }
+
+    .domain-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .diagram-wrap {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(251, 247, 241, 0.9));
+      border: 1px solid var(--line);
+      padding: 16px;
+      overflow: auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      min-width: 920px;
+      display: block;
+    }
+
+    .diagram-label {
+      fill: var(--muted);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .legend i {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .diagram-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .diagram-panel {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.76);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .diagram-panel--wide {
+      grid-column: 1 / -1;
+    }
+
+    .diagram-head {
+      display: grid;
+      gap: 6px;
+    }
+
+    .diagram-head strong {
+      font-size: 1.02rem;
+      letter-spacing: -0.02em;
+    }
+
+    .diagram-head p,
+    .diagram-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.58;
+      font-size: 0.94rem;
+    }
+
+    .erd-notes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    th {
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      background: rgba(27, 36, 48, 0.03);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    details {
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+    }
+
+    details + details {
+      margin-top: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary span {
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .detail-body {
+      margin-top: 14px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .inline-list,
+    .source-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.08);
+      border: 1px solid rgba(15, 118, 110, 0.12);
+      color: var(--accent-2);
+      font-size: 0.84rem;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .callout {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(29, 78, 216, 0.08), rgba(29, 78, 216, 0.03));
+      border: 1px solid rgba(29, 78, 216, 0.12);
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .two-col,
+      .three-col,
+      .four-col,
+      .diagram-grid,
+      .erd-notes,
+      .detail-grid,
+      .toc-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero surface">
+      <div>
+        <div class="eyebrow">CellGrowth / UAA / Snapshot 2026-07-22</div>
+        <h1>UAA <em>Data Models</em> Atlas</h1>
+        <p>
+          Tài liệu này vẽ lại lớp dữ liệu của UAA theo góc nhìn dùng chung cho BA/PM và backend dev:
+          từ business domain, quan hệ bảng ORM, request schemas, response envelope, tới mapping từ
+          endpoint sang schema và model. Nguồn phân tích lấy từ <code>uaa/models/entities.py</code>,
+          <code>uaa/schemas/*.py</code>, <code>uaa/controllers/*.py</code> và <code>uaa/static/swagger/openapi.yaml</code>.
+        </p>
+      </div>
+      <div class="hero-stack">
+        <div class="metric">
+          <div class="mini-label">ORM Models</div>
+          <strong>16</strong>
+          <span>Users, roles, permissions, datasets, approval workflow, MFA và social identity.</span>
+        </div>
+        <div class="metric">
+          <div class="mini-label">Schemas</div>
+          <strong>43</strong>
+          <span>Pydantic request/response contracts cho auth, RBAC, data scope, MFA và access request.</span>
+        </div>
+        <div class="metric">
+          <div class="mini-label">Controllers / Routes</div>
+          <strong>47</strong>
+          <span>Legacy RPC-style endpoints và REST-style access request/MFA APIs cùng tồn tại.</span>
+        </div>
+        <div class="note">
+          <strong>Phát hiện kiến trúc chính</strong>
+          <p>
+            UAA không chỉ là auth service. Nó đóng vai trò nền tảng <span class="mono">Internal IAM + Data Access Approval</span>,
+            nơi <span class="mono">Permission</span> là trục kết nối giữa RBAC, quyền URL/Page và phạm vi dữ liệu.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <nav class="toc surface">
+      <div class="toc-grid">
+        <a href="#business-overview">
+          <strong>Business Overview</strong>
+          <span>Bức tranh nghiệp vụ và phạm vi của nền tảng UAA.</span>
+        </a>
+        <a href="#core-erd">
+          <strong>Core Entity Relationship</strong>
+          <span>Sơ đồ trung tâm của User, Role, Permission, Set và AccessRequest.</span>
+        </a>
+        <a href="#domain-map">
+          <strong>Domain Map</strong>
+          <span>Phân rã theo domain nghiệp vụ và thành phần kỹ thuật liên quan.</span>
+        </a>
+        <a href="#key-flows">
+          <strong>Key Flows</strong>
+          <span>Luồng đăng nhập, cấp quyền và quy trình duyệt access request.</span>
+        </a>
+        <a href="#crosswalk">
+          <strong>Crosswalk</strong>
+          <span>Controller to Schema to Model Crosswalk để truy vết code nhanh.</span>
+        </a>
+        <a href="#orm-inventory">
+          <strong>ORM Inventory</strong>
+          <span>Danh mục đầy đủ các SQLAlchemy models và field quan trọng.</span>
+        </a>
+        <a href="#schema-inventory">
+          <strong>Schema Inventory</strong>
+          <span>Danh mục đầy đủ các Pydantic schemas và contract chính.</span>
+        </a>
+        <a href="#sources">
+          <strong>Sources</strong>
+          <span>Danh sách nguồn nội bộ được dùng để tái dựng trang này.</span>
+        </a>
+      </div>
+    </nav>
+
+    <section class="section surface" id="business-overview">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">01 / Business Overview</div>
+          <h2>Business Overview</h2>
+        </div>
+        <div class="chips">
+          <span class="chip">Internal IAM</span>
+          <span class="chip">Data Access Approval</span>
+          <span class="chip">RBAC + Data Scope</span>
+        </div>
+      </div>
+      <p class="section-copy">
+        Ở mức nghiệp vụ, UAA đang giải quyết ba vấn đề cùng lúc: xác thực người dùng, cấp quyền thao tác trên ứng dụng
+        và quản lý phạm vi dữ liệu mà người dùng được nhìn thấy. Điểm khác biệt quan trọng là quyền dữ liệu không được
+        lưu như một bảng tách biệt hoàn toàn; thay vào đó <code>Permission</code> là hạt nhân chung, rồi mở rộng sang
+        <code>UrlPermission</code>, <code>PagePermission</code> và <code>DataPermission</code>.
+      </p>
+      <div class="three-col">
+        <article class="mini-card">
+          <div class="mini-label">Identity</div>
+          <strong>Người dùng, đăng nhập, MFA, social identity</strong>
+          <p>Gồm <code>User</code>, <code>UserIdentity</code>, <code>UserTOTP</code> và <code>SocialProvider</code>.</p>
+        </article>
+        <article class="mini-card">
+          <div class="mini-label">Authorization</div>
+          <strong>Role, permission, URL/page access</strong>
+          <p>Gồm <code>Role</code>, <code>Permission</code>, <code>UserRole</code>, <code>RolePermission</code>, <code>UrlPermission</code>, <code>PagePermission</code>.</p>
+        </article>
+        <article class="mini-card">
+          <div class="mini-label">Data Scope</div>
+          <strong>Data set, set, data permission</strong>
+          <p><code>Set</code> nhóm dịch vụ và dataset; <code>DataPermission</code> gắn permission với set dữ liệu.</p>
+        </article>
+      </div>
+      <div class="two-col">
+        <article class="domain-card">
+          <div class="mini-label">Approval Layer</div>
+          <strong>Access Request là lớp workflow trung gian</strong>
+          <ul>
+            <li>Người dùng không nhất thiết được cấp role hoặc data scope trực tiếp.</li>
+            <li><code>AccessRequest</code> lưu yêu cầu, <code>AccessRequestItem</code> lưu từng hạng mục, <code>AccessRequestLog</code> lưu lịch sử duyệt.</li>
+            <li>Approval service sau đó áp role hoặc data permission vào user thực tế.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Technical Pattern</div>
+          <strong>Controller + Schema + Service + ORM</strong>
+          <ul>
+            <li>Controller nhận request và validate body bằng Pydantic schema.</li>
+            <li>Service xử lý nghiệp vụ, query repository và sinh <code>ResponseEnvelope</code>.</li>
+            <li>Route cũ thiên RPC như <code>/getRoleList</code>; route mới thiên REST như <code>/access_requests</code>.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>Điểm business cần nhớ</strong>
+        <span class="muted">
+          Một user có thể mang đồng thời quyền từ role và một <code>data_permission_id</code> trực tiếp. Điều này cho thấy nền tảng đang hỗ trợ
+          cả mô hình cấp quyền theo bundle lẫn cấp quyền dữ liệu trực tiếp cho cá nhân.
+        </span>
+      </div>
+    </section>
+
+    <section class="section surface" id="core-erd">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">02 / Core Entity Relationship</div>
+          <h2>Core Entity Relationship</h2>
+        </div>
+        <div class="legend">
+          <span><i style="background:#9f3a10;"></i>Identity / Workflow</span>
+          <span><i style="background:#0f766e;"></i>Authorization</span>
+          <span><i style="background:#1d4ed8;"></i>Data Scope</span>
+          <span><i style="background:#7c2d12;"></i>Catalog / Config</span>
+        </div>
+      </div>
+      <p class="section-copy">
+        Sơ đồ được tách thành ba góc nhìn để tránh các đường chéo dài cắt qua toàn bộ canvas. Hình đầu chỉ giữ backbone quan hệ dữ liệu,
+        hình thứ hai cô lập workflow duyệt quyền, và hình thứ ba dành riêng cho identity/MFA.
+      </p>
+      <div class="diagram-grid">
+        <article class="diagram-panel diagram-panel--wide">
+          <div class="diagram-head">
+            <div class="mini-label">Overview Relationship View</div>
+            <strong>Authorization backbone + data scope catalog</strong>
+            <p>Chỉ giữ các FK cốt lõi. Tất cả connector đều đi ngang hoặc dọc để người đọc lần theo từng lane.</p>
+          </div>
+          <div class="diagram-wrap">
+            <svg viewBox="0 0 1180 520" aria-label="Overview relationship view">
+              <defs>
+                <marker id="overview-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L0,10 L10,5 z" fill="#516072"></path>
+                </marker>
+              </defs>
+
+              <rect x="24" y="24" width="1132" height="114" rx="24" fill="rgba(15,118,110,0.05)" stroke="rgba(15,118,110,0.12)"></rect>
+              <rect x="24" y="164" width="1132" height="138" rx="24" fill="rgba(29,78,216,0.05)" stroke="rgba(29,78,216,0.12)"></rect>
+              <text x="50" y="52" font-family="JetBrains Mono" font-size="12" fill="#0f766e">AUTHORIZATION LANE</text>
+              <text x="50" y="192" font-family="JetBrains Mono" font-size="12" fill="#1d4ed8">DATA SCOPE LANE</text>
+
+              <g font-family="JetBrains Mono">
+                <rect x="52" y="70" width="154" height="68" rx="16" fill="rgba(159,58,16,0.09)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="76" y="96" font-size="16" fill="#9f3a10">User</text>
+                <text x="76" y="117" font-size="11" fill="#667085">direct data scope</text>
+
+                <rect x="252" y="70" width="154" height="68" rx="16" fill="rgba(15,118,110,0.09)" stroke="#0f766e" stroke-width="1.5"></rect>
+                <text x="278" y="96" font-size="16" fill="#0f766e">UserRole</text>
+                <text x="278" y="117" font-size="11" fill="#667085">user_id, role_id</text>
+
+                <rect x="452" y="70" width="154" height="68" rx="16" fill="rgba(15,118,110,0.09)" stroke="#0f766e" stroke-width="1.5"></rect>
+                <text x="498" y="96" font-size="16" fill="#0f766e">Role</text>
+                <text x="498" y="117" font-size="11" fill="#667085">code</text>
+
+                <rect x="652" y="70" width="164" height="68" rx="16" fill="rgba(15,118,110,0.09)" stroke="#0f766e" stroke-width="1.5"></rect>
+                <text x="678" y="96" font-size="16" fill="#0f766e">RolePermission</text>
+                <text x="678" y="117" font-size="11" fill="#667085">role_id, permission_id</text>
+
+                <rect x="862" y="70" width="164" height="68" rx="16" fill="rgba(15,118,110,0.09)" stroke="#0f766e" stroke-width="1.5"></rect>
+                <text x="890" y="96" font-size="16" fill="#0f766e">Permission</text>
+                <text x="890" y="117" font-size="11" fill="#667085">code, permission_type</text>
+
+                <rect x="1046" y="56" width="88" height="48" rx="14" fill="rgba(15,118,110,0.06)" stroke="#0f766e" stroke-width="1.2"></rect>
+                <text x="1061" y="85" font-size="12" fill="#0f766e">UrlPerm</text>
+
+                <rect x="1046" y="110" width="88" height="48" rx="14" fill="rgba(15,118,110,0.06)" stroke="#0f766e" stroke-width="1.2"></rect>
+                <text x="1054" y="139" font-size="12" fill="#0f766e">PagePerm</text>
+
+                <rect x="760" y="214" width="164" height="68" rx="16" fill="rgba(29,78,216,0.08)" stroke="#1d4ed8" stroke-width="1.5"></rect>
+                <text x="782" y="240" font-size="16" fill="#1d4ed8">DataPermission</text>
+                <text x="782" y="261" font-size="11" fill="#667085">permission_id, set_id</text>
+
+                <rect x="520" y="214" width="164" height="68" rx="16" fill="rgba(29,78,216,0.08)" stroke="#1d4ed8" stroke-width="1.5"></rect>
+                <text x="578" y="240" font-size="16" fill="#1d4ed8">Set</text>
+                <text x="548" y="261" font-size="11" fill="#667085">setname, setcode</text>
+
+                <rect x="280" y="214" width="164" height="68" rx="16" fill="rgba(29,78,216,0.08)" stroke="#1d4ed8" stroke-width="1.5"></rect>
+                <text x="326" y="240" font-size="16" fill="#1d4ed8">Dataset</text>
+                <text x="304" y="261" font-size="11" fill="#667085">tablename / col / val</text>
+
+                <polyline points="206,104 252,104" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="406,104 452,104" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="606,104 652,104" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="816,104 862,104" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+
+                <polyline points="944,138 944,184 842,184 842,214" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="1026,88 1046,88" fill="none" stroke="#516072" stroke-width="1.4" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="1026,122 1046,134" fill="none" stroke="#516072" stroke-width="1.4" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="760,248 684,248" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="520,248 444,248" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#overview-arrow)"></polyline>
+                <polyline points="130,138 130,330 842,330 842,282" fill="none" stroke="#516072" stroke-width="1.3" stroke-dasharray="7 6" marker-end="url(#overview-arrow)"></polyline>
+
+                <text x="220" y="94" font-size="11" fill="#667085">1-n</text>
+                <text x="422" y="94" font-size="11" fill="#667085">n-1</text>
+                <text x="622" y="94" font-size="11" fill="#667085">1-n</text>
+                <text x="830" y="94" font-size="11" fill="#667085">n-1</text>
+                <text x="956" y="174" font-size="11" fill="#667085">DATA FK</text>
+                <text x="994" y="73" font-size="11" fill="#667085">URL</text>
+                <text x="986" y="159" font-size="11" fill="#667085">PAGE</text>
+                <text x="456" y="346" font-size="11" fill="#667085">dashed = direct user data scope</text>
+              </g>
+            </svg>
+          </div>
+        </article>
+
+        <article class="diagram-panel">
+          <div class="diagram-head">
+            <div class="mini-label">Approval Relationship View</div>
+            <strong>Workflow lane tách riêng để không cắt sang backbone</strong>
+            <p><code>AccessRequestItem</code> được nối thẳng tới các target grant bằng nét đứt theo từng nhánh nghiệp vụ.</p>
+          </div>
+          <div class="diagram-wrap">
+            <svg viewBox="0 0 960 420" aria-label="Approval relationship view">
+              <defs>
+                <marker id="approval-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L0,10 L10,5 z" fill="#516072"></path>
+                </marker>
+              </defs>
+
+              <rect x="24" y="24" width="912" height="112" rx="24" fill="rgba(159,58,16,0.05)" stroke="rgba(159,58,16,0.14)"></rect>
+              <rect x="24" y="168" width="912" height="220" rx="24" fill="rgba(15,118,110,0.04)" stroke="rgba(15,118,110,0.12)"></rect>
+              <text x="48" y="52" font-family="JetBrains Mono" font-size="12" fill="#9f3a10">APPROVAL HEADER LANE</text>
+              <text x="48" y="196" font-family="JetBrains Mono" font-size="12" fill="#0f766e">GRANT TARGET LANE</text>
+
+              <g font-family="JetBrains Mono">
+                <rect x="52" y="72" width="188" height="70" rx="16" fill="rgba(159,58,16,0.1)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="76" y="99" font-size="16" fill="#9f3a10">AccessRequest</text>
+                <text x="76" y="120" font-size="11" fill="#667085">requester_id, status</text>
+
+                <rect x="300" y="72" width="196" height="70" rx="16" fill="rgba(159,58,16,0.1)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="324" y="99" font-size="16" fill="#9f3a10">AccessRequestItem</text>
+                <text x="324" y="120" font-size="11" fill="#667085">role_id, data_permission_id, set_id</text>
+
+                <rect x="556" y="72" width="188" height="70" rx="16" fill="rgba(159,58,16,0.1)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="580" y="99" font-size="16" fill="#9f3a10">AccessRequestLog</text>
+                <text x="580" y="120" font-size="11" fill="#667085">actor_id, action</text>
+
+                <rect x="786" y="72" width="116" height="70" rx="16" fill="rgba(159,58,16,0.08)" stroke="#9f3a10" stroke-width="1.4"></rect>
+                <text x="816" y="99" font-size="16" fill="#9f3a10">User</text>
+                <text x="807" y="120" font-size="11" fill="#667085">requester</text>
+
+                <rect x="84" y="242" width="150" height="64" rx="16" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1.5"></rect>
+                <text x="134" y="268" font-size="16" fill="#0f766e">Role</text>
+                <text x="110" y="289" font-size="11" fill="#667085">grant target</text>
+
+                <rect x="314" y="242" width="176" height="64" rx="16" fill="rgba(29,78,216,0.08)" stroke="#1d4ed8" stroke-width="1.5"></rect>
+                <text x="338" y="268" font-size="16" fill="#1d4ed8">Permission</text>
+                <text x="338" y="289" font-size="11" fill="#667085">data_permission_id</text>
+
+                <rect x="570" y="242" width="150" height="64" rx="16" fill="rgba(29,78,216,0.08)" stroke="#1d4ed8" stroke-width="1.5"></rect>
+                <text x="622" y="268" font-size="16" fill="#1d4ed8">Set</text>
+                <text x="602" y="289" font-size="11" fill="#667085">set_id</text>
+
+                <rect x="764" y="242" width="138" height="64" rx="16" fill="rgba(159,58,16,0.08)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="804" y="268" font-size="16" fill="#9f3a10">User</text>
+                <text x="786" y="289" font-size="11" fill="#667085">approved_by / actor_id</text>
+
+                <polyline points="240,107 300,107" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#approval-arrow)"></polyline>
+                <polyline points="496,107 556,107" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#approval-arrow)"></polyline>
+                <polyline points="744,107 786,107" fill="none" stroke="#516072" stroke-width="1.4" marker-end="url(#approval-arrow)"></polyline>
+                <polyline points="846,142 846,172 650,172 650,242" fill="none" stroke="#516072" stroke-width="1.3" marker-end="url(#approval-arrow)"></polyline>
+
+                <polyline points="398,142 398,214 159,214 159,242" fill="none" stroke="#516072" stroke-width="1.2" stroke-dasharray="7 6" marker-end="url(#approval-arrow)"></polyline>
+                <polyline points="398,142 398,214 402,214 402,242" fill="none" stroke="#516072" stroke-width="1.2" stroke-dasharray="7 6" marker-end="url(#approval-arrow)"></polyline>
+                <polyline points="398,142 398,214 645,214 645,242" fill="none" stroke="#516072" stroke-width="1.2" stroke-dasharray="7 6" marker-end="url(#approval-arrow)"></polyline>
+
+                <text x="260" y="95" font-size="11" fill="#667085">1-n</text>
+                <text x="518" y="95" font-size="11" fill="#667085">1-n</text>
+                <text x="770" y="95" font-size="11" fill="#667085">n-1</text>
+                <text x="82" y="336" font-size="11" fill="#667085">dashed = business grant target</text>
+              </g>
+            </svg>
+          </div>
+        </article>
+
+        <article class="diagram-panel">
+          <div class="diagram-head">
+            <div class="mini-label">Identity Relationship View</div>
+            <strong>User, MFA và social login</strong>
+            <p>Giữ <code>User</code> ở trung tâm, tách rõ phần one-to-many với identity và one-to-one với TOTP.</p>
+          </div>
+          <div class="diagram-wrap">
+            <svg viewBox="0 0 960 420" aria-label="Identity relationship view">
+              <defs>
+                <marker id="identity-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L0,10 L10,5 z" fill="#516072"></path>
+                </marker>
+              </defs>
+
+              <rect x="24" y="24" width="912" height="112" rx="24" fill="rgba(159,58,16,0.05)" stroke="rgba(159,58,16,0.14)"></rect>
+              <rect x="24" y="170" width="912" height="214" rx="24" fill="rgba(124,45,18,0.04)" stroke="rgba(124,45,18,0.12)"></rect>
+              <text x="48" y="52" font-family="JetBrains Mono" font-size="12" fill="#9f3a10">USER CORE</text>
+              <text x="48" y="198" font-family="JetBrains Mono" font-size="12" fill="#7c2d12">IDENTITY AND MFA EDGE</text>
+
+              <g font-family="JetBrains Mono">
+                <rect x="382" y="68" width="196" height="72" rx="16" fill="rgba(159,58,16,0.1)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="454" y="95" font-size="16" fill="#9f3a10">User</text>
+                <text x="420" y="117" font-size="11" fill="#667085">username, password, userlocked</text>
+
+                <rect x="82" y="246" width="220" height="70" rx="16" fill="rgba(159,58,16,0.08)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="120" y="273" font-size="16" fill="#9f3a10">UserIdentity</text>
+                <text x="106" y="295" font-size="11" fill="#667085">provider, external_id, tokens_json</text>
+
+                <rect x="372" y="246" width="216" height="70" rx="16" fill="rgba(159,58,16,0.08)" stroke="#9f3a10" stroke-width="1.5"></rect>
+                <text x="430" y="273" font-size="16" fill="#9f3a10">UserTOTP</text>
+                <text x="406" y="295" font-size="11" fill="#667085">secret_base32, confirmed</text>
+
+                <rect x="662" y="246" width="220" height="70" rx="16" fill="rgba(124,45,18,0.08)" stroke="#7c2d12" stroke-width="1.5"></rect>
+                <text x="698" y="273" font-size="16" fill="#7c2d12">SocialProvider</text>
+                <text x="696" y="295" font-size="11" fill="#667085">client_id, redirect_uri, scopes</text>
+
+                <polyline points="480,140 480,190 192,190 192,246" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#identity-arrow)"></polyline>
+                <polyline points="480,140 480,246" fill="none" stroke="#516072" stroke-width="1.5" marker-end="url(#identity-arrow)"></polyline>
+                <polyline points="772,246 772,206 192,206 192,316" fill="none" stroke="#516072" stroke-width="1.2" stroke-dasharray="7 6" marker-end="url(#identity-arrow)"></polyline>
+
+                <text x="330" y="182" font-size="11" fill="#667085">1-n</text>
+                <text x="494" y="195" font-size="11" fill="#667085">1-1</text>
+                <text x="620" y="197" font-size="11" fill="#667085">config for identity provider</text>
+              </g>
+            </svg>
+          </div>
+        </article>
+      </div>
+      <div class="erd-notes">
+        <article class="domain-card">
+          <div class="mini-label">Structural Insight</div>
+          <strong><code>Permission</code> vẫn là hub, nhưng không còn chiếm toàn bộ canvas</strong>
+          <p>
+            Khi tách phần approval khỏi backbone, người đọc có thể hiểu quan hệ FK thật trước, rồi mới xem các link nghiệp vụ được duyệt qua
+            <code>AccessRequestItem</code>.
+          </p>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Reading Rule</div>
+          <strong>Nét liền là FK trực tiếp, nét đứt là liên kết áp dụng nghiệp vụ</strong>
+          <p>
+            Quy ước này giúp phân biệt rõ quan hệ tồn tại trong schema DB với quan hệ chỉ xuất hiện khi service suy diễn hoặc apply quyền.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section surface" id="domain-map">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">03 / Domain Map</div>
+          <h2>Business + Technical Domain Map</h2>
+        </div>
+      </div>
+      <div class="four-col">
+        <article class="domain-card">
+          <div class="mini-label">Domain A</div>
+          <strong>Identity & Authentication</strong>
+          <ul>
+            <li>Models: <code>User</code>, <code>UserIdentity</code>, <code>UserTOTP</code>, <code>SocialProvider</code>.</li>
+            <li>Schemas: <code>LoginRequest</code>, <code>RegisterRequest</code>, MFA request schemas.</li>
+            <li>Controllers: <code>/login</code>, <code>/register</code>, <code>/check_auth_ext</code>, MFA routes.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Domain B</div>
+          <strong>RBAC & Application Access</strong>
+          <ul>
+            <li>Models: <code>Role</code>, <code>Permission</code>, <code>UserRole</code>, <code>RolePermission</code>, <code>UrlPermission</code>, <code>PagePermission</code>.</li>
+            <li>Schemas: role and URL schema groups.</li>
+            <li>Legacy RPC endpoints vẫn là giao diện chính cho frontend quản trị.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Domain C</div>
+          <strong>Data Scope Catalog</strong>
+          <ul>
+            <li>Models: <code>Set</code>, <code>Dataset</code>, <code>DataPermission</code>.</li>
+            <li>Schemas: set and data schema groups.</li>
+            <li>Cho phép định nghĩa phạm vi dữ liệu theo service, bảng, cột và giá trị.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Domain D</div>
+          <strong>Access Approval Workflow</strong>
+          <ul>
+            <li>Models: <code>AccessRequest</code>, <code>AccessRequestItem</code>, <code>AccessRequestLog</code>.</li>
+            <li>Schemas: access request create, approve, reject, list.</li>
+            <li>Domain này nối giữa identity, role và data permission ở tầng business process.</li>
+          </ul>
+        </article>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Business Question It Answers</th>
+            <th>Main Tables</th>
+            <th>Main Schema Families</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Identity</td>
+            <td>Người dùng là ai, đăng nhập thế nào, có MFA hay social login không?</td>
+            <td><code>users</code>, <code>user_identities</code>, <code>user_totp</code>, <code>social_providers</code></td>
+            <td><code>auth.py</code>, <code>mfa.py</code>, <code>response.py</code></td>
+          </tr>
+          <tr>
+            <td>RBAC</td>
+            <td>Người dùng làm được gì trên ứng dụng?</td>
+            <td><code>roles</code>, <code>permissions</code>, <code>user_roles</code>, <code>role_permissions</code>, <code>url_permissions</code>, <code>page_permissions</code></td>
+            <td><code>role.py</code>, <code>url.py</code>, <code>data.py</code></td>
+          </tr>
+          <tr>
+            <td>Data Scope</td>
+            <td>Người dùng được xem lát dữ liệu nào?</td>
+            <td><code>sets</code>, <code>datasets</code>, <code>data_permissions</code></td>
+            <td><code>set.py</code>, <code>data.py</code></td>
+          </tr>
+          <tr>
+            <td>Approval</td>
+            <td>Quyền truy cập mới được yêu cầu, duyệt, từ chối và áp dụng ra sao?</td>
+            <td><code>access_requests</code>, <code>access_request_items</code>, <code>access_request_logs</code></td>
+            <td><code>access_request.py</code>, <code>response.py</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section surface" id="key-flows">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">04 / Key Flows</div>
+          <h2>Key Business Flows</h2>
+        </div>
+      </div>
+      <div class="three-col">
+        <article class="domain-card">
+          <div class="mini-label">Flow 1</div>
+          <strong>Login + MFA</strong>
+          <ul>
+            <li><code>LoginRequest</code> vào <code>/login</code>.</li>
+            <li><code>AuthService</code> xác thực <code>User</code>; nếu cần MFA thì trả <code>mfa_token</code>.</li>
+            <li><code>/mfa/totp/verify_login</code> xác minh OTP và phát JWT cuối cùng.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Flow 2</div>
+          <strong>Role / Permission Administration</strong>
+          <ul>
+            <li>Admin tạo <code>Permission</code> kèm URL list hoặc DataSets.</li>
+            <li>Admin tạo <code>Role</code> và gắn permission qua <code>RolePermission</code>.</li>
+            <li>Admin gắn role cho user qua <code>UpdateUserRoleRequest</code> và bảng <code>UserRole</code>.</li>
+          </ul>
+        </article>
+        <article class="domain-card">
+          <div class="mini-label">Flow 3</div>
+          <strong>Access Request Approval</strong>
+          <ul>
+            <li>User gửi <code>AccessRequestCreate</code> với role hoặc data permission mong muốn.</li>
+            <li>Hệ thống tạo <code>AccessRequest</code> + <code>AccessRequestItem</code>.</li>
+            <li>Approver duyệt hoặc từ chối; service ghi <code>AccessRequestLog</code> và áp grant thực tế.</li>
+          </ul>
+        </article>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Flow</th>
+            <th>Entry Points</th>
+            <th>Main Schemas</th>
+            <th>Main Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Authentication</td>
+            <td><code>/login</code>, <code>/check_auth_ext</code>, <code>/mfa/totp/*</code></td>
+            <td><code>LoginRequest</code>, <code>VerifyTOTPRequest</code>, <code>ResponseEnvelope</code></td>
+            <td><code>User</code>, <code>UserTOTP</code>, <code>UserIdentity</code>, <code>SocialProvider</code></td>
+          </tr>
+          <tr>
+            <td>Authorization Provisioning</td>
+            <td><code>/addRole</code>, <code>/updateRole</code>, <code>/addPermission</code>, <code>/updateUserRole</code></td>
+            <td><code>AddRoleRequest</code>, <code>AddPermissionRequest</code>, <code>UpdateUserRoleRequest</code></td>
+            <td><code>Role</code>, <code>Permission</code>, <code>RolePermission</code>, <code>UserRole</code></td>
+          </tr>
+          <tr>
+            <td>Data Scope Catalog</td>
+            <td><code>/addSet</code>, <code>/updateDatasetBySet</code>, <code>/getDataSetByUser</code></td>
+            <td><code>AddSetRequest</code>, <code>UpdateDatasetBySetRequest</code>, <code>DataSetByUserRequest</code></td>
+            <td><code>Set</code>, <code>Dataset</code>, <code>DataPermission</code>, <code>Permission</code></td>
+          </tr>
+          <tr>
+            <td>Approval Workflow</td>
+            <td><code>/access_requests</code>, <code>/access_requests/&lt;id&gt;/approve</code>, <code>/access_requests/&lt;id&gt;/reject</code></td>
+            <td><code>AccessRequestCreate</code>, <code>AccessRequestApprove</code>, <code>AccessRequestReject</code>, <code>AccessRequestListQuery</code></td>
+            <td><code>AccessRequest</code>, <code>AccessRequestItem</code>, <code>AccessRequestLog</code>, <code>User</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section surface" id="crosswalk">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">05 / Crosswalk</div>
+          <h2>Controller to Schema to Model Crosswalk</h2>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Controller / Endpoint</th>
+            <th>Primary Schema</th>
+            <th>Business Intent</th>
+            <th>Likely Main Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Authentication.py /login</code></td>
+            <td><code>LoginRequest</code> + <code>ResponseEnvelope</code></td>
+            <td>Đăng nhập và phát JWT hoặc MFA token.</td>
+            <td><code>User</code>, <code>UserTOTP</code></td>
+          </tr>
+          <tr>
+            <td><code>Authentication.py /register</code></td>
+            <td><code>RegisterRequest</code></td>
+            <td>Tạo user mới, có thể đồng thời sinh access request xin quyền.</td>
+            <td><code>User</code>, <code>AccessRequest</code>, <code>AccessRequestItem</code></td>
+          </tr>
+          <tr>
+            <td><code>User.py /getUserList</code></td>
+            <td><code>UserListRequest</code></td>
+            <td>Tra cứu danh sách user có phân trang.</td>
+            <td><code>User</code></td>
+          </tr>
+          <tr>
+            <td><code>User.py /updateUserRole</code></td>
+            <td><code>UpdateUserRoleRequest</code></td>
+            <td>Gắn hoặc thay role cho user.</td>
+            <td><code>User</code>, <code>UserRole</code>, <code>Role</code></td>
+          </tr>
+          <tr>
+            <td><code>Role.py /getRoleList</code></td>
+            <td><code>RoleListRequest</code></td>
+            <td>Danh sách role theo filter code.</td>
+            <td><code>Role</code></td>
+          </tr>
+          <tr>
+            <td><code>Role.py /addRole</code></td>
+            <td><code>AddRoleRequest</code></td>
+            <td>Tạo role và nối permission bundle.</td>
+            <td><code>Role</code>, <code>RolePermission</code>, <code>Permission</code></td>
+          </tr>
+          <tr>
+            <td><code>Role.py /getRolePermissionList</code></td>
+            <td><code>RolePermissionListRequest</code></td>
+            <td>Tra cứu grant giữa role và permission.</td>
+            <td><code>RolePermission</code>, <code>Role</code>, <code>Permission</code></td>
+          </tr>
+          <tr>
+            <td><code>Data.py /addPermission</code></td>
+            <td><code>AddPermissionRequest</code></td>
+            <td>Tạo permission loại ROLE hoặc DATA cùng URL list/DataSets.</td>
+            <td><code>Permission</code>, <code>UrlPermission</code>, <code>DataPermission</code>, <code>Set</code></td>
+          </tr>
+          <tr>
+            <td><code>Data.py /getDataSetByUser</code></td>
+            <td><code>DataSetByUserRequest</code></td>
+            <td>Truy vết dataset user được nhìn thấy theo scope hiện tại.</td>
+            <td><code>User</code>, <code>Permission</code>, <code>DataPermission</code>, <code>Dataset</code></td>
+          </tr>
+          <tr>
+            <td><code>Set.py /updateDatasetBySet</code></td>
+            <td><code>UpdateDatasetBySetRequest</code></td>
+            <td>Cập nhật danh mục dataset nằm trong một set.</td>
+            <td><code>Set</code>, <code>Dataset</code></td>
+          </tr>
+          <tr>
+            <td><code>URL.py /getPageByUser</code></td>
+            <td><code>PageByUserRequest</code></td>
+            <td>Suy ra danh sách page user truy cập được từ role -> permission -> page_permission.</td>
+            <td><code>UserRole</code>, <code>RolePermission</code>, <code>PagePermission</code>, <code>Permission</code></td>
+          </tr>
+          <tr>
+            <td><code>AccessRequest.py /access_requests</code></td>
+            <td><code>AccessRequestCreate</code> hoặc <code>AccessRequestListQuery</code></td>
+            <td>Tạo mới hoặc liệt kê access request.</td>
+            <td><code>AccessRequest</code>, <code>AccessRequestItem</code>, <code>User</code></td>
+          </tr>
+          <tr>
+            <td><code>AccessRequest.py /access_requests/&lt;id&gt;/approve</code></td>
+            <td><code>AccessRequestApprove</code></td>
+            <td>Duyệt yêu cầu và áp quyền vào dữ liệu thực.</td>
+            <td><code>AccessRequest</code>, <code>AccessRequestLog</code>, <code>UserRole</code>, <code>User</code></td>
+          </tr>
+          <tr>
+            <td><code>Mfa.py /mfa/totp/enroll</code></td>
+            <td><code>EnrollTOTPRequest</code></td>
+            <td>Khởi tạo secret TOTP cho user.</td>
+            <td><code>UserTOTP</code>, <code>User</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section surface" id="orm-inventory">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">06 / ORM Inventory</div>
+          <h2>Full ORM Inventory</h2>
+        </div>
+        <div class="chips">
+          <span class="chip">SQLAlchemy</span>
+          <span class="chip">Schema: <span class="mono">uaa</span></span>
+          <span class="chip">Primary Source: <span class="mono">entities.py</span></span>
+        </div>
+      </div>
+
+      <details open>
+        <summary><span>User</span><span class="mono">uaa.users</span></summary>
+        <div class="detail-body">
+          <p class="muted">Tài khoản trung tâm của hệ thống. Mang định danh đăng nhập, trạng thái khóa, last sign-on và một data permission trực tiếp nếu có.</p>
+          <div class="detail-grid">
+            <table>
+              <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>Khóa chính user.</td></tr>
+                <tr><td><code>username</code></td><td>Tên đăng nhập duy nhất.</td></tr>
+                <tr><td><code>password</code></td><td>Mật khẩu băm, lưu dạng binary.</td></tr>
+                <tr><td><code>userlocked</code></td><td>Cờ khóa tài khoản.</td></tr>
+                <tr><td><code>name_display</code></td><td>Tên hiển thị.</td></tr>
+                <tr><td><code>data_permission_id</code></td><td>Liên kết trực tiếp tới <code>permissions.id</code>.</td></tr>
+                <tr><td><code>last_signon_datetime</code></td><td>Lần đăng nhập thành công gần nhất.</td></tr>
+              </tbody>
+            </table>
+            <div>
+              <div class="mini-label">Relationships</div>
+              <div class="inline-list">
+                <span class="pill">UserRole[] via roles</span>
+                <span class="pill">Permission via data_permission</span>
+                <span class="pill">UserIdentity[] via identities</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Role</span><span class="mono">uaa.roles</span></summary>
+        <div class="detail-body">
+          <p class="muted">Bundle quyền nghiệp vụ, thường đại diện một vai trò làm việc hoặc một nhóm quyền ứng dụng.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: id, code, description, last_update_username, last_update_datetime</span>
+            <span class="pill">Relationships: RolePermission[], UserRole[]</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Permission</span><span class="mono">uaa.permissions</span></summary>
+        <div class="detail-body">
+          <p class="muted">Thực thể quyền chung cho cả RBAC và data scope. <code>permission_type</code> phân nhánh use case ROLE hay DATA.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: id, code, permission_type, description</span>
+            <span class="pill">Relationships: users, role_links, url_permissions, page_permissions, data_permissions</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>RolePermission</span><span class="mono">uaa.role_permissions</span></summary>
+        <div class="detail-body">
+          <p class="muted">Bảng nối giữa role và permission, cho phép một role chứa nhiều permission và một permission được tái sử dụng bởi nhiều role.</p>
+          <div class="inline-list">
+            <span class="pill">FK: role_id -> roles.id</span>
+            <span class="pill">FK: permission_id -> permissions.id</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>UserRole</span><span class="mono">uaa.user_roles</span></summary>
+        <div class="detail-body">
+          <p class="muted">Bảng nối user với role, đại diện grant RBAC trực tiếp lên cá nhân.</p>
+          <div class="inline-list">
+            <span class="pill">FK: user_id -> users.id</span>
+            <span class="pill">FK: role_id -> roles.id</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>UrlPermission</span><span class="mono">uaa.url_permissions</span></summary>
+        <div class="detail-body">
+          <p class="muted">Danh sách route/method được gắn vào một permission. Đây là lớp kỹ thuật để middleware quyết định quyền truy cập endpoint.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: permission_id, url, method, type</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>PagePermission</span><span class="mono">uaa.page_permissions</span></summary>
+        <div class="detail-body">
+          <p class="muted">Danh sách page UI được gắn vào permission; phục vụ menu/page visibility ở frontend.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: permission_id, page</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Set</span><span class="mono">uaa.sets</span></summary>
+        <div class="detail-body">
+          <p class="muted">Nhóm dữ liệu ở mức business catalog. Một set thường đại diện một dịch vụ hoặc một phạm vi nghiệp vụ cụ thể.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: setname, services, setcode</span>
+            <span class="pill">Relationships: DataPermission[], Dataset[]</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>DataPermission</span><span class="mono">uaa.data_permissions</span></summary>
+        <div class="detail-body">
+          <p class="muted">Nối một permission kiểu DATA với một set dữ liệu. Đây là cầu nối giữa catalog dữ liệu và engine permission.</p>
+          <div class="inline-list">
+            <span class="pill">FK: permission_id -> permissions.id</span>
+            <span class="pill">FK: set_id -> sets.id</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Dataset</span><span class="mono">uaa.datasets</span></summary>
+        <div class="detail-body">
+          <p class="muted">Hạt dữ liệu nhỏ nhất được mô tả trong catalog. Bộ ba <code>tablename</code>, <code>colname</code>, <code>colval</code> cho thấy filter scope đang được mô hình hóa ở mức cột.</p>
+          <div class="inline-list">
+            <span class="pill">FK: set_id -> sets.id</span>
+            <span class="pill">Fields: tablename, colname, colval</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>AccessRequest</span><span class="mono">uaa.access_requests</span></summary>
+        <div class="detail-body">
+          <p class="muted">Header record của quy trình xin quyền. Lưu requester, loại request, trạng thái, thời hạn và kết quả apply.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: requester_id, request_type, status, reason, ttl_hours, approved_at, rejected_reason</span>
+            <span class="pill">Relationships: requester_user, items[], logs[]</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>AccessRequestItem</span><span class="mono">uaa.access_request_items</span></summary>
+        <div class="detail-body">
+          <p class="muted">Chi tiết grant cần duyệt. Có thể tham chiếu role, permission dữ liệu và set trong cùng một item.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: request_id, role_id, data_permission_id, set_id, note</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>AccessRequestLog</span><span class="mono">uaa.access_request_logs</span></summary>
+        <div class="detail-body">
+          <p class="muted">Audit trail cho hành động create, approve, reject, cancel.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: request_id, actor_id, action, note, created_at</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>UserIdentity</span><span class="mono">uaa.user_identities</span></summary>
+        <div class="detail-body">
+          <p class="muted">Liên kết user nội bộ với external identity provider như Google hoặc provider khác. Lưu external id, email, display name, avatar và tokens JSON.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: provider, external_id, email, display_name, avatar_url, tokens_json</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>UserTOTP</span><span class="mono">uaa.user_totp</span></summary>
+        <div class="detail-body">
+          <p class="muted">Thiết lập MFA TOTP một-một với user. Khóa chính là <code>user_id</code>.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: user_id, secret_base32, confirmed, backup_codes_json</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>SocialProvider</span><span class="mono">uaa.social_providers</span></summary>
+        <div class="detail-body">
+          <p class="muted">Cấu hình provider social login ở mức hệ thống, gồm client id/secret, redirect URI, scopes và cờ enabled.</p>
+          <div class="inline-list">
+            <span class="pill">Fields: provider, client_id, client_secret_enc, redirect_uri, scopes, enabled, updated_by</span>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="section surface" id="schema-inventory">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">07 / Schema Inventory</div>
+          <h2>Schema Inventory</h2>
+        </div>
+      </div>
+      <p class="section-copy">
+        Tất cả request schemas đều là Pydantic models với <code>extra="allow"</code>, cho thấy API đang ưu tiên tương thích ngược với payload cũ hơn là strict contract.
+        Dưới đây là inventory đầy đủ theo file.
+      </p>
+
+      <details open>
+        <summary><span>auth.py</span><span>Login and registration contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>LoginRequest</code></td><td><code>UserName:str</code>, <code>Password:str</code></td><td>Payload đăng nhập.</td></tr>
+              <tr><td><code>RegisterRequest</code></td><td><code>UserName</code>, <code>Password</code>, <code>NameDisplay</code>, <code>Roles[]</code>, <code>RoleCodes[]</code>, <code>DataPermissions[]</code>, <code>DataPermissionCodes[]</code>, <code>SetIds[]</code>, <code>Reason</code>, <code>TtlHours</code></td><td>Đăng ký user mới kèm nhu cầu xin quyền ban đầu.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>user.py</span><span>User management contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>UserListRequest</code></td><td><code>page</code>, <code>page_size</code>, <code>UserName?</code></td><td>Filter user list.</td></tr>
+              <tr><td><code>UserInfoRequest</code></td><td><code>id:int</code></td><td>Lấy thông tin một user.</td></tr>
+              <tr><td><code>UpdateUserRequest</code></td><td><code>id</code>, <code>UserLocked?</code>, <code>Password?</code>, <code>NameDisplay?</code>, <code>DataPermission?</code></td><td>Cập nhật trạng thái và profile user.</td></tr>
+              <tr><td><code>UpdateUserRoleRequest</code></td><td><code>UserId:int</code>, <code>RoleList:int[]</code></td><td>Thay role cho user.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>role.py</span><span>Role and role-permission contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>RoleListRequest</code></td><td><code>page</code>, <code>page_size</code>, <code>Code?</code></td><td>Danh sách role.</td></tr>
+              <tr><td><code>RoleInfoRequest</code></td><td><code>id:int</code></td><td>Chi tiết role.</td></tr>
+              <tr><td><code>AddRoleRequest</code></td><td><code>Code</code>, <code>Description?</code>, <code>Permission[]</code></td><td>Tạo role.</td></tr>
+              <tr><td><code>UpdateRoleRequest</code></td><td><code>RoleId</code>, <code>Description?</code>, <code>Permission[]</code></td><td>Cập nhật role.</td></tr>
+              <tr><td><code>DeleteRoleRequest</code></td><td><code>id:int</code></td><td>Xóa role.</td></tr>
+              <tr><td><code>PermissionByRoleRequest</code></td><td><code>id:int</code></td><td>Lấy permission của role.</td></tr>
+              <tr><td><code>UserByRoleRequest</code></td><td><code>id:int</code></td><td>Lấy user của role.</td></tr>
+              <tr><td><code>RoleByUserRequest</code></td><td><code>id?</code>, <code>UserId?</code></td><td>Lấy role theo user.</td></tr>
+              <tr><td><code>RolePermissionListRequest</code></td><td><code>page</code>, <code>page_size</code>, <code>Code?</code>, <code>PermissionType?</code>, <code>PermissionTypes?</code></td><td>Tra cứu liên kết role-permission.</td></tr>
+              <tr><td><code>RoleByPermissionRequest</code></td><td><code>id:int</code></td><td>Lấy role theo permission.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>data.py</span><span>Permission and data-scope contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>DataSetByUserRequest</code></td><td><code>UserId:int</code></td><td>Lấy dataset user được quyền xem.</td></tr>
+              <tr><td><code>DatasetByPermissionRequest</code></td><td><code>PermissionId:int</code></td><td>Lấy dataset theo permission.</td></tr>
+              <tr><td><code>PermissionInfoRequest</code></td><td><code>ids:int[]</code></td><td>Lấy chi tiết nhiều permission.</td></tr>
+              <tr><td><code>AddPermissionRequest</code></td><td><code>Code</code>, <code>PermissionType</code>, <code>Description?</code>, <code>UrlList[]</code>, <code>DataSets[]</code></td><td>Tạo permission.</td></tr>
+              <tr><td><code>UpdatePermissionRequest</code></td><td><code>PermissionId</code>, <code>Description?</code>, <code>PermissionType?</code>, <code>UrlList[]</code>, <code>DataSets[]</code></td><td>Cập nhật permission.</td></tr>
+              <tr><td><code>DeletePermissionRequest</code></td><td><code>id:int</code></td><td>Xóa permission.</td></tr>
+              <tr><td><code>PermissionListRequest</code></td><td><code>page</code>, <code>page_size</code>, <code>Code?</code>, <code>PermissionType?</code></td><td>Danh sách permission.</td></tr>
+              <tr><td><code>DataPermissionListRequest</code></td><td><code>page</code>, <code>page_size</code>, <code>Code?</code></td><td>Danh sách data permission.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>set.py</span><span>Set and dataset catalog contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>SetListRequest</code></td><td><code>SetName?</code>, <code>Services?</code>, <code>SetCode?</code></td><td>Filter set list.</td></tr>
+              <tr><td><code>AddSetRequest</code></td><td><code>SetName</code>, <code>Services</code>, <code>SetCode</code></td><td>Tạo set.</td></tr>
+              <tr><td><code>UpdateSetRequest</code></td><td><code>SetId</code>, <code>SetName?</code>, <code>Services?</code>, <code>SetCode?</code></td><td>Cập nhật set.</td></tr>
+              <tr><td><code>DeleteSetRequest</code></td><td><code>SetId?</code>, <code>id?</code></td><td>Xóa set.</td></tr>
+              <tr><td><code>DatasetBySetRequest</code></td><td><code>SetId:int</code></td><td>Lấy dataset của set.</td></tr>
+              <tr><td><code>UpdateDatasetBySetRequest</code></td><td><code>SetId:int</code>, <code>Data:list[dict]</code></td><td>Cập nhật danh sách dataset trong set.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>access_request.py</span><span>Approval workflow contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>AccessRequestCreate</code></td><td><code>Type?</code>, <code>Roles[]?</code>, <code>DataPermissions[]?</code>, <code>Reason?</code>, <code>TtlHours?</code></td><td>Tạo hoặc update request xin quyền.</td></tr>
+              <tr><td><code>AccessRequestApprove</code></td><td><code>Note?</code></td><td>Duyệt request.</td></tr>
+              <tr><td><code>AccessRequestReject</code></td><td><code>Note?</code>, <code>Reason?</code></td><td>Từ chối request.</td></tr>
+              <tr><td><code>AccessRequestListQuery</code></td><td><code>status?</code>, <code>type?</code>, <code>requester?</code>, <code>created_from?</code>, <code>created_to?</code>, <code>page</code>, <code>page_size</code></td><td>Filter danh sách request.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>mfa.py</span><span>TOTP contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>EnrollTOTPRequest</code></td><td><code>UserId?</code></td><td>Bắt đầu enroll TOTP.</td></tr>
+              <tr><td><code>VerifyTOTPRequest</code></td><td><code>UserId?</code>, <code>Code:str</code></td><td>Xác minh TOTP hoặc login OTP.</td></tr>
+              <tr><td><code>DisableTOTPRequest</code></td><td><code>UserId?</code></td><td>Tắt MFA TOTP.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>url.py</span><span>URL and page access contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>URLByPermissionRequest</code></td><td><code>PermissionId:int</code></td><td>Lấy URL theo permission.</td></tr>
+              <tr><td><code>URLByPermissionListRequest</code></td><td><code>PermissionList:list[int | str]</code></td><td>Lấy nhiều URL theo list permission id hoặc code.</td></tr>
+              <tr><td><code>PageByUserRequest</code></td><td><code>UserId:int</code></td><td>Lấy page user truy cập được.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>common.py + response.py</span><span>Shared contracts</span></summary>
+        <div class="detail-body">
+          <table>
+            <thead><tr><th>Schema</th><th>Fields</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>Pagination</code></td><td><code>page</code>, <code>page_size</code></td><td>Base paging inputs.</td></tr>
+              <tr><td><code>PaginationMeta</code></td><td><code>page</code>, <code>page_size</code>, <code>total?</code>, <code>total_row?</code></td><td>Metadata trả về của danh sách.</td></tr>
+              <tr><td><code>ResponseEnvelope</code></td><td><code>status</code>, <code>message?</code>, <code>data?</code>, <code>meta?</code>, <code>actions?</code></td><td>Chuẩn bao ngoài cho gần như toàn bộ API.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="section surface" id="sources">
+      <div class="section-head">
+        <div class="section-title">
+          <div class="section-id">08 / Sources</div>
+          <h2>Internal Source References</h2>
+        </div>
+      </div>
+      <div class="source-list">
+        <span class="pill">uaa/models/entities.py</span>
+        <span class="pill">uaa/models/orm.py</span>
+        <span class="pill">uaa/schemas/auth.py</span>
+        <span class="pill">uaa/schemas/user.py</span>
+        <span class="pill">uaa/schemas/role.py</span>
+        <span class="pill">uaa/schemas/data.py</span>
+        <span class="pill">uaa/schemas/set.py</span>
+        <span class="pill">uaa/schemas/access_request.py</span>
+        <span class="pill">uaa/schemas/mfa.py</span>
+        <span class="pill">uaa/schemas/url.py</span>
+        <span class="pill">uaa/schemas/common.py</span>
+        <span class="pill">uaa/schemas/response.py</span>
+        <span class="pill">uaa/controllers/Authentication.py</span>
+        <span class="pill">uaa/controllers/User.py</span>
+        <span class="pill">uaa/controllers/Role.py</span>
+        <span class="pill">uaa/controllers/Data.py</span>
+        <span class="pill">uaa/controllers/Set.py</span>
+        <span class="pill">uaa/controllers/URL.py</span>
+        <span class="pill">uaa/controllers/AccessRequest.py</span>
+        <span class="pill">uaa/controllers/Mfa.py</span>
+        <span class="pill">uaa/static/swagger/openapi.yaml</span>
+      </div>
+      <p class="small muted">
+        Ghi chú: đây là tài liệu snapshot tĩnh. Khi model/schema thay đổi, nội dung HTML cần được cập nhật thủ công để tiếp tục khớp với codebase.
+      </p>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,37 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <title>Đánh giá SOLID cho dự án</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đánh giá dự án UAA (tổng hợp)</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 32px; line-height: 1.5; color: #222; }
-    h1 { margin-bottom: 0.2em; }
-    h2 { margin-top: 1.4em; }
-    .status { font-weight: bold; }
-    .ok { color: #0b7a0b; }
-    .risk { color: #d17a00; }
-    .fail { color: #c00; }
-    ul { margin-top: 0.4em; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 24px; color: #222; }
+    h1, h2, h3 { color: #1a2f5b; margin-top: 1.2em; }
+    h1 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: left; }
+    th { background: #f1f5fb; }
+    .note { margin-top: 12px; font-size: 0.95em; color: #444; }
+    blockquote { background: #f9faff; border-left: 4px solid #1a75d1; margin: 10px 0; padding: 10px 16px; }
     code { background: #f3f3f3; padding: 2px 4px; }
   </style>
 </head>
 <body>
-  <h2>Review tổng thể (Business logic / Code pattern / Architecture)</h2>
-  <p><strong>Business logic hiện tại</strong></p>
+  <h1>Đánh giá dự án UAA (tổng hợp)</h1>
+
+  <h2>1. Tóm tắt nhanh (Business logic / Architecture / Risk)</h2>
+  <h3>Business logic hiện tại</h3>
   <ul>
-    <li>Auth: login/register cấp JWT + lưu session; AccessRequest cho phép user tự gửi yêu cầu xin thêm role/data-permission (duyệt sau), không trực tiếp quản lý.Tạo/cập nhật user, gán role (ROLE-url/page) và data-permission trực tiếp qua API/console (hoặc approve AccessRequest).</li>
-    <li>Authorization: kiểm tra URL theo bảng url_permissions, cache RAM cục bộ.</li>
+    <li>Auth: login/register cấp JWT + lưu session; AccessRequest cho phép user tự gửi yêu cầu xin thêm role/data-permission (duyệt sau), không trực tiếp quản lý. Tạo/cập nhật user, gán role (ROLE-url/page) và data-permission trực tiếp qua API/console (hoặc approve AccessRequest).</li>
+    <li>Authorization: kiểm tra URL theo bảng <code>url_permissions</code>, cache RAM cục bộ.</li>
     <li>Data scope: mỗi user gắn một <code>data_permission_id</code> → join <code>data_permissions</code> → <code>sets</code>/<code>datasets</code>; build WHERE động (table/col/val) theo dịch vụ, hỗ trợ wildcard “*”; mặc định deny nếu không có scope khớp.</li>
-    <li>AccessRequest: duyệt chỉ áp dụng roles và data_permission; trường <code>set_ids</code> đã loại khỏi luồng duyệt (data scope đi theo data_permission).</li>
+    <li>AccessRequest: duyệt chỉ áp dụng roles và <code>data_permission</code>; trường <code>set_ids</code> đã loại khỏi luồng duyệt (data scope đi theo <code>data_permission</code>).</li>
   </ul>
-  <p><strong>Kiến trúc & pattern</strong></p>
+  <h3>Kiến trúc &amp; pattern</h3>
   <ul>
     <li>Layers: controllers → services → repositories (ORM), utils cho cache/audit/idempotency.</li>
     <li>ORM: hầu hết repo chuyển sang SQLAlchemy ORM; QueryBuilder dùng expression; không bật FK theo chủ đích.</li>
     <li>DI: services khởi tạo qua container; engine/session cấu hình qua container; vẫn còn một số cấu hình khác đọc Config trực tiếp.</li>
     <li>Caching: Redis cho permission list; authz cache nằm trong bộ nhớ process.</li>
   </ul>
-  <p><strong>Rủi ro / Tech debt</strong></p>
+  <h3>Rủi ro / Tech debt</h3>
   <ul>
     <li>Chưa có FK ở DB (chủ động); toàn vẹn dữ liệu phụ thuộc code và trình tự xoá.</li>
     <li>AuthZ cache không invalidate khi đổi role/permission; TTL mới xóa.</li>
@@ -39,13 +43,123 @@
     <li>Nhiều file xóa (person/department) đang ở trạng thái D trong git; cần dọn commit.</li>
     <li>Alembic baseline no-op: cần quyết định có bật FK/migration hay giữ hiện trạng.</li>
   </ul>
-  <p><strong>Hành động khuyến nghị</strong></p>
+  <h3>Hành động khuyến nghị</h3>
   <ul>
     <li>Dọn nốt <code>text()</code> còn lại, chuẩn hóa scope filter sang expression; bổ sung test cho QueryBuilder mới.</li>
     <li>Đưa Redis/DB/client vào container/factory để dễ mock; bổ sung test integration.</li>
     <li>AuthZ cache sang Redis (hoặc cache layer chung) và flush khi cập nhật role/permission.</li>
-    <li>Hoàn thiện logic set_ids trong AccessRequest hoặc bỏ field khỏi API.</li>
+    <li>Hoàn thiện logic <code>set_ids</code> trong AccessRequest hoặc bỏ field khỏi API.</li>
     <li>Chuẩn hóa logging/error code; thêm audit cho create/update/delete role/permission.</li>
   </ul>
+
+  <h2>2. Mục tiêu và phạm vi đánh giá</h2>
+  <p>Báo cáo này tổng hợp toàn diện các thành phần trong thư mục <code>uaa/</code> bao gồm: cấu hình, app entrypoint, controllers, services, repositories, models, schema và utils. Mục tiêu: xác định business flow, logic chính, tech stack, và đề xuất cải tiến.</p>
+
+  <h2>3. Cấu trúc chính dự án</h2>
+  <ul>
+    <li><code>uaa/main.py</code>: Flask app, session Redis, prefix middleware &amp; URL permission guard.</li>
+    <li><code>uaa/controllers</code>: Blueprint cho API (Authentication, User, Role, URL, Data, Set, AccessRequest).</li>
+    <li><code>uaa/services</code>: Lớp service xử lý business logic theo các domain.</li>
+    <li><code>uaa/repositories</code>: Repository pattern, truy vấn DB, interface protocols.</li>
+    <li><code>uaa/models</code>: SQLAlchemy entities, schema DB.</li>
+    <li><code>uaa/schemas</code>: Pydantic-like request/response schema, validate và enum.</li>
+    <li><code>uaa/utils</code>: data_scope, cache, http helpers, token extraction.</li>
+  </ul>
+
+  <h2>4. Flow auth &amp; authorization (cường quyền)</h2>
+  <ol>
+    <li><strong>Login/Register</strong> via <code>controllers/Authentication.py</code> gọi <code>services/AuthService</code> và <code>RegistrationService</code> để tạo JWT.</li>
+    <li><strong>Before request</strong> trong <code>main.py</code>: public endpoints skip, token validate, lấy <code>UserId</code>, gọi <code>AuthorizationService.has_url_access</code>.</li>
+    <li><strong>Exception special case</strong> với <code>/access_requests</code> cho phép owner tự thao tác.</li>
+    <li><strong>Session</strong>: lưu Flask session bảo trì version token + username.</li>
+  </ol>
+
+  <h2>5. Mô tả chi tiết từng component</h2>
+  <h3>5.1 Controllers</h3>
+  <ul>
+    <li><code>Authentication.py</code>: login/register/check_auth_ext.</li>
+    <li><code>User.py</code>: /users CRUD, /users/:id.</li>
+    <li><code>Role.py</code>: /roles, /roles/public, /roles/:id, /roles/:id/permissions.</li>
+    <li><code>URL.py</code>: /urls/permissions, /urls/pages.</li>
+    <li><code>Data.py</code>: /data permissions, /dataset/user.</li>
+    <li><code>Set.py</code>: /sets + dataset-by-set.</li>
+    <li><code>AccessRequest.py</code>: create/list/get/update/approve/reject/cancel.</li>
+  </ul>
+
+  <h3>5.2 Services</h3>
+  <table>
+    <thead><tr><th>Service</th><th>Chức năng chính</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>AuthService</td><td>Login + register + token</td><td>Gọi user_repo + password_service + access_request_service</td></tr>
+      <tr><td>RegistrationService</td><td>register</td><td>Tách riêng khỏi Auth nhưng trùng logic nhiều</td></tr>
+      <tr><td>AuthorizationService</td><td>Kiểm tra URL permission</td><td>In-memory cache TTL</td></tr>
+      <tr><td>AccessRequestService</td><td>Create/list/get/update</td><td>Workflow access request + data scope</td></tr>
+      <tr><td>AccessRequestApprovalService</td><td>approve/reject/cancel</td><td>Delegation tới apply_service</td></tr>
+      <tr><td>AccessRequestApplyService</td><td>Áp dụng mapping role/data permission</td><td>Single Responsibility</td></tr>
+      <tr><td>UserService</td><td>list/get/update user</td><td>Data scope filters + query builder</td></tr>
+      <tr><td>RoleService</td><td>role CRUD/query</td><td>Role-permission/user-role APIs</td></tr>
+      <tr><td>PermissionService</td><td>permission CRUD/list + cache</td><td>Redis + data scope</td></tr>
+      <tr><td>DataService</td><td>data permission API</td><td>Scope+cache, overlap PermissionService</td></tr>
+      <tr><td>SetService</td><td>set/dataset CRUD</td><td>Includes access guard</td></tr>
+      <tr><td>UrlPageService</td><td>URL/page lookup</td><td>Map id/code arrays</td></tr>
+      <tr><td>PasswordService</td><td>hash/verify password</td><td>bcrypt lazy import, fallback plaintext</td></tr>
+      <tr><td>session_service</td><td>Flask session helpers</td><td>set/get/is_session_user</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3 Repositories</h3>
+  <p>Pattern tương tự Active Record minimal: <code>session()</code> context, ORM query, raw SQL. Thực hiện CRUD cho entities chính.</p>
+
+  <h3>5.4 Models</h3>
+  <ul>
+    <li>Bảng người dùng: <code>users</code> với password hash, lock, <code>data_permission_id</code>.</li>
+    <li>Role/Permission liên kết qua <code>user_roles</code>, <code>role_permissions</code>.</li>
+    <li>URL, Page, Data Permission mapping.</li>
+    <li>Set/Dataset cho dữ liệu set-based.</li>
+    <li>AccessRequest + Item + Log để approve workflow.</li>
+  </ul>
+
+  <h3>5.5 Utils</h3>
+  <ul>
+    <li>Data scope filter: <code>utils/data_scope.py</code> (phân quyền hàng user/tenant).</li>
+    <li>Cache Redis wrapper: <code>utils/cache.py</code>.</li>
+    <li>HTTP helpers + body validation: <code>utils/http.py</code>.</li>
+    <li>Token parser từ header/cookie: <code>utils/token.py</code>.</li>
+  </ul>
+
+  <h2>6. Tech stack chi tiết</h2>
+  <ul>
+    <li>Python 3</li>
+    <li>Flask + flask_session</li>
+    <li>SQLAlchemy</li>
+    <li>PyJWT</li>
+    <li>Bcrypt (tùy môi trường)</li>
+    <li>Redis (session + cache)</li>
+    <li>PostgreSQL/MySQL qua SQLAlchemy</li>
+  </ul>
+
+  <h2>7. Điểm mạnh</h2>
+  <ol>
+    <li>Kiến trúc rõ: controller -&gt; service -&gt; repository -&gt; model.</li>
+    <li>Bảo mật RBAC với URL permission và request permission.</li>
+    <li>Cơ chế access request/approval built-in (workflow rõ ràng).</li>
+    <li>Đã có unit test (ưu tiên service + middleware).</li>
+  </ol>
+
+  <h2>8. Vấn đề &amp; cải tiến đề xuất</h2>
+  <ul>
+    <li>Duplicate logic <code>AuthService.register</code> &amp; <code>RegistrationService.register</code>.</li>
+    <li>Quản lý password: fallback plaintext; khuyến nghị chỉ dùng cho test.</li>
+    <li>Data scope dùng raw SQL đổi table name chưa validate.</li>
+    <li>Authorization cache là process-local; cần Redis khi scale multi-instance.</li>
+    <li>AccessRequest không dùng <code>requested_set_ids</code> ở đăng ký.</li>
+    <li>Broad <code>except</code> cần đổi thành exception rõ ràng + logging.</li>
+    <li>Token parsing &amp; authz ở middleware có thể tách ra authentication service riêng.</li>
+  </ul>
+
+  <h2>9. Kết luận</h2>
+  <p>Ứng dụng UAA đang hoạt động đầy đủ cho RBAC + user management + workflow request. Tuy nhiên cần gia cố chất lượng code (DRY, error handling) và an toàn (password, SQL injection, cache). Với nền tảng hiện tại, refactor nhanh vào 1-2 sprint có thể nâng cao mạnh.</p>
+
+  <p class="note">File tổng hợp từ <code>project-review</code> và <code>review</code> cũ, được cập nhật từ mã nguồn.</p>
 </body>
 </html>

@@ -2,45 +2,68 @@
 {% block content %}
 <!-- CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-<div class="container auth-grid">
-    <div>
-        <img src="/static/images/free.png" alt="Register" height="350">
-    </div>
+<div class="container panel-container--wide">
+    <div class="auth-layout">
+        <section class="auth-visual">
+            <div class="auth-stack">
+                <span class="auth-kicker">Request access</span>
+                <div>
+                    <h2>Tạo tài khoản mới với quyền cần thiết ngay từ đầu.</h2>
+                    <p>Điền thông tin, chọn role hoặc data permission cần thiết, và nêu rõ lý do yêu cầu.</p>
+                </div>
+                <div class="auth-points">
+                    <div class="auth-point">
+                        <strong>Least privilege</strong>
+                        <p>Chỉ yêu cầu đúng quyền cần dùng để việc phê duyệt rõ ràng hơn.</p>
+                    </div>
+                    <div class="auth-point">
+                        <strong>Traceable intent</strong>
+                        <p>Lý do và TTL giúp luồng access request dễ đối chiếu về sau.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-media">
+                <img src="/static/images/free.png" alt="Register access request illustration">
+            </div>
+        </section>
 
-    <div class="auth-form">
-        <h2>Đăng ký</h2>
-        <p>Tạo tài khoản mới để bắt đầu.</p>
-        <form method="post">
-            <div class="input-group">
-                <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
+        <section class="auth-form">
+            <div>
+                <h2>Đăng ký</h2>
+                <p>Tạo tài khoản mới để bắt đầu.</p>
             </div>
-            <div class="input-group">
-                <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
-            </div>
-            <div class="input-group">
-                <input type="text" placeholder="NameDisplay" name="namedisplay" value="{{request.form.namedisplay }}">
-            </div>
-            <div class="input-group">
-                <label for="RoleCodes">Chọn Role</label>
-                <select id="RoleCodes" name="role_codes" multiple style="width:100%"></select>
-            </div>
-            <div class="input-group">
-                <label for="DataPermissionCodes">Chọn Data Permission (TYPE=DATA)</label>
-                <select id="DataPermissionCodes" name="data_permission_codes" multiple style="width:100%"></select>
-            </div>
-            <div class="input-group">
-                <input type="number" placeholder="TTL giờ (tuỳ chọn)" name="ttl_hours" value="{{request.form.ttl_hours }}" min="1">
-            </div>
-            <div class="input-group">
-                <textarea placeholder="Lý do yêu cầu quyền" name="reason" rows="3">{{request.form.reason }}</textarea>
-            </div>
-            <div class="input-group">
-                <input type="submit" value="Register">
-            </div>
-        </form>
-        {% if error %}
-        <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
-        {% endif %}
+            <form method="post">
+                <div class="input-group">
+                    <input type="text" placeholder="Username" name="username" value="{{request.form.username }}">
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" name="password" value="{{request.form.password }}">
+                </div>
+                <div class="input-group">
+                    <input type="text" placeholder="NameDisplay" name="namedisplay" value="{{request.form.namedisplay }}">
+                </div>
+                <div class="input-group">
+                    <label for="RoleCodes">Chọn Role</label>
+                    <select id="RoleCodes" name="role_codes" multiple></select>
+                </div>
+                <div class="input-group">
+                    <label for="DataPermissionCodes">Chọn Data Permission (TYPE=DATA)</label>
+                    <select id="DataPermissionCodes" name="data_permission_codes" multiple></select>
+                </div>
+                <div class="input-group">
+                    <input type="number" placeholder="TTL giờ (tuỳ chọn)" name="ttl_hours" value="{{request.form.ttl_hours }}" min="1">
+                </div>
+                <div class="input-group">
+                    <textarea placeholder="Lý do yêu cầu quyền" name="reason" rows="3">{{request.form.reason }}</textarea>
+                </div>
+                <div class="input-group">
+                    <input type="submit" value="Register">
+                </div>
+            </form>
+            {% if error %}
+            <p class="auth-error"><strong>Error:</strong> {{ error }}</p>
+            {% endif %}
+        </section>
     </div>
 </div>
 <script>

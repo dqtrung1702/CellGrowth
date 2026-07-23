@@ -1,15 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width: 900px;">
-  <h1>Request #{{ req.id }}</h1>
-  <div class="card" style="padding:12px; margin-bottom:12px;">
-    <p><strong>Requester:</strong> {{ req.requester_username or req.requester_id }}</p>
-    <p><strong>Type:</strong> {{ req.request_type }} | <strong>Status:</strong> {{ req.status }}</p>
-    <p><strong>Reason:</strong> {{ req.reason }}</p>
-    <p><strong>TTL (hours):</strong> {{ req.ttl_hours or 'N/A' }}</p>
-    <p><strong>Created:</strong> {{ req.created_at }} | <strong>Updated:</strong> {{ req.updated_at }}</p>
+<div class="container panel-container--wide page-shell">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Approval workflow</p>
+      <h2 class="page-title">Request #{{ req.id }}</h2>
+      <p class="page-subtitle">Xem lại yêu cầu truy cập và quyết định approve hoặc reject từ cùng một màn hình.</p>
+    </div>
   </div>
+  <div class="surface-card">
+    <div class="summary-grid">
+      <div class="summary-item">
+        <strong>Requester</strong>
+        <span>{{ req.requester_username or req.requester_id }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Status</strong>
+        <span class="status-pill status-pill--{{ (req.status or 'submitted')|lower }}">{{ req.status }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Type</strong>
+        <span>{{ req.request_type }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>TTL (hours)</strong>
+        <span>{{ req.ttl_hours or 'N/A' }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Created</strong>
+        <span>{{ req.created_at }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Updated</strong>
+        <span>{{ req.updated_at }}</span>
+      </div>
+    </div>
+    <div class="auth-note">
+      <strong>Reason</strong>
+      <p>{{ req.reason }}</p>
+    </div>
     <h3>Items</h3>
+    <div class="table-wrapper">
     <table class="table">
       <thead>
         <tr><th>Role</th><th>Data Permission</th><th>Note</th></tr>
@@ -26,29 +57,35 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
-  <h3>Action (Approve/Reject)</h3>
-  <form method="post" style="display:flex; gap:8px; align-items:flex-start;">
-    <textarea name="note" placeholder="Ghi chú" rows="2" class="form-control" style="max-width:300px;"></textarea>
-    <button name="action" value="approve" class="btn btn-success" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Approve</button>
-    <button name="action" value="reject" class="btn btn-danger" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Reject</button>
-  </form>
+    <h3>Action (Approve/Reject)</h3>
+    <form method="post" class="form-card">
+      <textarea name="note" placeholder="Ghi chú" rows="2" class="form-control"></textarea>
+      <div class="action-row">
+        <button name="action" value="approve" class="btn btn-success" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Approve</button>
+        <button name="action" value="reject" class="btn btn-danger" {% if req.status != 'SUBMITTED' %}disabled{% endif %}>Reject</button>
+      </div>
+    </form>
 
-  <h3 style="margin-top:16px;">Logs</h3>
-  <table class="table">
-    <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Note</th></tr></thead>
-    <tbody>
-      {% for lg in req.Logs %}
-      <tr>
-        <td class="table__content">{{ lg.created_at }}</td>
-        <td class="table__content">{{ lg.actor_username or lg.actor_id }}</td>
-        <td class="table__content">{{ lg.action }}</td>
-        <td class="table__content">{{ lg.note }}</td>
-      </tr>
-      {% else %}
-      <tr><td class="table__content" colspan="4">No logs</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <h3>Logs</h3>
+    <div class="table-wrapper">
+    <table class="table">
+      <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Note</th></tr></thead>
+      <tbody>
+        {% for lg in req.Logs %}
+        <tr>
+          <td class="table__content">{{ lg.created_at }}</td>
+          <td class="table__content">{{ lg.actor_username or lg.actor_id }}</td>
+          <td class="table__content">{{ lg.action }}</td>
+          <td class="table__content">{{ lg.note }}</td>
+        </tr>
+        {% else %}
+        <tr><td class="table__content" colspan="4">No logs</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
